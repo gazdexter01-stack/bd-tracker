@@ -390,7 +390,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <div id="log-entries" style="max-height:220px;overflow-y:auto;margin-bottom:12px"></div>
       <div class="flabel" style="margin-bottom:5px">Add touchpoint</div>
       <div class="log-add">
-        <select id="log-type"><option>Called</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Met in person</option></select>
+        <select id="log-type"><option>Called</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Video call</option><option>Met in person</option></select>
         <input id="log-note" placeholder="Optional note">
         <button class="btn btn-primary btn-sm" onclick="addLogEntry()">Add</button>
       </div>
@@ -922,7 +922,7 @@ async function addLogEntry(){
   const noLastContactUpdate=['Voicemail','LinkedIn connection request'];
 
   // Update contact in memory immediately
-  if(type==='Called'){const existingCallback=c.callbackDate||'';if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}}
+  if(type==='Called'||type==='Video call'){const existingCallback=c.callbackDate||'';if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}}
   else if(type==='Email / InMail'||type==='LinkedIn message'){c.callbackDate=oneWeekStr;}
   if(!noLastContactUpdate.includes(type)){c.lastContactDate=now.toISOString().slice(0,10);}
   c.lastTouchType=type;
