@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCC Pharma BD Tracker</title>
+<!--
+=========================================================
+  vantEdge BD Tracker
+  © Gary Dexter 2026 - vantEdge
+  All rights reserved.
+
+  Licensed for single user use only.
+  Redistribution, resale, sharing or republishing
+  of this code in whole or in part is strictly prohibited.
+
+  Licenced to: [BUYER NAME]
+  Licence issued: [DATE]
+  Contact: gary@thevantedge.co
+=========================================================
+-->
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0efec;
+  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --blue-bg:#e6f1fb;--blue-text:#0c447c;
+  --green-bg:#eaf3de;--green-text:#27500a;
+  --amber-bg:#faeeda;--amber-text:#633806;
+  --gray-bg:#f1efe8;--gray-text:#444441;
+  --red-bg:#fcebeb;--red-text:#791f1f;
+  --dot-green:#639922;--dot-amber:#BA7517;--dot-red:#E24B4A;
+  --tl-green:#3b6d11;--tl-amber:#BA7517;--tl-red:#a32d2d;
+  --orange:#E8620A;--orange-light:#fdf0e8;--orange-dark:#c4520a;
+  --radius:8px;--radius-lg:12px;
+}
+
+@media (prefers-color-scheme:dark) {
+  :root {
+    --bg:#1a1a1a;--bg2:#222222;--bg3:#141414;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+    --text:#e8e8e8;--text2:#aaa;--text3:#666;
+    --blue-bg:#0d2a45;--blue-text:#7ab8f5;
+    --green-bg:#0d2a14;--green-text:#6fcf7a;
+    --amber-bg:#2a1a05;--amber-text:#f0a854;
+    --gray-bg:#242424;--gray-text:#999;
+    --red-bg:#2a0d0d;--red-text:#f47a7a;
+    --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
+    --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
+    --orange-light:#2a1505;
+  }
+}
+
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
+
+/* PIN */
+#pin-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.pin-box{background:var(--bg);border-radius:var(--radius-lg);padding:36px 32px;width:340px;border:0.5px solid var(--border2);text-align:center}
+.pin-logo{margin-bottom:20px}
+.pin-logo .vant{font-size:34px;font-weight:300;color:#9a9a9a;letter-spacing:-1px}
+.pin-logo .edge{font-size:34px;font-weight:500;color:var(--orange);letter-spacing:-1px}
+.pin-box p{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.pin-box input{width:100%;padding:10px 12px;font-size:22px;letter-spacing:0.3em;text-align:center;border:0.5px solid var(--border2);border-radius:var(--radius);margin-bottom:10px;background:var(--bg);color:var(--text);font-family:inherit}
+.pin-box input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
+.pin-btn{width:100%;padding:11px;font-size:14px;cursor:pointer;border:none;border-radius:var(--radius);background:var(--orange);color:#fff;font-family:inherit;font-weight:500}
+.pin-btn:hover{background:var(--orange-dark)}
+.pin-error{font-size:12px;color:var(--tl-red);margin-top:8px;display:none}
+
+/* Onboarding */
+#onboarding-screen{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;padding:20px}
+#onboarding-screen.open{display:flex}
+.onboarding-box{background:var(--bg);border-radius:var(--radius-lg);padding:32px;width:480px;max-width:100%;border:0.5px solid var(--border2)}
+.onboarding-box h2{font-size:18px;font-weight:500;margin-bottom:6px}
+.onboarding-box .sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.5}
+.onboard-steps{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+.onboard-step{display:flex;gap:14px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body .step-title{font-weight:500;font-size:14px;margin-bottom:3px}
+.step-body .step-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* App */
+#app{display:none;max-width:1200px;margin:0 auto;padding:16px}
+
+/* Nav */
+nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.nav-logo .vant{font-size:22px;font-weight:300;color:#9a9a9a;letter-spacing:-0.5px;line-height:1}
+.nav-logo .edge{font-size:22px;font-weight:500;color:var(--orange);letter-spacing:-0.5px;line-height:1}
+.nav-divider{width:1px;height:20px;background:var(--border2);margin:0 4px}
+.nav-btn{background:none;border:none;font-size:13px;font-weight:500;padding:6px 14px;border-radius:var(--radius);color:var(--text2);cursor:pointer}
+.nav-btn:hover{background:var(--bg2)}
+.nav-btn.active{background:var(--bg);border:0.5px solid var(--border2);color:var(--text)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{font-size:13px;cursor:pointer;border:0.5px solid var(--border2);border-radius:var(--radius);padding:6px 14px;background:var(--bg);color:var(--text);font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btn:disabled{opacity:0.5;cursor:default}
+.btn-primary{background:var(--orange-light);color:var(--orange);border-color:var(--orange)}
+.btn-primary:hover{opacity:0.85}
+.btn-danger{color:var(--tl-red);border-color:#f7c1c1}
+.btn-danger:hover{background:var(--red-bg)}
+.btn-sm{font-size:11px;padding:3px 9px}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--text2);padding:4px 7px;border-radius:var(--radius);font-size:15px}
+.btn-icon:hover{background:var(--bg2);color:var(--text)}
+
+.sync-status{font-size:11px;padding:3px 9px;border-radius:var(--radius);white-space:nowrap}
+.sync-ok{background:var(--green-bg);color:var(--green-text)}
+.sync-loading{background:var(--gray-bg);color:var(--gray-text)}
+.sync-err{background:var(--red-bg);color:var(--red-text)}
+
+.view{display:none}
+.view.active{display:block}
+
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 14px}
+.stat-card .slabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px}
+.stat-card .sval{font-size:22px;font-weight:500}
+
+.filter-bar{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;width:auto}
+.search-input{width:190px !important}
+
+.section-head{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text2);margin:18px 0 8px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+.section-overdue{color:var(--tl-red)}
+.section-today{color:var(--tl-amber)}
+
+.crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 125px;gap:10px;align-items:start}
+.crow.overdue{border-left:3px solid var(--dot-red);border-radius:0 var(--radius) var(--radius) 0}
+.crow.today-row{border-left:3px solid var(--dot-amber);border-radius:0 var(--radius) var(--radius) 0}
+.cname{font-weight:500;font-size:13px}
+.csub{font-size:12px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5}
+.cactions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+
+.task-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:10px;font-weight:600;padding:1px 6px;margin-left:4px;vertical-align:middle}
+
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.badge-t1{background:var(--blue-bg);color:var(--blue-text)}
+.badge-t2{background:var(--green-bg);color:var(--green-text)}
+.badge-t3{background:var(--amber-bg);color:var(--amber-text)}
+.badge-t4{background:var(--gray-bg);color:var(--gray-text)}
+.badge-cold{background:var(--gray-bg);color:var(--gray-text)}
+.badge-warm{background:var(--amber-bg);color:var(--amber-text)}
+.badge-active{background:var(--green-bg);color:var(--green-text)}
+
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.dot-g{background:var(--dot-green)}.dot-a{background:var(--dot-amber)}.dot-r{background:var(--dot-red)}
+.tl-g{color:var(--tl-green)}.tl-a{color:var(--tl-amber)}.tl-r{color:var(--tl-red)}
+
+/* Tooltip */
+.tooltip-wrap{position:relative;display:inline-block;margin-left:4px;vertical-align:middle}
+.tooltip-icon{width:14px;height:14px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text3);font-size:10px;cursor:default;display:inline-flex;align-items:center;justify-content:center;font-weight:500}
+.tooltip-text{display:none;position:absolute;left:20px;top:-4px;background:var(--text);color:var(--bg);font-size:11px;padding:6px 10px;border-radius:var(--radius);width:200px;line-height:1.5;z-index:100}
+.tooltip-wrap:hover .tooltip-text{display:block}
+
+.company-block{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden}
+.company-head{padding:10px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.csub-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px 125px;gap:10px;align-items:start}
+.csub-row:last-child{border-bottom:none}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;padding:24px 16px;justify-content:center;align-items:flex-start;overflow-y:auto}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius-lg);padding:22px;width:580px;max-width:100%;border:0.5px solid var(--border2);margin-top:auto;margin-bottom:auto}
+.modal h3{font-size:16px;font-weight:500;margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid .full{grid-column:1/-1}
+.fgroup{display:flex;flex-direction:column}
+.flabel{font-size:11px;color:var(--text2);margin-bottom:3px;display:flex;align-items:center;gap:2px}
+.fgroup input,.fgroup select,.fgroup textarea{font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);width:100%;font-family:inherit}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
+.mfooter{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.cal-note{font-size:11px;color:var(--text3);margin-top:8px}
+
+.tab-bar{display:flex;gap:0;margin-bottom:14px;border-bottom:0.5px solid var(--border)}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:500;padding:7px 14px;color:var(--text2);cursor:pointer;border-radius:0;margin-bottom:-1px}
+.tab-btn:hover{color:var(--text);background:none}
+.tab-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
+
+.log-entry{font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--border);color:var(--text2);display:flex;justify-content:space-between;gap:8px}
+.log-entry:last-child{border-bottom:none}
+.ltype{font-weight:500;color:var(--text);white-space:nowrap}
+.lts{color:var(--text3);white-space:nowrap;font-size:11px}
+.log-add{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.log-add select,.log-add input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+.log-add select{flex:1;min-width:140px}
+.log-add input{flex:2}
+
+.task-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.task-item:last-child{border-bottom:none}
+.task-item input[type=checkbox]{width:auto;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--orange)}
+.task-add{display:flex;gap:7px;margin-top:10px}
+.task-add input{flex:1;font-size:13px;padding:6px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+
+.history-entry{background:var(--bg2);border-radius:var(--radius);padding:9px 11px;margin-bottom:8px}
+.history-ts{font-size:10px;color:var(--text3);margin-bottom:4px}
+.history-note{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* Settings */
+.settings-section{margin-bottom:20px}
+.settings-section h4{font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em}
+.settings-row{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.settings-row label{font-size:12px;color:var(--text2)}
+.settings-row input{font-size:13px;padding:6px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+.settings-row input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
+
+.empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+
+.ve-footer{text-align:center;padding:20px 0 10px;font-size:11px;color:var(--text3)}
+.ve-footer .vant{color:#bbb;font-weight:300}
+.ve-footer .edge{color:var(--orange);font-weight:500}
+
+@media (max-width:700px){
+  #app{padding:10px}
+  nav{padding:8px 12px;gap:6px}
+  .nav-logo .vant,.nav-logo .edge{font-size:18px}
+  .nav-btn{font-size:12px;padding:5px 10px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:10px}
+  .stat-card .sval{font-size:18px}
+  .filter-bar{gap:5px}
+  .filter-bar select,.filter-bar input{font-size:11px;padding:4px 6px}
+  .search-input{width:100% !important}
+  .crow{grid-template-columns:1fr;gap:8px;padding:12px}
+  .crow>div:nth-child(4){display:flex;gap:16px;background:var(--bg2);border-radius:var(--radius);padding:8px 10px}
+  .crow>div:nth-child(4)>div{margin-bottom:0;flex:1}
+  .cactions{justify-content:flex-start;flex-wrap:wrap;gap:5px}
+  .cactions .btn{flex:1;min-width:0;text-align:center;padding:6px 4px;font-size:11px}
+  .notes-cell{max-height:60px}
+  .csub-row{grid-template-columns:1fr;gap:6px;padding:10px 12px}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid .full{grid-column:1}
+  .modal{padding:16px}
+  .tab-btn{font-size:12px;padding:6px 10px}
+  .log-add{flex-direction:column}
+  .log-add select,.log-add input{width:100%}
+  .task-add{flex-direction:column}
+  .mfooter{gap:6px}
+  .mfooter .btn{flex:1;text-align:center}
+  .section-head{font-size:10px;margin:14px 0 6px}
+  .settings-row{grid-template-columns:1fr;gap:4px}
+}
+</style>
+</head>
+<body>
+
+<div id="pin-screen">
+  <div class="pin-box">
+    <div class="pin-logo"><span style="font-size:34px;font-weight:500;color:var(--text)">BD Tracker</span></div>
+    <p>Enter your PIN to access your contacts.</p>
+    <input type="password" id="pin-input" maxlength="8" placeholder="• • • •" onkeydown="if(event.key==='Enter')checkPin()">
+    <button class="pin-btn" onclick="checkPin()">Unlock</button>
+    <div class="pin-error" id="pin-error">Incorrect PIN. Try again.</div>
+  </div>
+</div>
+
+<!-- Onboarding -->
+<div id="onboarding-screen">
+  <div class="onboarding-box">
+    <div style="margin-bottom:16px"><span style="font-size:24px;font-weight:500;color:var(--text)">BD Tracker</span></div>
+    <h2>Welcome back</h2>
+    <p class="sub">Your GCC pharma BD tracker. Everything you need to manage your pipeline.</p>
+    <div class="onboard-steps">
+      <div class="onboard-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Check your pipeline</div>
+          <div class="step-desc">Red rows are overdue, amber is this week. Work through those first before moving to green.</div>
+        </div>
+      </div>
+      <div class="onboard-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Log every touchpoint</div>
+          <div class="step-desc">After every call, WhatsApp or LinkedIn message click Log and record what happened.</div>
+        </div>
+      </div>
+      <div class="onboard-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Use the Tasks view</div>
+          <div class="step-desc">Check the Tasks tab in the nav for a full list of outstanding actions across all contacts.</div>
+        </div>
+      </div>
+    </div>
+    <button class="pin-btn" onclick="closeOnboarding()">Get started</button>
+  </div>
+</div>
+
+<div id="app">
+  <nav>
+    <div class="nav-logo" style="font-weight:500;font-size:15px;color:var(--text)">BD Tracker</div>
+    <div class="nav-divider"></div>
+    <button class="nav-btn active" onclick="showView('pipeline',this)">Pipeline</button>
+    <button class="nav-btn" onclick="showView('accounts',this)">Accounts</button>
+    <button class="nav-btn" onclick="showView('all',this)">All contacts</button>
+    <button class="nav-btn" onclick="showView('tasks',this)" id="nav-tasks-btn">Tasks</button>
+    <div class="nav-right">
+      <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add contact</button>
+      <button class="btn btn-sm" onclick="exportCSV()" title="Export contacts to CSV">&#8595; CSV</button>
+      <button class="btn btn-sm" onclick="loadContacts()" title="Refresh">&#8635;</button>
+      <span id="sync-status" class="sync-status sync-loading">Connecting...</span>
+    </div>
+  </nav>
+
+  <div id="v-pipeline" class="view active">
+    <div class="stat-grid" id="stats"></div>
+    <div class="filter-bar">
+      <input class="search-input" id="f-search" placeholder="Search name or company..." oninput="renderPipeline()">
+      <select id="f-status" onchange="renderPipeline()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
+      <select id="f-tier" onchange="renderPipeline()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      <select id="f-country" onchange="renderPipeline()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
+      <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option></select>
+      <button class="btn btn-sm" onclick="clearFilters()">Clear</button>
+    </div>
+    <div id="pipeline-content"></div>
+  </div>
+
+  <div id="v-accounts" class="view">
+    <div class="filter-bar">
+      <select id="fa-tier" onchange="renderAccounts()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      <select id="fa-country" onchange="renderAccounts()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
+      <input id="fa-search" placeholder="Search company or site..." style="width:200px" oninput="renderAccounts()">
+    </div>
+    <div id="accounts-content"></div>
+  </div>
+
+  <div id="v-all" class="view">
+    <div class="filter-bar">
+      <select id="fall-status" onchange="renderAll()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
+      <select id="fall-tier" onchange="renderAll()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      <select id="fall-country" onchange="renderAll()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
+    </div>
+    <div id="all-content"></div>
+  </div>
+
+  <div id="v-tasks" class="view">
+    <div id="global-tasks-content"></div>
+  </div>
+
+  <div class="ve-footer"><span style="color:var(--text3)">BD Tracker</span> &nbsp;·&nbsp; GCC Pharma</div>
+</div>
+
+<!-- Add/Edit modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3 id="modal-title">Add contact</h3>
+    <div class="form-grid">
+      <div class="fgroup"><div class="flabel">First name</div><input id="f-fname" placeholder="First name"></div>
+      <div class="fgroup"><div class="flabel">Last name</div><input id="f-lname" placeholder="Last name"></div>
+      <div class="fgroup"><div class="flabel">Job title</div><input id="f-jobtitle" placeholder="Job title"></div>
+      <div class="fgroup"><div class="flabel">Company</div><input id="f-company" placeholder="Company name"></div>
+      <div class="fgroup"><div class="flabel">Region / country</div><select id="f-ctry"><option value="">Select country</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select></div>
+      <div class="fgroup"><div class="flabel">Site / location</div><input id="f-site" placeholder="e.g. London office"></div>
+      <div class="fgroup"><div class="flabel">Email</div><input id="f-email" type="email" placeholder="email@company.com"></div>
+      <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00447..."></div>
+      <div class="fgroup">
+        <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text" id="tier-tooltip">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors. Singapore tiers shown separately.</span></span></div>
+        <select id="f-tier2"><option value="">Select tier</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      </div>
+      <div class="fgroup">
+        <div class="flabel">Status <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Cold: no prior relationship. Warm: engaged but no active need. Active: current live opportunity or conversation.</span></span></div>
+        <select id="f-stat"><option value="">Select status</option><option>Cold</option><option>Warm</option><option>Active</option></select>
+      </div>
+      <div class="fgroup"><div class="flabel">Next callback date</div><input id="f-callback" type="date"></div>
+      <div class="fgroup"><div class="flabel">Last contact date</div><input id="f-lastcontact" type="date"></div>
+      <div class="fgroup full"><div class="flabel">Notes</div><textarea id="f-notes" rows="3" placeholder="Short summary of where things stand..."></textarea></div>
+    </div>
+    <input type="hidden" id="f-calEventId">
+    <input type="hidden" id="f-notesHistory">
+    <input type="hidden" id="f-tasks">
+    <input type="hidden" id="f-lastTouchType">
+    <input type="hidden" id="f-lastTouchNote">
+    <div class="cal-note">Callback dates are automatically added to your Google Calendar as reminders.</div>
+    <div class="mfooter">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveContact()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Log / Tasks / History modal -->
+<div class="modal-bg" id="log-modal-bg">
+  <div class="modal" style="width:520px">
+    <h3 id="log-modal-title">Contact</h3>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-btn-log" onclick="switchTab('log',this)">Log</button>
+      <button class="tab-btn" id="tab-btn-tasks" onclick="switchTab('tasks',this)">Tasks</button>
+      <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history',this)">Notes history</button>
+    </div>
+    <div id="tab-log">
+      <div id="log-entries" style="max-height:220px;overflow-y:auto;margin-bottom:12px"></div>
+      <div class="flabel" style="margin-bottom:5px">Add touchpoint</div>
+      <div class="log-add">
+        <select id="log-type"><option>Called</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Met in person</option></select>
+        <input id="log-note" placeholder="Optional note">
+        <button class="btn btn-primary btn-sm" onclick="addLogEntry()">Add</button>
+      </div>
+    </div>
+    <div id="tab-tasks" style="display:none">
+      <div id="task-list" style="max-height:220px;overflow-y:auto;margin-bottom:4px"></div>
+      <div class="task-add">
+        <input id="task-input" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
+        <button class="btn btn-primary btn-sm" onclick="addTask()">Add</button>
+      </div>
+    </div>
+    <div id="tab-history" style="display:none">
+      <div id="history-content" style="max-height:280px;overflow-y:auto"></div>
+    </div>
+    <div class="mfooter"><button class="btn" onclick="closeLogModal()">Close</button></div>
+  </div>
+</div>
+
+<!-- Notes modal -->
+<div class="modal-bg" id="notes-modal-bg">
+  <div class="modal" style="width:440px">
+    <h3>Edit notes</h3>
+    <textarea id="notes-edit" rows="6" style="width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:8px;margin-bottom:12px;resize:vertical;font-family:inherit;background:var(--bg);color:var(--text)"></textarea>
+    <div class="mfooter">
+      <button class="btn" onclick="closeNotesModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNotes()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete modal -->
+<div class="modal-bg" id="del-modal-bg">
+  <div class="modal" style="width:360px">
+    <h3>Delete contact</h3>
+    <p id="del-msg" style="font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6"></p>
+    <div class="mfooter">
+      <button class="btn" onclick="closeDelModal()">Cancel</button>
+      <button class="btn btn-danger" id="del-confirm-btn" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-bg" id="settings-modal-bg">
+  <div class="modal" style="width:500px">
+    <h3>Settings</h3>
+    <div class="settings-section">
+      <h4>Tier labels</h4>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Rename the four tiers to match your market. These names will appear throughout the tracker.</p>
+      <div class="settings-row"><label>Tier 1</label><input id="s-t1" placeholder="e.g. Manufacturer"></div>
+      <div class="settings-row"><label>Tier 2</label><input id="s-t2" placeholder="e.g. Consultancy"></div>
+      <div class="settings-row"><label>Tier 3</label><input id="s-t3" placeholder="e.g. Vendor"></div>
+      <div class="settings-row"><label>Tier 4</label><input id="s-t4" placeholder="e.g. Other"></div>
+    </div>
+    <div class="settings-section">
+      <h4>Regions</h4>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Enter your regions or countries separated by commas.</p>
+      <div class="settings-row"><label>Regions</label><input id="s-regions" placeholder="UK, USA, Europe, Middle East"></div>
+    </div>
+    <div class="mfooter">
+      <button class="btn" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save settings</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =========================================================
+// CONFIGURATION - update before opening
+// =========================================================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBjgEm5aeJ_Pw_54vXytAr6i8VLAD2970K183jevLnxGv3TMYRTmYJya0VYYsUYWSp3Q/exec';
+const PIN_CODE   = '3005';
+// =========================================================
+
+const DEFAULT_TIERS = ['Tier 1','Tier 2','Tier 3','Tier 4'];
+const DEFAULT_REGIONS = ['UK','USA','Europe','Middle East','Asia Pacific','Other'];
+
+let contacts=[],editingId=null,logContactId=null,notesContactId=null,deletingId=null,currentView='pipeline',userPin='';
+let settings = { tiers: [...DEFAULT_TIERS], regions: [...DEFAULT_REGIONS] };
+
+function loadSettings() {
+  try { const s=localStorage.getItem('ve_settings');if(s)settings=JSON.parse(s); } catch(e) {}
+  rebuildDropdowns();
+}
+
+function saveSettingsToStorage() { localStorage.setItem('ve_settings',JSON.stringify(settings)); }
+
+function rebuildDropdowns() {
+  const tierSelects=['f-tier','fa-tier','fall-tier','f-tier2'];
+  tierSelects.forEach(id=>{const el=document.getElementById(id);if(!el)return;const isFilter=id!=='f-tier2';const cur=el.value;el.innerHTML=isFilter?'<option value="">All tiers</option>':'<option value="">Select tier</option>';settings.tiers.forEach(t=>{if(t.trim())el.innerHTML+='<option value="'+esc(t)+'">'+esc(t)+'</option>';});el.value=cur;});
+  const regionSelects=['f-country','fa-country','fall-country','f-ctry'];
+  regionSelects.forEach(id=>{const el=document.getElementById(id);if(!el)return;const isFilter=id!=='f-ctry';const cur=el.value;el.innerHTML=isFilter?'<option value="">All regions</option>':'<option value="">Select region</option>';settings.regions.forEach(r=>{if(r.trim())el.innerHTML+='<option value="'+esc(r)+'">'+esc(r)+'</option>';});el.value=cur;});
+}
+
+function openSettings() {
+  document.getElementById('s-t1').value=settings.tiers[0]||'';
+  document.getElementById('s-t2').value=settings.tiers[1]||'';
+  document.getElementById('s-t3').value=settings.tiers[2]||'';
+  document.getElementById('s-t4').value=settings.tiers[3]||'';
+  document.getElementById('s-regions').value=settings.regions.join(', ');
+  document.getElementById('settings-modal-bg').classList.add('open');
+}
+
+function saveSettings() {
+  settings.tiers=[document.getElementById('s-t1').value.trim()||'Tier 1',document.getElementById('s-t2').value.trim()||'Tier 2',document.getElementById('s-t3').value.trim()||'Tier 3',document.getElementById('s-t4').value.trim()||'Tier 4'];
+  settings.regions=document.getElementById('s-regions').value.split(',').map(r=>r.trim()).filter(Boolean);
+  if(!settings.regions.length)settings.regions=[...DEFAULT_REGIONS];
+  saveSettingsToStorage();rebuildDropdowns();closeSettings();renderCurrent();
+}
+
+function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
+
+// PIN
+function checkPin() {
+  const val=document.getElementById('pin-input').value.trim();
+  if(val===PIN_CODE){
+    userPin=val;localStorage.setItem('bd_pin',val);
+    document.getElementById('pin-screen').style.display='none';
+    const firstTime=!localStorage.getItem('bd_seen_onboarding');
+    if(firstTime){document.getElementById('onboarding-screen').classList.add('open');}
+    else{document.getElementById('app').style.display='block';loadContacts();}
+  } else {
+    document.getElementById('pin-error').style.display='block';
+    document.getElementById('pin-input').value='';
+  }
+}
+
+function closeOnboarding() {
+  localStorage.setItem('bd_seen_onboarding','1');
+  document.getElementById('onboarding-screen').classList.remove('open');
+  document.getElementById('app').style.display='block';
+  loadContacts();
+}
+
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('bd_pin');
+  if(saved===PIN_CODE){userPin=saved;document.getElementById('pin-screen').style.display='none';document.getElementById('app').style.display='block';loadContacts();}
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'&&document.activeElement.tagName!=='SELECT'){
+    if(document.getElementById('app').style.display!=='none')openAdd();
+  }
+});
+
+// JSONP API
+let cbId=0;
+function api(params) {
+  return new Promise((resolve,reject)=>{
+    const cbName='__bdcb'+(++cbId);
+    params.pin=userPin;params.callback=cbName;
+    let settled=false;
+    window[cbName]=(data)=>{settled=true;delete window[cbName];try{document.head.removeChild(script);}catch(e){}if(data.success)resolve(data.data);else reject(new Error(data.error||'API error'));};
+    const qs=Object.entries(params).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+    const script=document.createElement('script');
+    script.src=SCRIPT_URL+'?'+qs;
+    script.onerror=()=>{if(!settled){settled=true;delete window[cbName];reject(new Error('Network error'));}};
+    setTimeout(()=>{if(!settled){settled=true;delete window[cbName];try{document.head.removeChild(script);}catch(e){}reject(new Error('Timeout'));}},20000);
+    document.head.appendChild(script);
+  });
+}
+
+function setSyncStatus(state,msg){const el=document.getElementById('sync-status');el.className='sync-status '+(state==='ok'?'sync-ok':state==='err'?'sync-err':'sync-loading');el.textContent=msg;}
+
+async function loadContacts(){
+  setSyncStatus('loading','Loading...');
+  try{contacts=await api({action:'getAll'});setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));updateTaskNavBadge();renderCurrent();}
+  catch(e){setSyncStatus('err','Failed: '+e.message);}
+}
+
+function exportCSV() {
+  if(!contacts.length){alert('No contacts to export.');return;}
+  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','Tier','Status','Next callback','Last contact','Notes'];
+  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.tier,c.status,c.callbackDate,c.lastContactDate,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
+  const csv=[headers.map(h=>'"'+h+'"').join(','),...rows.map(r=>r.join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='vantEdge-contacts-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Date helpers
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function daysDiff(ds){
+  if(!ds||ds==='')return null;
+  try{const clean=String(ds).trim();let d=clean.match(/^\d{4}-\d{2}-\d{2}$/)?new Date(clean+'T00:00:00'):new Date(clean);if(isNaN(d.getTime()))return null;d.setHours(0,0,0,0);const t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}catch(e){return null;}
+}
+function fmtDate(s){
+  if(!s||s==='')return'';
+  try{const clean=String(s).trim();let d=clean.match(/^\d{4}-\d{2}-\d{2}$/)?new Date(parseInt(clean.split('-')[0]),parseInt(clean.split('-')[1])-1,parseInt(clean.split('-')[2])):new Date(clean);if(isNaN(d.getTime()))return'';return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];}catch(e){return'';}
+}
+function cbTraffic(ds){
+  if(!ds)return{dot:'',label:'No date set',cls:'',urg:'none'};
+  const d=daysDiff(ds);if(d===null)return{dot:'',label:'No date set',cls:'',urg:'none'};
+  const fmt=fmtDate(ds);
+  if(d<0)return{dot:'dot-r',label:'Overdue ('+fmt+')',cls:'tl-r',urg:'overdue'};
+  if(d===0)return{dot:'dot-a',label:'Today',cls:'tl-a',urg:'today'};
+  if(d<=7)return{dot:'dot-a',label:fmt,cls:'tl-a',urg:'upcoming'};
+  return{dot:'dot-g',label:fmt,cls:'tl-g',urg:'upcoming'};
+}
+function lcTraffic(ds){
+  if(!ds)return{dot:'dot-r',label:'Never',cls:'tl-r'};
+  const d=daysDiff(ds);if(d===null)return{dot:'dot-r',label:'Never',cls:'tl-r'};
+  const ago=Math.abs(d);const fmt=fmtDate(ds);
+  if(ago<=14)return{dot:'dot-g',label:fmt,cls:'tl-g'};
+  if(ago<=28)return{dot:'dot-a',label:fmt,cls:'tl-a'};
+  return{dot:'dot-r',label:fmt,cls:'tl-r'};
+}
+function urg(c){return cbTraffic(c.callbackDate).urg;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function tierBadge(t){
+  if(!t)return'';
+  const cls=t.startsWith('T1')?'badge-t1':t.startsWith('T2')?'badge-t2':'badge-t3';
+  const s=t.startsWith('T1')?'T1':t.startsWith('T2')?'T2':'T3';
+  const region=(t.includes('MNC')||t.includes('CDMO')||t.includes('Engineering Consultancy'))?' (SG)':'';
+  return'<span class="badge '+cls+'">'+s+region+'</span>';
+}
+function statusBadge(s){
+  if(!s)return'';
+  const cls=s==='Cold'?'badge-cold':s==='Warm'?'badge-warm':'badge-active';
+  return'<span class="badge '+cls+'">'+s+'</span>';
+}
+function touchBadge(type){
+  if(!type)return'';
+  const map={'Called':'var(--green-bg),var(--tl-green)','Email / InMail':'var(--amber-bg),var(--amber-text)','LinkedIn message':'var(--blue-bg),var(--blue-text)','WhatsApp':'var(--green-bg),var(--tl-green)','Voicemail':'var(--gray-bg),var(--gray-text)','LinkedIn connection request':'var(--blue-bg),var(--blue-text)','Met in person':'var(--green-bg),var(--tl-green)'};
+  const cols=(map[type]||'var(--gray-bg),var(--gray-text)').split(',');
+  return'<span style="font-size:11px;padding:2px 6px;border-radius:6px;font-weight:500;background:'+cols[0]+';color:'+cols[1]+'">'+esc(type)+'</span>';
+}
+function getOpenTasks(c){if(!c.tasks)return[];try{return JSON.parse(c.tasks).filter(t=>!t.done);}catch(e){return[];}}
+function taskBadgeHTML(c){const open=getOpenTasks(c);return open.length?'<span class="task-badge">'+open.length+'</span>':'';}
+
+function filtered(status,tier,country,urgency,search){
+  return contacts.filter(c=>{
+    if(status&&c.status!==status)return false;
+    if(tier&&c.tier!==tier)return false;
+    if(country&&c.country!==country)return false;
+    if(urgency&&urg(c)!==urgency)return false;
+    if(search){const s=search.toLowerCase();if(!(c.fname+' '+c.lname).toLowerCase().includes(s)&&!(c.company||'').toLowerCase().includes(s))return false;}
+    return true;
+  });
+}
+
+// CHANGED: company name is now a clickable orange link to accounts view
+function rowHTML(c){
+  const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate),u=urg(c);
+  const cls=u==='overdue'?'crow overdue':u==='today'?'crow today-row':'crow';
+  return'<div class="'+cls+'">'+
+    '<div><div class="cname">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">'+tierBadge(c.tier)+' '+statusBadge(c.status)+'</div></div>'+
+    '<div><div style="font-weight:500;font-size:13px;cursor:pointer;color:var(--orange)" onclick="goToAccount(\''+esc(c.company||'')+'\')">'+esc(c.company||'')+'</div><div class="csub">'+esc(c.site||'')+'</div><div class="csub">'+esc(c.country||'')+'</div>'+(c.email?'<div class="csub" style="margin-top:2px">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
+    '<div><div class="notes-cell">'+(c.notes?esc(c.notes):'<span style="color:var(--text3)">No notes</span>')+'</div></div>'+
+    '<div style="font-size:12px"><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Next callback</div><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+(c.lastTouchType?'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:2px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Last touchpoint</div>'+touchBadge(c.lastTouchType)+(c.lastTouchNote?'<div style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4">'+esc(c.lastTouchNote)+'</div>':'')+'</div>':'')+'</div>'+
+    '<div class="cactions"><button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button><button class="btn btn-sm" onclick="openLog(\''+c.id+'\')">Log</button><button class="btn btn-sm" onclick="openNotes(\''+c.id+'\')">Notes</button><button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button><button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button></div>'+
+  '</div>';
+}
+
+// NEW: jump to accounts view filtered by company
+function goToAccount(company){
+  document.getElementById('fa-search').value=company;
+  document.getElementById('fa-tier').value='';
+  document.getElementById('fa-country').value='';
+  const btn=document.querySelector('.nav-btn[onclick*="accounts"]');
+  showView('accounts',btn);
+}
+
+function renderStats(list){
+  const ov=list.filter(c=>urg(c)==='overdue').length,tod=list.filter(c=>urg(c)==='today').length;
+  const wk=list.filter(c=>{const d=daysDiff(c.callbackDate);return d!==null&&d>=0&&d<=7;}).length;
+  document.getElementById('stats').innerHTML=
+    '<div class="stat-card"><div class="slabel">Total</div><div class="sval">'+list.length+'</div></div>'+
+    '<div class="stat-card"><div class="slabel">Overdue</div><div class="sval" style="color:var(--tl-red)">'+ov+'</div></div>'+
+    '<div class="stat-card"><div class="slabel">Today</div><div class="sval" style="color:var(--tl-amber)">'+tod+'</div></div>'+
+    '<div class="stat-card"><div class="slabel">This week</div><div class="sval">'+wk+'</div></div>';
+}
+
+function renderPipeline(){
+  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value);
+  renderStats(list);
+  const ov=list.filter(c=>urg(c)==='overdue').sort((a,b)=>{const da=new Date(a.callbackDate||'9999-12-31');const db=new Date(b.callbackDate||'9999-12-31');return da-db;});
+  const tod=list.filter(c=>urg(c)==='today');
+  const up=list.filter(c=>urg(c)==='upcoming').sort((a,b)=>{const da=new Date(a.callbackDate||'9999-12-31');const db=new Date(b.callbackDate||'9999-12-31');return da-db;});
+  const no=list.filter(c=>urg(c)==='none');
+
+  if(!window.pipelineSections)window.pipelineSections={overdue:true,today:true,upcoming:true,none:false};
+
+  function section(key,label,items,headCls){
+    if(!items.length)return'';
+    const open=window.pipelineSections[key];
+    let html='<div class="section-head '+(headCls||'')+'" onclick="toggleSection(\''+key+'\')" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;">'+
+      '<span>'+label+' ('+items.length+')</span>'+
+      '<span style="font-size:12px;color:var(--text3);">'+(open?'▲':'▼')+'</span>'+
+    '</div>';
+    if(open)items.forEach(c=>html+=rowHTML(c));
+    return html;
+  }
+
+  let html='';
+  html+=section('overdue','Overdue',ov,'section-overdue');
+  html+=section('today','Today',tod,'section-today');
+  html+=section('upcoming','Upcoming',up,'');
+  html+=section('none','No callback set',no,'');
+  if(!list.length)html='<div class="empty">No contacts yet. Press <strong>N</strong> or click "+ Add contact" to get started.</div>';
+  document.getElementById('pipeline-content').innerHTML=html;
+}
+
+function toggleSection(key){
+  if(!window.pipelineSections)window.pipelineSections={overdue:true,today:true,upcoming:true,none:false};
+  window.pipelineSections[key]=!window.pipelineSections[key];
+  renderPipeline();
+}
+
+function renderAccounts(){
+  const t=document.getElementById('fa-tier').value,co=document.getElementById('fa-country').value;
+  const search=(document.getElementById('fa-search').value||'').toLowerCase();
+  const list=contacts.filter(c=>(!t||c.tier===t)&&(!co||c.country===co)&&(!search||(c.company||'').toLowerCase().includes(search)||(c.site||'').toLowerCase().includes(search)));
+  const companies={};
+  list.forEach(c=>{const k=c.company||'Unknown';if(!companies[k])companies[k]={tier:c.tier,contacts:[]};companies[k].contacts.push(c);});
+  let html='';
+  Object.entries(companies).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name,data])=>{
+    const sites=[...new Set(data.contacts.map(c=>c.site).filter(Boolean))];
+    html+='<div class="company-block"><div class="company-head"><span style="font-weight:500;font-size:15px">'+esc(name)+'</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+tierBadge(data.tier)+'<span style="font-size:12px;color:var(--text2)">'+data.contacts.length+' contact'+(data.contacts.length>1?'s':'')+'</span>'+(sites.length?'<span style="font-size:12px;color:var(--text3)">'+sites.map(esc).join(' / ')+'</span>':'')+'</div></div>';
+    data.contacts.forEach(c=>{
+      const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate);
+      html+='<div class="csub-row">'+
+        '<div><div class="cname" style="font-size:13px">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:3px">'+statusBadge(c.status)+'</div></div>'+
+        '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
+        '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5">'+esc(c.notes||'')+'</div>'+
+        '<div style="font-size:12px"><div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div></div>'+
+        '<div class="cactions"><button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button><button class="btn btn-sm" onclick="openLog(\''+c.id+'\')">Log</button><button class="btn btn-sm" onclick="openNotes(\''+c.id+'\')">Notes</button><button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button><button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button></div>'+
+      '</div>';
+    });
+    html+='</div>';
+  });
+  if(!html)html='<div class="empty">No contacts match.</div>';
+  document.getElementById('accounts-content').innerHTML=html;
+}
+
+function renderAll(){
+  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','').sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
+  document.getElementById('all-content').innerHTML=list.map(c=>rowHTML(c)).join('')||'<div class="empty">No contacts match.</div>';
+}
+
+function renderCurrent(){if(currentView==='pipeline')renderPipeline();else if(currentView==='accounts')renderAccounts();else if(currentView==='tasks')renderGlobalTasks();else renderAll();}
+
+function updateTaskNavBadge(){
+  const total=contacts.reduce((sum,c)=>sum+getOpenTasks(c).length,0);
+  const btn=document.getElementById('nav-tasks-btn');
+  if(btn)btn.textContent=total?'Tasks ('+total+')':'Tasks';
+}
+
+function renderGlobalTasks(){
+  const el=document.getElementById('global-tasks-content');
+  const allTasks=[];
+  contacts.forEach(c=>{
+    let tasks=[];
+    if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+    tasks.forEach((t,idx)=>{
+      if(!t.done)allTasks.push({contactId:c.id,taskIdx:idx,text:t.text,fname:c.fname,lname:c.lname,company:c.company||'',createdAt:t.createdAt||0});
+    });
+  });
+  allTasks.sort((a,b)=>b.createdAt-a.createdAt);
+  if(!allTasks.length){el.innerHTML='<div class="empty">No outstanding tasks. Good work.</div>';return;}
+  el.innerHTML='<div style="margin-bottom:12px;font-size:12px;color:var(--text3)">'+allTasks.length+' outstanding task'+(allTasks.length!==1?'s':'')+' across '+[...new Set(allTasks.map(t=>t.contactId))].length+' contact'+(([...new Set(allTasks.map(t=>t.contactId))].length!==1)?'s':'')+'</div>'+
+  allTasks.map(t=>'<div class="crow" style="grid-template-columns:auto 1fr auto;gap:12px;align-items:center" id="gtask-'+t.contactId+'-'+t.taskIdx+'">'+
+    '<input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:var(--orange);flex-shrink:0" onchange="completeGlobalTask(\''+t.contactId+'\','+t.taskIdx+',this)">'+
+    '<div><div style="font-size:13px;color:var(--text)">'+esc(t.text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(t.fname)+' '+esc(t.lname)+(t.company?' &middot; '+esc(t.company):'')+'</div></div>'+
+    '<button class="btn btn-sm" onclick="openLog(\''+t.contactId+'\')" style="white-space:nowrap">View contact</button>'+
+  '</div>').join('');
+}
+
+async function completeGlobalTask(contactId,taskIdx,checkbox){
+  const c=contacts.find(x=>x.id===contactId);if(!c)return;
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  let openCount=-1;
+  const targetIdx=tasks.findIndex((t,i)=>{if(!t.done)openCount++;return openCount===taskIdx;});
+  if(targetIdx<0){renderGlobalTasks();return;}
+  tasks[targetIdx].done=true;
+  c.tasks=JSON.stringify(tasks);
+  const row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
+  if(row){row.style.opacity='0.3';row.style.pointerEvents='none';}
+  try{
+    await api({action:'save',contact:JSON.stringify(c)});
+    updateTaskNavBadge();
+    setTimeout(()=>renderGlobalTasks(),300);
+  }catch(e){setSyncStatus('err','Save failed');if(row){row.style.opacity='1';row.style.pointerEvents='';}checkbox.checked=false;}
+}
+
+function showView(v,btn){
+  currentView=v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('v-'+v).classList.add('active');
+  btn.classList.add('active');
+  renderCurrent();
+}
+
+function clearFilters(){['f-status','f-tier','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
+
+function openAdd(){
+  editingId=null;
+  document.getElementById('modal-title').textContent='Add contact';
+  ['fname','lname','jobtitle','company','site','email','mobile','notes'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['ctry','tier2','stat'].forEach(f=>document.getElementById('f-'+f).value='');
+  document.getElementById('f-callback').value='';
+  document.getElementById('f-lastcontact').value='';
+  document.getElementById('f-calEventId').value='';
+  document.getElementById('f-notesHistory').value='';
+  document.getElementById('f-tasks').value='';
+  document.getElementById('f-lastTouchType').value='';
+  document.getElementById('f-lastTouchNote').value='';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openEdit(id){
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  editingId=id;
+  document.getElementById('modal-title').textContent='Edit contact';
+  document.getElementById('f-fname').value=c.fname||'';
+  document.getElementById('f-lname').value=c.lname||'';
+  document.getElementById('f-jobtitle').value=c.jobTitle||'';
+  document.getElementById('f-company').value=c.company||'';
+  document.getElementById('f-ctry').value=c.country||'';
+  document.getElementById('f-site').value=c.site||'';
+  document.getElementById('f-email').value=c.email||'';
+  document.getElementById('f-mobile').value=c.mobile||'';
+  document.getElementById('f-tier2').value=c.tier||'';
+  document.getElementById('f-stat').value=c.status||'';
+  document.getElementById('f-callback').value=c.callbackDate||'';
+  document.getElementById('f-lastcontact').value=c.lastContactDate||'';
+  document.getElementById('f-notes').value=c.notes||'';
+  document.getElementById('f-calEventId').value=c.calEventId||'';
+  document.getElementById('f-notesHistory').value=c.notesHistory||'';
+  document.getElementById('f-tasks').value=c.tasks||'';
+  document.getElementById('f-lastTouchType').value=c.lastTouchType||'';
+  document.getElementById('f-lastTouchNote').value=c.lastTouchNote||'';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+async function saveContact(){
+  const fname=document.getElementById('f-fname').value.trim(),lname=document.getElementById('f-lname').value.trim();
+  if(!fname&&!lname){alert('Please enter a name.');return;}
+  const contact={id:editingId||'',calEventId:document.getElementById('f-calEventId').value||'',notesHistory:document.getElementById('f-notesHistory').value||'',tasks:document.getElementById('f-tasks').value||'',lastTouchType:document.getElementById('f-lastTouchType').value||'',lastTouchNote:document.getElementById('f-lastTouchNote').value||'',fname,lname,jobTitle:document.getElementById('f-jobtitle').value.trim(),company:document.getElementById('f-company').value.trim(),country:document.getElementById('f-ctry').value,site:document.getElementById('f-site').value.trim(),email:document.getElementById('f-email').value.trim(),mobile:document.getElementById('f-mobile').value.trim(),tier:document.getElementById('f-tier2').value,status:document.getElementById('f-stat').value,callbackDate:document.getElementById('f-callback').value,lastContactDate:document.getElementById('f-lastcontact').value,notes:document.getElementById('f-notes').value.trim()};
+  const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Saving...';
+  try{
+    const saved=await api({action:'save',contact:JSON.stringify(contact)});
+    if(editingId){const idx=contacts.findIndex(c=>c.id===editingId);if(idx>=0)contacts[idx]=saved;}else{contacts.push(saved);}
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+    closeModal();renderCurrent();
+  }catch(e){setSyncStatus('err','Save failed: '+e.message);}
+  btn.disabled=false;btn.textContent='Save';
+}
+
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
+
+function openDelModal(id){
+  deletingId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
+  document.getElementById('del-msg').textContent='Delete '+c.fname+' '+c.lname+' from '+(c.company||'unknown company')+'? This cannot be undone.';
+  document.getElementById('del-modal-bg').classList.add('open');
+}
+
+async function confirmDelete(){
+  if(!deletingId)return;
+  const btn=document.getElementById('del-confirm-btn');btn.disabled=true;btn.textContent='Deleting...';
+  try{
+    await api({action:'delete',id:deletingId});
+    contacts=contacts.filter(c=>c.id!==deletingId);
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+    closeDelModal();renderCurrent();
+  }catch(e){setSyncStatus('err','Delete failed: '+e.message);}
+  btn.disabled=false;btn.textContent='Delete';
+}
+
+function closeDelModal(){document.getElementById('del-modal-bg').classList.remove('open');deletingId=null;}
+
+async function snooze(id){
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  let baseStr=todayStr();
+  if(c.callbackDate){const parsed=new Date(c.callbackDate);if(!isNaN(parsed.getTime())){parsed.setHours(0,0,0,0);const today=new Date();today.setHours(0,0,0,0);if(parsed>=today){baseStr=parsed.toISOString().slice(0,10);}}}
+  const d=new Date(baseStr+'T00:00:00');d.setDate(d.getDate()+7);
+  c.callbackDate=d.toISOString().slice(0,10);
+  setSyncStatus('loading','Saving...');
+  try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));renderCurrent();}
+  catch(e){setSyncStatus('err','Snooze failed: '+e.message);}
+}
+
+function switchTab(tab,btn){
+  ['log','tasks','history'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).style.display='block';
+  btn.classList.add('active');
+  if(tab==='tasks')renderTaskList();
+  if(tab==='history')renderNotesHistory();
+}
+
+async function openLog(id){
+  logContactId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
+  document.getElementById('log-modal-title').textContent=c.fname+' '+c.lname;
+  document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--text3)">Loading...</div>';
+  document.getElementById('log-note').value='';
+  document.getElementById('task-input').value='';
+  ['log','tasks','history'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-log').style.display='block';
+  document.getElementById('tab-btn-log').classList.add('active');
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+  document.getElementById('log-modal-bg').classList.add('open');
+  try{const logs=await api({action:'getLogs',contactId:id});renderLogEntries(logs.slice().reverse());}
+  catch(e){document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--tl-red)">Failed to load log.</div>';}
+}
+
+function renderLogEntries(logs){
+  const el=document.getElementById('log-entries');
+  if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No touchpoints logged yet.</div>';return;}
+  el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' - '+esc(e.note):'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
+}
+
+// CHANGED: optimistic update - UI updates instantly, API saves in background
+async function addLogEntry(){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  const type=document.getElementById('log-type').value;
+  const note=document.getElementById('log-note').value.trim();
+  const now=new Date();
+  const ts=fmtDate(now.toISOString().slice(0,10))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const nineWeeks=new Date();nineWeeks.setDate(nineWeeks.getDate()+63);const nineWeeksStr=nineWeeks.toISOString().slice(0,10);
+  const oneWeek=new Date();oneWeek.setDate(oneWeek.getDate()+7);const oneWeekStr=oneWeek.toISOString().slice(0,10);
+  const noLastContactUpdate=['Voicemail','LinkedIn connection request'];
+
+  // Update contact in memory immediately
+  if(type==='Called'){const existingCallback=c.callbackDate||'';if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}}
+  else if(type==='Email / InMail'||type==='LinkedIn message'){c.callbackDate=oneWeekStr;}
+  if(!noLastContactUpdate.includes(type)){c.lastContactDate=now.toISOString().slice(0,10);}
+  c.lastTouchType=type;
+  c.lastTouchNote=note;
+
+  // Show entry in UI immediately
+  const entry={type,note,ts};
+  const currentEntries=document.getElementById('log-entries');
+  const newRow='<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(type)+'</span>'+(note?' - '+esc(note):'')+'</div><div class="lts">'+ts+'</div></div>';
+  if(currentEntries.querySelector('.log-entry')){
+    currentEntries.insertAdjacentHTML('afterbegin',newRow);
+  } else {
+    currentEntries.innerHTML=newRow;
+  }
+  document.getElementById('log-note').value='';
+  renderCurrent();
+
+  // Save to API in background
+  try{
+    await api({action:'addLog',entry:JSON.stringify({contactId:logContactId,type,note,ts})});
+    await api({action:'save',contact:JSON.stringify(c)});
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+  }catch(e){setSyncStatus('err','Log failed - refresh to resync');}
+}
+
+function closeLogModal(){document.getElementById('log-modal-bg').classList.remove('open');logContactId=null;}
+
+function renderTaskList(){
+  const c=contacts.find(x=>x.id===logContactId);const el=document.getElementById('task-list');
+  if(!c){el.innerHTML='';return;}
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  if(!tasks.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No tasks yet.</div>';return;}
+  const hasDone=tasks.some(t=>t.done);
+  el.innerHTML=tasks.map((t,i)=>'<div class="task-item"><input type="checkbox"'+(t.done?' checked':'')+' onchange="toggleTask('+i+')"><span style="'+(t.done?'text-decoration:line-through;color:var(--text3)':'')+'">'+esc(t.text)+'</span></div>').join('')+(hasDone?'<div style="margin-top:8px"><button class="btn btn-sm" onclick="clearCompletedTasks()">Clear completed</button></div>':'');
+}
+
+// CHANGED: optimistic update for tasks
+async function addTask(){
+  const input=document.getElementById('task-input');const text=input.value.trim();if(!text)return;
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  tasks.push({text,done:false,createdAt:Date.now()});
+  c.tasks=JSON.stringify(tasks);
+  input.value='';
+  // Update UI immediately
+  renderTaskList();
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+  updateTaskNavBadge();
+  renderCurrent();
+  // Save in background
+  try{await api({action:'save',contact:JSON.stringify(c)});}
+  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+}
+
+// CHANGED: optimistic update for task toggle
+async function toggleTask(idx){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  if(tasks[idx])tasks[idx].done=!tasks[idx].done;
+  c.tasks=JSON.stringify(tasks);
+  // Update UI immediately
+  renderTaskList();
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+  updateTaskNavBadge();
+  renderCurrent();
+  // Save in background
+  try{await api({action:'save',contact:JSON.stringify(c)});}
+  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+}
+
+async function clearCompletedTasks(){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  tasks=tasks.filter(t=>!t.done);
+  c.tasks=JSON.stringify(tasks);
+  // Update UI immediately
+  renderTaskList();
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+  updateTaskNavBadge();
+  renderCurrent();
+  // Save in background
+  try{await api({action:'save',contact:JSON.stringify(c)});}
+  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+}
+
+function renderNotesHistory(){
+  const c=contacts.find(x=>x.id===logContactId);const el=document.getElementById('history-content');
+  if(!c||!c.notesHistory){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous notes saved yet.</div>';return;}
+  let history=[];try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}
+  if(!history.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous notes saved yet.</div>';return;}
+  el.innerHTML=history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
+}
+
+function openNotes(id){
+  notesContactId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
+  document.getElementById('notes-edit').value=c.notes||'';
+  document.getElementById('notes-modal-bg').classList.add('open');
+}
+
+// CHANGED: optimistic update for notes
+async function saveNotes(){
+  const c=contacts.find(x=>x.id===notesContactId);if(!c)return;
+  const newNote=document.getElementById('notes-edit').value.trim();
+  if(c.notes&&c.notes!==newNote){
+    let history=[];if(c.notesHistory){try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}}
+    const now=new Date();const ts=fmtDate(now.toISOString().slice(0,10))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    history.push({note:c.notes,ts});c.notesHistory=JSON.stringify(history);
+  }
+  c.notes=newNote;
+  // Close modal and update UI immediately
+  closeNotesModal();
+  renderCurrent();
+  // Save in background
+  try{await api({action:'save',contact:JSON.stringify(c)});}
+  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+}
+
+function closeNotesModal(){document.getElementById('notes-modal-bg').classList.remove('open');notesContactId=null;}
+
+['modal-bg','log-modal-bg','notes-modal-bg','del-modal-bg'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById(id).classList.remove('open');});
+});
+</script>
+</body>
+</html>
