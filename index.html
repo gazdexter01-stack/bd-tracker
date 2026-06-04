@@ -774,8 +774,8 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
   c.tasks=JSON.stringify(tasks);
   const row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
   if(row){
-    const textEl=row.querySelector('div[style*="font-size:13px"]');
-    if(textEl)textEl.style.textDecoration='line-through';
+    const divs=row.querySelectorAll('div');
+    divs.forEach(d=>{if(d.children.length===0)d.style.textDecoration='line-through';});
     row.style.opacity='0.4';
     checkbox.disabled=true;
   }
@@ -785,7 +785,7 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
     setTimeout(()=>renderGlobalTasks(),800);
   }catch(e){
     setSyncStatus('err','Save failed');
-    if(row){row.style.opacity='1';const textEl=row.querySelector('div[style*="font-size:13px"]');if(textEl)textEl.style.textDecoration='';row.style.opacity='1';}
+    if(row){row.style.opacity='1';const divs=row.querySelectorAll('div');divs.forEach(d=>d.style.textDecoration='');}
     checkbox.checked=false;checkbox.disabled=false;
   }
 }
