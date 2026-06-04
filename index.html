@@ -780,7 +780,7 @@ function renderAccounts(){
   let html='';
   Object.entries(companies).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name,data])=>{
     const sites=[...new Set(data.contacts.map(c=>c.site).filter(Boolean))];
-    html+='<div class="company-block"><div class="company-head"><span style="font-weight:500;font-size:15px">'+esc(name)+'</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+tierBadge(data.tier)+'<span style="font-size:12px;color:var(--text2)">'+data.contacts.length+' contact'+(data.contacts.length>1?'s':'')+'</span>'+(sites.length?'<span style="font-size:12px;color:var(--text3)">'+sites.map(esc).join(' / ')+'</span>':'')+'</div></div>';
+    html+='<div class="company-block"><div class="company-head"><span style="font-weight:500;font-size:15px;color:var(--orange)">'+esc(name)+'</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+tierBadge(data.tier)+'<span style="font-size:12px;color:var(--text2)">'+data.contacts.length+' contact'+(data.contacts.length>1?'s':'')+'</span>'+(sites.length?'<span style="font-size:12px;color:var(--text3)">'+sites.map(esc).join(' / ')+'</span>':'')+'</div></div>';
     data.contacts.forEach(c=>{
       const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate);
       html+='<div class="csub-row">'+
