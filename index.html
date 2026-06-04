@@ -773,12 +773,22 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
   tasks[targetIdx].done=true;
   c.tasks=JSON.stringify(tasks);
   const row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
-  if(row){row.style.opacity='0.3';row.style.pointerEvents='none';}
+  if(row){
+    const textEl=row.querySelector('div[style*="font-size:13px"]');
+    if(textEl)textEl.style.textDecoration='line-through';
+    row.style.opacity='0.4';
+    checkbox.disabled=true;
+  }
   try{
     await api({action:'save',contact:JSON.stringify(c)});
     updateTaskNavBadge();
-    setTimeout(()=>renderGlobalTasks(),300);
-  }catch(e){setSyncStatus('err','Save failed');if(row){row.style.opacity='1';row.style.pointerEvents='';}checkbox.checked=false;}
+    setTimeout(()=>renderGlobalTasks(),800);
+  }catch(e){
+    setSyncStatus('err','Save failed');
+    if(row){row.style.opacity='1';const textEl=row.querySelector('div[style*="font-size:13px"]');if(textEl)textEl.style.textDecoration='';row.style.opacity='1';}
+    checkbox.checked=false;checkbox.disabled=false;
+  }
+}
 }
 
 function showView(v,btn){
