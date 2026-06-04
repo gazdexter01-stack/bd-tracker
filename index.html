@@ -49,6 +49,7 @@
     --red-bg:#2a0d0d;--red-text:#f47a7a;
     --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
     --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
+    
     --orange-light:#2a1505;
   }
 }
@@ -618,7 +619,7 @@ function statusBadge(s){
 }
 function touchBadge(type){
   if(!type)return'';
-  const map={'Called':'var(--green-bg),var(--tl-green)','Email / InMail':'var(--amber-bg),var(--amber-text)','LinkedIn message':'var(--blue-bg),var(--blue-text)','WhatsApp':'var(--amber-bg),var(--amber-text)','Voicemail':'var(--gray-bg),var(--gray-text)','LinkedIn connection request':'var(--blue-bg),var(--blue-text)','Met in person':'var(--green-bg),var(--tl-green)'};
+  const map={'Called':'var(--green-bg),var(--tl-green)','Video call':'var(--green-bg),var(--tl-green)','Email / InMail':'var(--amber-bg),var(--amber-text)','LinkedIn message':'var(--blue-bg),var(--blue-text)','WhatsApp':'var(--amber-bg),var(--amber-text)','Voicemail':'var(--gray-bg),var(--gray-text)','LinkedIn connection request':'var(--blue-bg),var(--blue-text)','Met in person':'var(--green-bg),var(--tl-green)'};
   const cols=(map[type]||'var(--gray-bg),var(--gray-text)').split(',');
   return'<span style="font-size:11px;padding:2px 6px;border-radius:6px;font-weight:500;background:'+cols[0]+';color:'+cols[1]+'">'+esc(type)+'</span>';
 }
@@ -631,7 +632,7 @@ function filtered(status,tier,country,urgency,search){
     if(tier&&c.tier!==tier)return false;
     if(country&&c.country!==country)return false;
     if(urgency&&urg(c)!==urgency)return false;
-    if(search){const s=search.toLowerCase();if(!(c.fname+' '+c.lname).toLowerCase().includes(s)&&!(c.company||'').toLowerCase().includes(s))return false;}
+    if(search){const s=search.toLowerCase();if(!(c.fname+' '+c.lname).toLowerCase().includes(s)&&!(c.company||'').toLowerCase().includes(s)&&!(c.mobile||'').toLowerCase().includes(s)&&!(c.email||'').toLowerCase().includes(s))return false;}
     return true;
   });
 }
