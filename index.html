@@ -850,21 +850,21 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
   if(targetIdx<0){renderGlobalTasks();return;}
   tasks[targetIdx].done=true;
   c.tasks=JSON.stringify(tasks);
-  const row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
+  updateTaskNavBadge();
+  var row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
   if(row){
-    const textEl=row.querySelector('div div:first-child');
-    if(textEl){textEl.style.textDecoration='line-through';textEl.style.color='var(--text3)';}
+    row.innerHTML='<input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:var(--orange);flex-shrink:0"><div><div style="font-size:13px;color:var(--text3);text-decoration:line-through">'+esc(tasks[targetIdx].text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(c.fname)+' '+esc(c.lname)+(c.company?' &middot; '+esc(c.company):'')+'</div></div>';
     row.style.opacity='0.4';
-    checkbox.disabled=true;
   }
   try{
     await api({action:'save',contact:JSON.stringify(c)});
-    updateTaskNavBadge();
-    setTimeout(()=>renderGlobalTasks(),800);
+    setTimeout(()=>renderGlobalTasks(),600);
   }catch(e){
     setSyncStatus('err','Save failed');
-    if(row){row.style.opacity='1';const textEl=row.querySelector('div div:first-child');if(textEl){textEl.style.textDecoration='';textEl.style.color='';}}
-    checkbox.checked=false;checkbox.disabled=false;
+    tasks[targetIdx].done=false;
+    c.tasks=JSON.stringify(tasks);
+    updateTaskNavBadge();
+    renderGlobalTasks();
   }
 }
 
