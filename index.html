@@ -920,13 +920,12 @@ async function addLogEntry(){
   const ts=fmtDate(now.toISOString().slice(0,10))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const nineWeeks=new Date();nineWeeks.setDate(nineWeeks.getDate()+63);const nineWeeksStr=nineWeeks.toISOString().slice(0,10);
   const oneWeek=new Date();oneWeek.setDate(oneWeek.getDate()+7);const oneWeekStr=oneWeek.toISOString().slice(0,10);
-  const noLastContactUpdate=['LinkedIn connection request'];
 
   // Update contact in memory immediately
-  if(type==='Called'||type==='Video call'){const existingCallback=c.callbackDate||'';if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}}
-  else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){c.callbackDate=oneWeekStr;}
-else if(type==='Voicemail'){const fourDays=new Date();fourDays.setDate(fourDays.getDate()+4);c.callbackDate=fourDays.toISOString().slice(0,10);}
-  if(!noLastContactUpdate.includes(type)){c.lastContactDate=now.toISOString().slice(0,10);}
+  if(type==='Called'||type==='Video call'||type==='Met in person'){const existingCallback=c.callbackDate||'';if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}}
+else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){c.callbackDate=oneWeekStr;}
+else if(type==='Voicemail'||type==='LinkedIn connection request'){const fourDays=new Date();fourDays.setDate(fourDays.getDate()+4);c.callbackDate=fourDays.toISOString().slice(0,10);}
+  c.lastContactDate=now.toISOString().slice(0,10);
   c.lastTouchType=type;
   c.lastTouchNote=note;
 
