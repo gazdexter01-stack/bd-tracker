@@ -845,15 +845,13 @@ function renderGlobalTasks(){
 async function completeGlobalTask(contactId,taskIdx,checkbox){
   const c=contacts.find(x=>x.id===contactId);if(!c)return;
   let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
-  let openCount=-1;
-  const targetIdx=tasks.findIndex((t,i)=>{if(!t.done)openCount++;return openCount===taskIdx;});
-  if(targetIdx<0){renderGlobalTasks();return;}
-  tasks[targetIdx].done=true;
+  if(!tasks[taskIdx]){renderGlobalTasks();return;}
+  tasks[taskIdx].done=true;
   c.tasks=JSON.stringify(tasks);
   updateTaskNavBadge();
   var row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
   if(row){
-    row.innerHTML='<input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:var(--orange);flex-shrink:0"><div><div style="font-size:13px;color:var(--text3);text-decoration:line-through">'+esc(tasks[targetIdx].text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(c.fname)+' '+esc(c.lname)+(c.company?' &middot; '+esc(c.company):'')+'</div></div>';
+    row.innerHTML='<input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:var(--orange);flex-shrink:0"><div><div style="font-size:13px;color:var(--text3);text-decoration:line-through">'+esc(tasks[taskIdx].text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(c.fname)+' '+esc(c.lname)+(c.company?' &middot; '+esc(c.company):'')+'</div></div>';
     row.style.opacity='0.4';
   }
   try{
@@ -861,7 +859,7 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
     setTimeout(()=>renderGlobalTasks(),600);
   }catch(e){
     setSyncStatus('err','Save failed');
-    tasks[targetIdx].done=false;
+    tasks[taskIdx].done=false;
     c.tasks=JSON.stringify(tasks);
     updateTaskNavBadge();
     renderGlobalTasks();
