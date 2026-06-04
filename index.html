@@ -618,7 +618,7 @@ function statusBadge(s){
 }
 function touchBadge(type){
   if(!type)return'';
-  const map={'Called':'var(--green-bg),var(--tl-green)','Email / InMail':'var(--amber-bg),var(--amber-text)','LinkedIn message':'var(--blue-bg),var(--blue-text)','WhatsApp':'var(--green-bg),var(--tl-green)','Voicemail':'var(--gray-bg),var(--gray-text)','LinkedIn connection request':'var(--blue-bg),var(--blue-text)','Met in person':'var(--green-bg),var(--tl-green)'};
+  const map={'Called':'var(--green-bg),var(--tl-green)','Email / InMail':'var(--amber-bg),var(--amber-text)','LinkedIn message':'var(--blue-bg),var(--blue-text)','WhatsApp':'var(--amber-bg),var(--amber-text)','Voicemail':'var(--gray-bg),var(--gray-text)','LinkedIn connection request':'var(--blue-bg),var(--blue-text)','Met in person':'var(--green-bg),var(--tl-green)'};
   const cols=(map[type]||'var(--gray-bg),var(--gray-text)').split(',');
   return'<span style="font-size:11px;padding:2px 6px;border-radius:6px;font-weight:500;background:'+cols[0]+';color:'+cols[1]+'">'+esc(type)+'</span>';
 }
@@ -919,11 +919,12 @@ async function addLogEntry(){
   const ts=fmtDate(now.toISOString().slice(0,10))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const nineWeeks=new Date();nineWeeks.setDate(nineWeeks.getDate()+63);const nineWeeksStr=nineWeeks.toISOString().slice(0,10);
   const oneWeek=new Date();oneWeek.setDate(oneWeek.getDate()+7);const oneWeekStr=oneWeek.toISOString().slice(0,10);
-  const noLastContactUpdate=['Voicemail','LinkedIn connection request'];
+  const noLastContactUpdate=['LinkedIn connection request'];
 
   // Update contact in memory immediately
   if(type==='Called'||type==='Video call'){const existingCallback=c.callbackDate||'';if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}}
-  else if(type==='Email / InMail'||type==='LinkedIn message'){c.callbackDate=oneWeekStr;}
+  else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){c.callbackDate=oneWeekStr;}
+else if(type==='Voicemail'){const fourDays=new Date();fourDays.setDate(fourDays.getDate()+4);c.callbackDate=fourDays.toISOString().slice(0,10);}
   if(!noLastContactUpdate.includes(type)){c.lastContactDate=now.toISOString().slice(0,10);}
   c.lastTouchType=type;
   c.lastTouchNote=note;
