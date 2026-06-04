@@ -49,7 +49,6 @@
     --red-bg:#2a0d0d;--red-text:#f47a7a;
     --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
     --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
-    
     --orange-light:#2a1505;
   }
 }
@@ -472,21 +471,34 @@ const DEFAULT_REGIONS = ['UK','USA','Europe','Middle East','Asia Pacific','Other
 let contacts=[],editingId=null,logContactId=null,notesContactId=null,deletingId=null,currentView='pipeline',userPin='';
 let settings = { tiers: [...DEFAULT_TIERS], regions: [...DEFAULT_REGIONS] };
 
-function loadSettings() {
-  try { const s=localStorage.getItem('ve_settings');if(s)settings=JSON.parse(s); } catch(e) {}
+// ---------- Settings ----------
+function loadSettings(){
+  try{const s=localStorage.getItem('ve_settings');if(s)settings=JSON.parse(s);}catch(e){}
   rebuildDropdowns();
 }
 
-function saveSettingsToStorage() { localStorage.setItem('ve_settings',JSON.stringify(settings)); }
+function saveSettingsToStorage(){localStorage.setItem('ve_settings',JSON.stringify(settings));}
 
-function rebuildDropdowns() {
+function rebuildDropdowns(){
   const tierSelects=['f-tier','fa-tier','fall-tier','f-tier2'];
-  tierSelects.forEach(id=>{const el=document.getElementById(id);if(!el)return;const isFilter=id!=='f-tier2';const cur=el.value;el.innerHTML=isFilter?'<option value="">All tiers</option>':'<option value="">Select tier</option>';settings.tiers.forEach(t=>{if(t.trim())el.innerHTML+='<option value="'+esc(t)+'">'+esc(t)+'</option>';});el.value=cur;});
+  tierSelects.forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const isFilter=id!=='f-tier2';const cur=el.value;
+    el.innerHTML=isFilter?'<option value="">All tiers</option>':'<option value="">Select tier</option>';
+    settings.tiers.forEach(t=>{if(t.trim())el.innerHTML+='<option value="'+esc(t)+'">'+esc(t)+'</option>';});
+    el.value=cur;
+  });
   const regionSelects=['f-country','fa-country','fall-country','f-ctry'];
-  regionSelects.forEach(id=>{const el=document.getElementById(id);if(!el)return;const isFilter=id!=='f-ctry';const cur=el.value;el.innerHTML=isFilter?'<option value="">All regions</option>':'<option value="">Select region</option>';settings.regions.forEach(r=>{if(r.trim())el.innerHTML+='<option value="'+esc(r)+'">'+esc(r)+'</option>';});el.value=cur;});
+  regionSelects.forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const isFilter=id!=='f-ctry';const cur=el.value;
+    el.innerHTML=isFilter?'<option value="">All regions</option>':'<option value="">Select region</option>';
+    settings.regions.forEach(r=>{if(r.trim())el.innerHTML+='<option value="'+esc(r)+'">'+esc(r)+'</option>';});
+    el.value=cur;
+  });
 }
 
-function openSettings() {
+function openSettings(){
   document.getElementById('s-t1').value=settings.tiers[0]||'';
   document.getElementById('s-t2').value=settings.tiers[1]||'';
   document.getElementById('s-t3').value=settings.tiers[2]||'';
@@ -495,8 +507,13 @@ function openSettings() {
   document.getElementById('settings-modal-bg').classList.add('open');
 }
 
-function saveSettings() {
-  settings.tiers=[document.getElementById('s-t1').value.trim()||'Tier 1',document.getElementById('s-t2').value.trim()||'Tier 2',document.getElementById('s-t3').value.trim()||'Tier 3',document.getElementById('s-t4').value.trim()||'Tier 4'];
+function saveSettings(){
+  settings.tiers=[
+    document.getElementById('s-t1').value.trim()||'Tier 1',
+    document.getElementById('s-t2').value.trim()||'Tier 2',
+    document.getElementById('s-t3').value.trim()||'Tier 3',
+    document.getElementById('s-t4').value.trim()||'Tier 4'
+  ];
   settings.regions=document.getElementById('s-regions').value.split(',').map(r=>r.trim()).filter(Boolean);
   if(!settings.regions.length)settings.regions=[...DEFAULT_REGIONS];
   saveSettingsToStorage();rebuildDropdowns();closeSettings();renderCurrent();
@@ -504,8 +521,8 @@ function saveSettings() {
 
 function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
 
-// PIN
-function checkPin() {
+// ---------- PIN / startup ----------
+function checkPin(){
   const val=document.getElementById('pin-input').value.trim();
   if(val===PIN_CODE){
     userPin=val;localStorage.setItem('bd_pin',val);
@@ -513,13 +530,13 @@ function checkPin() {
     const firstTime=!localStorage.getItem('bd_seen_onboarding');
     if(firstTime){document.getElementById('onboarding-screen').classList.add('open');}
     else{document.getElementById('app').style.display='block';loadContacts();}
-  } else {
+  }else{
     document.getElementById('pin-error').style.display='block';
     document.getElementById('pin-input').value='';
   }
 }
 
-function closeOnboarding() {
+function closeOnboarding(){
   localStorage.setItem('bd_seen_onboarding','1');
   document.getElementById('onboarding-screen').classList.remove('open');
   document.getElementById('app').style.display='block';
@@ -527,8 +544,14 @@ function closeOnboarding() {
 }
 
 window.addEventListener('load',()=>{
+  loadSettings();
   const saved=localStorage.getItem('bd_pin');
-  if(saved===PIN_CODE){userPin=saved;document.getElementById('pin-screen').style.display='none';document.getElementById('app').style.display='block';loadContacts();}
+  if(saved===PIN_CODE){
+    userPin=saved;
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadContacts();
+  }
 });
 
 document.addEventListener('keydown',e=>{
@@ -537,9 +560,9 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// JSONP API
+// ---------- JSONP API ----------
 let cbId=0;
-function api(params) {
+function api(params){
   return new Promise((resolve,reject)=>{
     const cbName='__bdcb'+(++cbId);
     params.pin=userPin;params.callback=cbName;
@@ -554,7 +577,11 @@ function api(params) {
   });
 }
 
-function setSyncStatus(state,msg){const el=document.getElementById('sync-status');el.className='sync-status '+(state==='ok'?'sync-ok':state==='err'?'sync-err':'sync-loading');el.textContent=msg;}
+function setSyncStatus(state,msg){
+  const el=document.getElementById('sync-status');
+  el.className='sync-status '+(state==='ok'?'sync-ok':state==='err'?'sync-err':'sync-loading');
+  el.textContent=msg;
+}
 
 async function loadContacts(){
   setSyncStatus('loading','Loading...');
@@ -562,10 +589,11 @@ async function loadContacts(){
   catch(e){setSyncStatus('err','Failed: '+e.message);}
 }
 
-function exportCSV() {
+// ---------- CSV Export ----------
+function exportCSV(){
   if(!contacts.length){alert('No contacts to export.');return;}
-  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','Tier','Status','Next callback','Last contact','Notes'];
-  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.tier,c.status,c.callbackDate,c.lastContactDate,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
+  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
+  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
   const csv=[headers.map(h=>'"'+h+'"').join(','),...rows.map(r=>r.join(','))].join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
@@ -575,16 +603,19 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
-// Date helpers
+// ---------- Date helpers ----------
 function todayStr(){return new Date().toISOString().slice(0,10);}
+
 function daysDiff(ds){
   if(!ds||ds==='')return null;
   try{const clean=String(ds).trim();let d=clean.match(/^\d{4}-\d{2}-\d{2}$/)?new Date(clean+'T00:00:00'):new Date(clean);if(isNaN(d.getTime()))return null;d.setHours(0,0,0,0);const t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}catch(e){return null;}
 }
+
 function fmtDate(s){
   if(!s||s==='')return'';
   try{const clean=String(s).trim();let d=clean.match(/^\d{4}-\d{2}-\d{2}$/)?new Date(parseInt(clean.split('-')[0]),parseInt(clean.split('-')[1])-1,parseInt(clean.split('-')[2])):new Date(clean);if(isNaN(d.getTime()))return'';return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];}catch(e){return'';}
 }
+
 function cbTraffic(ds){
   if(!ds)return{dot:'',label:'No date set',cls:'',urg:'none'};
   const d=daysDiff(ds);if(d===null)return{dot:'',label:'No date set',cls:'',urg:'none'};
@@ -594,6 +625,7 @@ function cbTraffic(ds){
   if(d<=7)return{dot:'dot-a',label:fmt,cls:'tl-a',urg:'upcoming'};
   return{dot:'dot-g',label:fmt,cls:'tl-g',urg:'upcoming'};
 }
+
 function lcTraffic(ds){
   if(!ds)return{dot:'dot-r',label:'Never',cls:'tl-r'};
   const d=daysDiff(ds);if(d===null)return{dot:'dot-r',label:'Never',cls:'tl-r'};
@@ -602,9 +634,11 @@ function lcTraffic(ds){
   if(ago<=28)return{dot:'dot-a',label:fmt,cls:'tl-a'};
   return{dot:'dot-r',label:fmt,cls:'tl-r'};
 }
+
 function urg(c){return cbTraffic(c.callbackDate).urg;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+// ---------- Badges ----------
 function tierBadge(t){
   if(!t)return'';
   const cls=t.startsWith('T1')?'badge-t1':t.startsWith('T2')?'badge-t2':'badge-t3';
@@ -612,32 +646,58 @@ function tierBadge(t){
   const region=(t.includes('MNC')||t.includes('CDMO')||t.includes('Engineering Consultancy'))?' (SG)':'';
   return'<span class="badge '+cls+'">'+s+region+'</span>';
 }
+
 function statusBadge(s){
   if(!s)return'';
   const cls=s==='Cold'?'badge-cold':s==='Warm'?'badge-warm':'badge-active';
   return'<span class="badge '+cls+'">'+s+'</span>';
 }
+
 function touchBadge(type){
   if(!type)return'';
-  const map={'Called':'var(--green-bg),var(--tl-green)','Video call':'var(--green-bg),var(--tl-green)','Email / InMail':'var(--amber-bg),var(--amber-text)','LinkedIn message':'var(--blue-bg),var(--blue-text)','WhatsApp':'var(--amber-bg),var(--amber-text)','Voicemail':'var(--gray-bg),var(--gray-text)','LinkedIn connection request':'var(--blue-bg),var(--blue-text)','Met in person':'var(--green-bg),var(--tl-green)'};
+  const map={
+    'Called':'var(--green-bg),var(--tl-green)',
+    'Video call':'var(--green-bg),var(--tl-green)',
+    'Met in person':'var(--green-bg),var(--tl-green)',
+    'Email / InMail':'var(--amber-bg),var(--amber-text)',
+    'WhatsApp':'var(--amber-bg),var(--amber-text)',
+    'LinkedIn message':'var(--blue-bg),var(--blue-text)',
+    'LinkedIn connection request':'var(--blue-bg),var(--blue-text)',
+    'Voicemail':'var(--gray-bg),var(--gray-text)'
+  };
   const cols=(map[type]||'var(--gray-bg),var(--gray-text)').split(',');
   return'<span style="font-size:11px;padding:2px 6px;border-radius:6px;font-weight:500;background:'+cols[0]+';color:'+cols[1]+'">'+esc(type)+'</span>';
 }
+
 function getOpenTasks(c){if(!c.tasks)return[];try{return JSON.parse(c.tasks).filter(t=>!t.done);}catch(e){return[];}}
 function taskBadgeHTML(c){const open=getOpenTasks(c);return open.length?'<span class="task-badge">'+open.length+'</span>':'';}
 
+// Last touchpoint block shared by pipeline + accounts views
+function lastTouchHTML(c){
+  if(!c.lastTouchType)return'';
+  return'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:2px">'+
+    '<div style="font-size:10px;color:var(--text3);margin-bottom:3px">Last touchpoint</div>'+
+    touchBadge(c.lastTouchType)+
+    (c.lastTouchNote?'<div style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px;">'+esc(c.lastTouchNote)+'</div>':'')+
+  '</div>';
+}
+
+// ---------- Filtering ----------
 function filtered(status,tier,country,urgency,search){
   return contacts.filter(c=>{
     if(status&&c.status!==status)return false;
     if(tier&&c.tier!==tier)return false;
     if(country&&c.country!==country)return false;
     if(urgency&&urg(c)!==urgency)return false;
-    if(search){const s=search.toLowerCase();if(!(c.fname+' '+c.lname).toLowerCase().includes(s)&&!(c.company||'').toLowerCase().includes(s)&&!(c.mobile||'').toLowerCase().includes(s)&&!(c.email||'').toLowerCase().includes(s))return false;}
+    if(search){
+      const s=search.toLowerCase();
+      if(!(c.fname+' '+c.lname).toLowerCase().includes(s)&&!(c.company||'').toLowerCase().includes(s)&&!(c.mobile||'').toLowerCase().includes(s)&&!(c.email||'').toLowerCase().includes(s))return false;
+    }
     return true;
   });
 }
 
-// CHANGED: company name is now a clickable orange link to accounts view
+// ---------- Row rendering ----------
 function rowHTML(c){
   const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate),u=urg(c);
   const cls=u==='overdue'?'crow overdue':u==='today'?'crow today-row':'crow';
@@ -645,12 +705,12 @@ function rowHTML(c){
     '<div><div class="cname">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">'+tierBadge(c.tier)+' '+statusBadge(c.status)+'</div></div>'+
     '<div><div style="font-weight:500;font-size:13px;cursor:pointer;color:var(--orange)" onclick="goToAccount(\''+esc(c.company||'')+'\')">'+esc(c.company||'')+'</div><div class="csub">'+esc(c.site||'')+'</div><div class="csub">'+esc(c.country||'')+'</div>'+(c.email?'<div class="csub" style="margin-top:2px">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
     '<div><div class="notes-cell">'+(c.notes?esc(c.notes):'<span style="color:var(--text3)">No notes</span>')+'</div></div>'+
-    '<div style="font-size:12px"><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Next callback</div><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+(c.lastTouchType?'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:2px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Last touchpoint</div>'+touchBadge(c.lastTouchType)+(c.lastTouchNote?'<div style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px;">'+esc(c.lastTouchNote)+'</div>':'')+'</div>':'')+'</div>'+
+    '<div style="font-size:12px"><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Next callback</div><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+lastTouchHTML(c)+'</div>'+
     '<div class="cactions"><button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button><button class="btn btn-sm" onclick="openLog(\''+c.id+'\')">Log</button><button class="btn btn-sm" onclick="openNotes(\''+c.id+'\')">Notes</button><button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button><button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button></div>'+
   '</div>';
 }
 
-// NEW: jump to accounts view filtered by company
+// Jump to accounts view filtered by company
 function goToAccount(company){
   document.getElementById('fa-search').value=company;
   document.getElementById('fa-tier').value='';
@@ -670,7 +730,13 @@ function renderStats(list){
 }
 
 function renderPipeline(){
-  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value);
+  const list=filtered(
+    document.getElementById('f-status').value,
+    document.getElementById('f-tier').value,
+    document.getElementById('f-country').value,
+    document.getElementById('f-urgency').value,
+    document.getElementById('f-search').value
+  );
   renderStats(list);
   const ov=list.filter(c=>urg(c)==='overdue').sort((a,b)=>{const da=new Date(a.callbackDate||'9999-12-31');const db=new Date(b.callbackDate||'9999-12-31');return da-db;});
   const tod=list.filter(c=>urg(c)==='today');
@@ -721,7 +787,7 @@ function renderAccounts(){
         '<div><div class="cname" style="font-size:13px">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:3px">'+statusBadge(c.status)+'</div></div>'+
         '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
         '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5">'+esc(c.notes||'')+'</div>'+
-        '<div style="font-size:12px"><div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:4px"><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+(c.lastTouchType?'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:2px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Last touchpoint</div>'+touchBadge(c.lastTouchType)+(c.lastTouchNote?'<div style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px;">'+esc(c.lastTouchNote)+'</div>':'')+'</div>':'')+'</div>'+
+        '<div style="font-size:12px"><div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:4px"><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+lastTouchHTML(c)+'</div>'+
         '<div class="cactions"><button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button><button class="btn btn-sm" onclick="openLog(\''+c.id+'\')">Log</button><button class="btn btn-sm" onclick="openNotes(\''+c.id+'\')">Notes</button><button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button><button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button></div>'+
       '</div>';
     });
@@ -732,12 +798,23 @@ function renderAccounts(){
 }
 
 function renderAll(){
-  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','').sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
+  const list=filtered(
+    document.getElementById('fall-status').value,
+    document.getElementById('fall-tier').value,
+    document.getElementById('fall-country').value,
+    '',''
+  ).sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
   document.getElementById('all-content').innerHTML=list.map(c=>rowHTML(c)).join('')||'<div class="empty">No contacts match.</div>';
 }
 
-function renderCurrent(){if(currentView==='pipeline')renderPipeline();else if(currentView==='accounts')renderAccounts();else if(currentView==='tasks')renderGlobalTasks();else renderAll();}
+function renderCurrent(){
+  if(currentView==='pipeline')renderPipeline();
+  else if(currentView==='accounts')renderAccounts();
+  else if(currentView==='tasks')renderGlobalTasks();
+  else renderAll();
+}
 
+// ---------- Tasks ----------
 function updateTaskNavBadge(){
   const total=contacts.reduce((sum,c)=>sum+getOpenTasks(c).length,0);
   const btn=document.getElementById('nav-tasks-btn');
@@ -756,7 +833,8 @@ function renderGlobalTasks(){
   });
   allTasks.sort((a,b)=>b.createdAt-a.createdAt);
   if(!allTasks.length){el.innerHTML='<div class="empty">No outstanding tasks. Good work.</div>';return;}
-  el.innerHTML='<div style="margin-bottom:12px;font-size:12px;color:var(--text3)">'+allTasks.length+' outstanding task'+(allTasks.length!==1?'s':'')+' across '+[...new Set(allTasks.map(t=>t.contactId))].length+' contact'+(([...new Set(allTasks.map(t=>t.contactId))].length!==1)?'s':'')+'</div>'+
+  const contactCount=[...new Set(allTasks.map(t=>t.contactId))].length;
+  el.innerHTML='<div style="margin-bottom:12px;font-size:12px;color:var(--text3)">'+allTasks.length+' outstanding task'+(allTasks.length!==1?'s':'')+' across '+contactCount+' contact'+(contactCount!==1?'s':'')+'</div>'+
   allTasks.map(t=>'<div class="crow" style="grid-template-columns:auto 1fr auto;gap:12px;align-items:center" id="gtask-'+t.contactId+'-'+t.taskIdx+'">'+
     '<input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:var(--orange);flex-shrink:0" onchange="completeGlobalTask(\''+t.contactId+'\','+t.taskIdx+',this)">'+
     '<div><div style="font-size:13px;color:var(--text)">'+esc(t.text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(t.fname)+' '+esc(t.lname)+(t.company?' &middot; '+esc(t.company):'')+'</div></div>'+
@@ -790,6 +868,7 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
   }
 }
 
+// ---------- Views / nav ----------
 function showView(v,btn){
   currentView=v;
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
@@ -801,6 +880,7 @@ function showView(v,btn){
 
 function clearFilters(){['f-status','f-tier','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
 
+// ---------- Add / Edit contact ----------
 function openAdd(){
   editingId=null;
   document.getElementById('modal-title').textContent='Add contact';
@@ -844,7 +924,26 @@ function openEdit(id){
 async function saveContact(){
   const fname=document.getElementById('f-fname').value.trim(),lname=document.getElementById('f-lname').value.trim();
   if(!fname&&!lname){alert('Please enter a name.');return;}
-  const contact={id:editingId||'',calEventId:document.getElementById('f-calEventId').value||'',notesHistory:document.getElementById('f-notesHistory').value||'',tasks:document.getElementById('f-tasks').value||'',lastTouchType:document.getElementById('f-lastTouchType').value||'',lastTouchNote:document.getElementById('f-lastTouchNote').value||'',fname,lname,jobTitle:document.getElementById('f-jobtitle').value.trim(),company:document.getElementById('f-company').value.trim(),country:document.getElementById('f-ctry').value,site:document.getElementById('f-site').value.trim(),email:document.getElementById('f-email').value.trim(),mobile:document.getElementById('f-mobile').value.trim(),tier:document.getElementById('f-tier2').value,status:document.getElementById('f-stat').value,callbackDate:document.getElementById('f-callback').value,lastContactDate:document.getElementById('f-lastcontact').value,notes:document.getElementById('f-notes').value.trim()};
+  const contact={
+    id:editingId||'',
+    calEventId:document.getElementById('f-calEventId').value||'',
+    notesHistory:document.getElementById('f-notesHistory').value||'',
+    tasks:document.getElementById('f-tasks').value||'',
+    lastTouchType:document.getElementById('f-lastTouchType').value||'',
+    lastTouchNote:document.getElementById('f-lastTouchNote').value||'',
+    fname,lname,
+    jobTitle:document.getElementById('f-jobtitle').value.trim(),
+    company:document.getElementById('f-company').value.trim(),
+    country:document.getElementById('f-ctry').value,
+    site:document.getElementById('f-site').value.trim(),
+    email:document.getElementById('f-email').value.trim(),
+    mobile:document.getElementById('f-mobile').value.trim(),
+    tier:document.getElementById('f-tier2').value,
+    status:document.getElementById('f-stat').value,
+    callbackDate:document.getElementById('f-callback').value,
+    lastContactDate:document.getElementById('f-lastcontact').value,
+    notes:document.getElementById('f-notes').value.trim()
+  };
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Saving...';
   try{
     const saved=await api({action:'save',contact:JSON.stringify(contact)});
@@ -857,6 +956,7 @@ async function saveContact(){
 
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
 
+// ---------- Delete ----------
 function openDelModal(id){
   deletingId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
   document.getElementById('del-msg').textContent='Delete '+c.fname+' '+c.lname+' from '+(c.company||'unknown company')+'? This cannot be undone.';
@@ -877,6 +977,7 @@ async function confirmDelete(){
 
 function closeDelModal(){document.getElementById('del-modal-bg').classList.remove('open');deletingId=null;}
 
+// ---------- Snooze ----------
 async function snooze(id){
   const c=contacts.find(x=>x.id===id);if(!c)return;
   let baseStr=todayStr();
@@ -888,6 +989,7 @@ async function snooze(id){
   catch(e){setSyncStatus('err','Snooze failed: '+e.message);}
 }
 
+// ---------- Log / Tasks / History modal ----------
 function switchTab(tab,btn){
   ['log','tasks','history'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -920,7 +1022,7 @@ function renderLogEntries(logs){
   el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' - '+esc(e.note):'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
 }
 
-// CHANGED: optimistic update - UI updates instantly, API saves in background
+// Optimistic update - UI updates instantly, API saves in background
 async function addLogEntry(){
   const c=contacts.find(x=>x.id===logContactId);if(!c)return;
   const type=document.getElementById('log-type').value;
@@ -929,22 +1031,27 @@ async function addLogEntry(){
   const ts=fmtDate(now.toISOString().slice(0,10))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const nineWeeks=new Date();nineWeeks.setDate(nineWeeks.getDate()+63);const nineWeeksStr=nineWeeks.toISOString().slice(0,10);
   const oneWeek=new Date();oneWeek.setDate(oneWeek.getDate()+7);const oneWeekStr=oneWeek.toISOString().slice(0,10);
+  const fourDays=new Date();fourDays.setDate(fourDays.getDate()+4);const fourDaysStr=fourDays.toISOString().slice(0,10);
 
-  // Update contact in memory immediately
-  if(type==='Called'||type==='Video call'||type==='Met in person'){const existingCallback=c.callbackDate||'';if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}}
-else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){c.callbackDate=oneWeekStr;}
-else if(type==='Voicemail'||type==='LinkedIn connection request'){const fourDays=new Date();fourDays.setDate(fourDays.getDate()+4);c.callbackDate=fourDays.toISOString().slice(0,10);}
+  // Callback rules by touchpoint type
+  if(type==='Called'||type==='Video call'||type==='Met in person'){
+    const existingCallback=c.callbackDate||'';
+    if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}
+  }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
+    c.callbackDate=oneWeekStr;
+  }else if(type==='Voicemail'||type==='LinkedIn connection request'){
+    c.callbackDate=fourDaysStr;
+  }
   c.lastContactDate=now.toISOString().slice(0,10);
   c.lastTouchType=type;
   c.lastTouchNote=note;
 
   // Show entry in UI immediately
-  const entry={type,note,ts};
   const currentEntries=document.getElementById('log-entries');
   const newRow='<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(type)+'</span>'+(note?' - '+esc(note):'')+'</div><div class="lts">'+ts+'</div></div>';
   if(currentEntries.querySelector('.log-entry')){
     currentEntries.insertAdjacentHTML('afterbegin',newRow);
-  } else {
+  }else{
     currentEntries.innerHTML=newRow;
   }
   document.getElementById('log-note').value='';
@@ -969,7 +1076,7 @@ function renderTaskList(){
   el.innerHTML=tasks.map((t,i)=>'<div class="task-item"><input type="checkbox"'+(t.done?' checked':'')+' onchange="toggleTask('+i+')"><span style="'+(t.done?'text-decoration:line-through;color:var(--text3)':'')+'">'+esc(t.text)+'</span></div>').join('')+(hasDone?'<div style="margin-top:8px"><button class="btn btn-sm" onclick="clearCompletedTasks()">Clear completed</button></div>':'');
 }
 
-// CHANGED: optimistic update for tasks
+// Optimistic update for tasks
 async function addTask(){
   const input=document.getElementById('task-input');const text=input.value.trim();if(!text)return;
   const c=contacts.find(x=>x.id===logContactId);if(!c)return;
@@ -977,30 +1084,26 @@ async function addTask(){
   tasks.push({text,done:false,createdAt:Date.now()});
   c.tasks=JSON.stringify(tasks);
   input.value='';
-  // Update UI immediately
   renderTaskList();
   const open=getOpenTasks(c);
   document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
   updateTaskNavBadge();
   renderCurrent();
-  // Save in background
   try{await api({action:'save',contact:JSON.stringify(c)});}
   catch(e){setSyncStatus('err','Save failed - refresh to resync');}
 }
 
-// CHANGED: optimistic update for task toggle
+// Optimistic update for task toggle
 async function toggleTask(idx){
   const c=contacts.find(x=>x.id===logContactId);if(!c)return;
   let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
   if(tasks[idx])tasks[idx].done=!tasks[idx].done;
   c.tasks=JSON.stringify(tasks);
-  // Update UI immediately
   renderTaskList();
   const open=getOpenTasks(c);
   document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
   updateTaskNavBadge();
   renderCurrent();
-  // Save in background
   try{await api({action:'save',contact:JSON.stringify(c)});}
   catch(e){setSyncStatus('err','Save failed - refresh to resync');}
 }
@@ -1010,13 +1113,11 @@ async function clearCompletedTasks(){
   let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
   tasks=tasks.filter(t=>!t.done);
   c.tasks=JSON.stringify(tasks);
-  // Update UI immediately
   renderTaskList();
   const open=getOpenTasks(c);
   document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
   updateTaskNavBadge();
   renderCurrent();
-  // Save in background
   try{await api({action:'save',contact:JSON.stringify(c)});}
   catch(e){setSyncStatus('err','Save failed - refresh to resync');}
 }
@@ -1029,13 +1130,14 @@ function renderNotesHistory(){
   el.innerHTML=history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
 }
 
+// ---------- Notes ----------
 function openNotes(id){
   notesContactId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
   document.getElementById('notes-edit').value=c.notes||'';
   document.getElementById('notes-modal-bg').classList.add('open');
 }
 
-// CHANGED: optimistic update for notes
+// Optimistic update for notes
 async function saveNotes(){
   const c=contacts.find(x=>x.id===notesContactId);if(!c)return;
   const newNote=document.getElementById('notes-edit').value.trim();
@@ -1045,16 +1147,15 @@ async function saveNotes(){
     history.push({note:c.notes,ts});c.notesHistory=JSON.stringify(history);
   }
   c.notes=newNote;
-  // Close modal and update UI immediately
   closeNotesModal();
   renderCurrent();
-  // Save in background
   try{await api({action:'save',contact:JSON.stringify(c)});}
   catch(e){setSyncStatus('err','Save failed - refresh to resync');}
 }
 
 function closeNotesModal(){document.getElementById('notes-modal-bg').classList.remove('open');notesContactId=null;}
 
+// ---------- Modal backdrop click-to-close ----------
 ['modal-bg','log-modal-bg','notes-modal-bg','del-modal-bg'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById(id).classList.remove('open');});
 });
