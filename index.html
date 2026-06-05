@@ -55,12 +55,9 @@
 
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
 
-/* PIN */
 #pin-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
 .pin-box{background:var(--bg);border-radius:var(--radius-lg);padding:36px 32px;width:340px;border:0.5px solid var(--border2);text-align:center}
 .pin-logo{margin-bottom:20px}
-.pin-logo .vant{font-size:34px;font-weight:300;color:#9a9a9a;letter-spacing:-1px}
-.pin-logo .edge{font-size:34px;font-weight:500;color:var(--orange);letter-spacing:-1px}
 .pin-box p{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
 .pin-box input{width:100%;padding:10px 12px;font-size:22px;letter-spacing:0.3em;text-align:center;border:0.5px solid var(--border2);border-radius:var(--radius);margin-bottom:10px;background:var(--bg);color:var(--text);font-family:inherit}
 .pin-box input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
@@ -68,7 +65,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .pin-btn:hover{background:var(--orange-dark)}
 .pin-error{font-size:12px;color:var(--tl-red);margin-top:8px;display:none}
 
-/* Onboarding */
 #onboarding-screen{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;padding:20px}
 #onboarding-screen.open{display:flex}
 .onboarding-box{background:var(--bg);border-radius:var(--radius-lg);padding:32px;width:480px;max-width:100%;border:0.5px solid var(--border2)}
@@ -80,13 +76,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .step-body .step-title{font-weight:500;font-size:14px;margin-bottom:3px}
 .step-body .step-desc{font-size:12px;color:var(--text2);line-height:1.5}
 
-/* App */
 #app{display:none;max-width:1200px;margin:0 auto;padding:16px}
 
-/* Nav */
-nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
-.nav-logo .vant{font-size:22px;font-weight:300;color:#9a9a9a;letter-spacing:-0.5px;line-height:1}
-.nav-logo .edge{font-size:22px;font-weight:500;color:var(--orange);letter-spacing:-0.5px;line-height:1}
+nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
 .nav-divider{width:1px;height:20px;background:var(--border2);margin:0 4px}
 .nav-btn{background:none;border:none;font-size:13px;font-weight:500;padding:6px 14px;border-radius:var(--radius);color:var(--text2);cursor:pointer}
 .nav-btn:hover{background:var(--bg2)}
@@ -100,8 +92,6 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .btn-danger{color:var(--tl-red);border-color:#f7c1c1}
 .btn-danger:hover{background:var(--red-bg)}
 .btn-sm{font-size:11px;padding:3px 9px}
-.btn-icon{background:none;border:none;cursor:pointer;color:var(--text2);padding:4px 7px;border-radius:var(--radius);font-size:15px}
-.btn-icon:hover{background:var(--bg2);color:var(--text)}
 
 .sync-status{font-size:11px;padding:3px 9px;border-radius:var(--radius);white-space:nowrap}
 .sync-ok{background:var(--green-bg);color:var(--green-text)}
@@ -147,7 +137,6 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .dot-g{background:var(--dot-green)}.dot-a{background:var(--dot-amber)}.dot-r{background:var(--dot-red)}
 .tl-g{color:var(--tl-green)}.tl-a{color:var(--tl-amber)}.tl-r{color:var(--tl-red)}
 
-/* Tooltip */
 .tooltip-wrap{position:relative;display:inline-block;margin-left:4px;vertical-align:middle}
 .tooltip-icon{width:14px;height:14px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text3);font-size:10px;cursor:default;display:inline-flex;align-items:center;justify-content:center;font-weight:500}
 .tooltip-text{display:none;position:absolute;left:20px;top:-4px;background:var(--text);color:var(--bg);font-size:11px;padding:6px 10px;border-radius:var(--radius);width:200px;line-height:1.5;z-index:100}
@@ -195,7 +184,6 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .history-ts{font-size:10px;color:var(--text3);margin-bottom:4px}
 .history-note{font-size:12px;color:var(--text2);line-height:1.5}
 
-/* Settings */
 .settings-section{margin-bottom:20px}
 .settings-section h4{font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em}
 .settings-row{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:8px}
@@ -204,15 +192,11 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .settings-row input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
 
 .empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
-
 .ve-footer{text-align:center;padding:20px 0 10px;font-size:11px;color:var(--text3)}
-.ve-footer .vant{color:#bbb;font-weight:300}
-.ve-footer .edge{color:var(--orange);font-weight:500}
 
 @media (max-width:700px){
   #app{padding:10px}
   nav{padding:8px 12px;gap:6px}
-  .nav-logo .vant,.nav-logo .edge{font-size:18px}
   .nav-btn{font-size:12px;padding:5px 10px}
   .stat-grid{grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:10px}
   .stat-card .sval{font-size:18px}
@@ -246,40 +230,21 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   <div class="pin-box">
     <div class="pin-logo"><span style="font-size:34px;font-weight:500;color:var(--text)">BD Tracker</span></div>
     <p>Enter your PIN to access your contacts.</p>
-    <input type="password" id="pin-input" maxlength="8" placeholder="• • • •" onkeydown="if(event.key==='Enter')checkPin()">
+    <input type="password" id="pin-input" maxlength="8" placeholder="&bull; &bull; &bull; &bull;" onkeydown="if(event.key==='Enter')checkPin()">
     <button class="pin-btn" onclick="checkPin()">Unlock</button>
     <div class="pin-error" id="pin-error">Incorrect PIN. Try again.</div>
   </div>
 </div>
 
-<!-- Onboarding -->
 <div id="onboarding-screen">
   <div class="onboarding-box">
     <div style="margin-bottom:16px"><span style="font-size:24px;font-weight:500;color:var(--text)">BD Tracker</span></div>
     <h2>Welcome back</h2>
     <p class="sub">Your GCC pharma BD tracker. Everything you need to manage your pipeline.</p>
     <div class="onboard-steps">
-      <div class="onboard-step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">Check your pipeline</div>
-          <div class="step-desc">Red rows are overdue, amber is this week. Work through those first before moving to green.</div>
-        </div>
-      </div>
-      <div class="onboard-step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Log every touchpoint</div>
-          <div class="step-desc">After every call, WhatsApp or LinkedIn message click Log and record what happened.</div>
-        </div>
-      </div>
-      <div class="onboard-step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">Use the Tasks view</div>
-          <div class="step-desc">Check the Tasks tab in the nav for a full list of outstanding actions across all contacts.</div>
-        </div>
-      </div>
+      <div class="onboard-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Check your pipeline</div><div class="step-desc">Red rows are overdue, amber is this week. Work through those first before moving to green.</div></div></div>
+      <div class="onboard-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Log every touchpoint</div><div class="step-desc">After every call, WhatsApp or LinkedIn message click Log and record what happened.</div></div></div>
+      <div class="onboard-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Use the Tasks view</div><div class="step-desc">Check the Tasks tab in the nav for a full list of outstanding actions across all contacts.</div></div></div>
     </div>
     <button class="pin-btn" onclick="closeOnboarding()">Get started</button>
   </div>
@@ -287,7 +252,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 
 <div id="app">
   <nav>
-    <div class="nav-logo" style="font-weight:500;font-size:15px;color:var(--text)">BD Tracker</div>
+    <div style="font-weight:500;font-size:15px;color:var(--text)">BD Tracker</div>
     <div class="nav-divider"></div>
     <button class="nav-btn active" onclick="showView('pipeline',this)">Pipeline</button>
     <button class="nav-btn" onclick="showView('accounts',this)">Accounts</button>
@@ -304,7 +269,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   <div id="v-pipeline" class="view active">
     <div class="stat-grid" id="stats"></div>
     <div class="filter-bar">
-      <input class="search-input" id="f-search" placeholder="Search name or company..." oninput="renderPipeline()">
+      <input class="search-input" id="f-search" placeholder="Search name, company, mobile, email...">
       <select id="f-status" onchange="renderPipeline()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
       <select id="f-tier" onchange="renderPipeline()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
       <select id="f-country" onchange="renderPipeline()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
@@ -332,10 +297,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <div id="all-content"></div>
   </div>
 
-  <div id="v-tasks" class="view">
-    <div id="global-tasks-content"></div>
-  </div>
-
+  <div id="v-tasks" class="view"><div id="global-tasks-content"></div></div>
   <div class="ve-footer"><span style="color:var(--text3)">BD Tracker</span> &nbsp;·&nbsp; GCC Pharma</div>
 </div>
 
@@ -353,7 +315,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <div class="fgroup"><div class="flabel">Email</div><input id="f-email" type="email" placeholder="email@company.com"></div>
       <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00447..."></div>
       <div class="fgroup">
-        <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text" id="tier-tooltip">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors. Singapore tiers shown separately.</span></span></div>
+        <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors. Singapore tiers shown separately.</span></span></div>
         <select id="f-tier2"><option value="">Select tier</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
       </div>
       <div class="fgroup">
@@ -439,7 +401,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <h3>Settings</h3>
     <div class="settings-section">
       <h4>Tier labels</h4>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Rename the four tiers to match your market. These names will appear throughout the tracker.</p>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Rename the four tiers to match your market.</p>
       <div class="settings-row"><label>Tier 1</label><input id="s-t1" placeholder="e.g. Manufacturer"></div>
       <div class="settings-row"><label>Tier 2</label><input id="s-t2" placeholder="e.g. Consultancy"></div>
       <div class="settings-row"><label>Tier 3</label><input id="s-t3" placeholder="e.g. Vendor"></div>
@@ -459,17 +421,32 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 
 <script>
 // =========================================================
-// CONFIGURATION - update before opening
+// CONFIGURATION
 // =========================================================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBjgEm5aeJ_Pw_54vXytAr6i8VLAD2970K183jevLnxGv3TMYRTmYJya0VYYsUYWSp3Q/exec';
 const PIN_CODE   = '3005';
+
+// Callback durations in days
+const CB_LONG  = 63;  // 9 weeks: Called, Video call, Met in person
+const CB_MED   = 7;   // 1 week:  Email, LinkedIn message, WhatsApp
+const CB_SHORT = 4;   // 4 days:  Voicemail, LinkedIn connection request
 // =========================================================
 
-const DEFAULT_TIERS = ['Tier 1','Tier 2','Tier 3','Tier 4'];
+const DEFAULT_TIERS   = ['Tier 1','Tier 2','Tier 3','Tier 4'];
 const DEFAULT_REGIONS = ['UK','USA','Europe','Middle East','Asia Pacific','Other'];
 
 let contacts=[],editingId=null,logContactId=null,notesContactId=null,deletingId=null,currentView='pipeline',userPin='';
-let settings = { tiers: [...DEFAULT_TIERS], regions: [...DEFAULT_REGIONS] };
+let settings={tiers:[...DEFAULT_TIERS],regions:[...DEFAULT_REGIONS]};
+let searchTimeout=null;
+let saving=false;
+
+// ---------- Local date helpers (fixes UTC timezone bugs) ----------
+function localDateStr(d){
+  d=d||new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function todayStr(){return localDateStr();}
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return localDateStr(d);}
 
 // ---------- Settings ----------
 function loadSettings(){
@@ -480,16 +457,14 @@ function loadSettings(){
 function saveSettingsToStorage(){localStorage.setItem('ve_settings',JSON.stringify(settings));}
 
 function rebuildDropdowns(){
-  const tierSelects=['f-tier','fa-tier','fall-tier','f-tier2'];
-  tierSelects.forEach(id=>{
+  ['f-tier','fa-tier','fall-tier','f-tier2'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const isFilter=id!=='f-tier2';const cur=el.value;
     el.innerHTML=isFilter?'<option value="">All tiers</option>':'<option value="">Select tier</option>';
     settings.tiers.forEach(t=>{if(t.trim())el.innerHTML+='<option value="'+esc(t)+'">'+esc(t)+'</option>';});
     el.value=cur;
   });
-  const regionSelects=['f-country','fa-country','fall-country','f-ctry'];
-  regionSelects.forEach(id=>{
+  ['f-country','fa-country','fall-country','f-ctry'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const isFilter=id!=='f-ctry';const cur=el.value;
     el.innerHTML=isFilter?'<option value="">All regions</option>':'<option value="">Select region</option>';
@@ -527,8 +502,7 @@ function checkPin(){
   if(val===PIN_CODE){
     userPin=val;localStorage.setItem('bd_pin',val);
     document.getElementById('pin-screen').style.display='none';
-    const firstTime=!localStorage.getItem('bd_seen_onboarding');
-    if(firstTime){document.getElementById('onboarding-screen').classList.add('open');}
+    if(!localStorage.getItem('bd_seen_onboarding')){document.getElementById('onboarding-screen').classList.add('open');}
     else{document.getElementById('app').style.display='block';loadContacts();}
   }else{
     document.getElementById('pin-error').style.display='block';
@@ -545,6 +519,9 @@ function closeOnboarding(){
 
 window.addEventListener('load',()=>{
   loadSettings();
+  // Debounced search - runs 200ms after user stops typing instead of on every keystroke
+  const searchEl=document.getElementById('f-search');
+  if(searchEl)searchEl.oninput=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(renderPipeline,200);};
   const saved=localStorage.getItem('bd_pin');
   if(saved===PIN_CODE){
     userPin=saved;
@@ -577,6 +554,14 @@ function api(params){
   });
 }
 
+// Shared background save - used by tasks, notes, log entries
+async function saveInBackground(c){
+  try{
+    await api({action:'save',contact:JSON.stringify(c)});
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+  }catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+}
+
 function setSyncStatus(state,msg){
   const el=document.getElementById('sync-status');
   el.className='sync-status '+(state==='ok'?'sync-ok':state==='err'?'sync-err':'sync-loading');
@@ -598,22 +583,32 @@ function exportCSV(){
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='vantEdge-contacts-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.href=url;a.download='bd-tracker-'+todayStr()+'.csv';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
 // ---------- Date helpers ----------
-function todayStr(){return new Date().toISOString().slice(0,10);}
-
 function daysDiff(ds){
   if(!ds||ds==='')return null;
-  try{const clean=String(ds).trim();let d=clean.match(/^\d{4}-\d{2}-\d{2}$/)?new Date(clean+'T00:00:00'):new Date(clean);if(isNaN(d.getTime()))return null;d.setHours(0,0,0,0);const t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}catch(e){return null;}
+  try{
+    const parts=String(ds).trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const d=parts?new Date(+parts[1],+parts[2]-1,+parts[3]):new Date(ds);
+    if(isNaN(d.getTime()))return null;
+    d.setHours(0,0,0,0);
+    const t=new Date();t.setHours(0,0,0,0);
+    return Math.round((d-t)/86400000);
+  }catch(e){return null;}
 }
 
 function fmtDate(s){
   if(!s||s==='')return'';
-  try{const clean=String(s).trim();let d=clean.match(/^\d{4}-\d{2}-\d{2}$/)?new Date(parseInt(clean.split('-')[0]),parseInt(clean.split('-')[1])-1,parseInt(clean.split('-')[2])):new Date(clean);if(isNaN(d.getTime()))return'';return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];}catch(e){return'';}
+  try{
+    const parts=String(s).trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const d=parts?new Date(+parts[1],+parts[2]-1,+parts[3]):new Date(s);
+    if(isNaN(d.getTime()))return'';
+    return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  }catch(e){return'';}
 }
 
 function cbTraffic(ds){
@@ -672,7 +667,6 @@ function touchBadge(type){
 function getOpenTasks(c){if(!c.tasks)return[];try{return JSON.parse(c.tasks).filter(t=>!t.done);}catch(e){return[];}}
 function taskBadgeHTML(c){const open=getOpenTasks(c);return open.length?'<span class="task-badge">'+open.length+'</span>':'';}
 
-// Last touchpoint block shared by pipeline + accounts views
 function lastTouchHTML(c){
   if(!c.lastTouchType)return'';
   return'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:2px">'+
@@ -710,13 +704,11 @@ function rowHTML(c){
   '</div>';
 }
 
-// Jump to accounts view filtered by company
 function goToAccount(company){
   document.getElementById('fa-search').value=company;
   document.getElementById('fa-tier').value='';
   document.getElementById('fa-country').value='';
-  const btn=document.querySelector('.nav-btn[onclick*="accounts"]');
-  showView('accounts',btn);
+  showView('accounts',document.querySelector('.nav-btn[onclick*="accounts"]'));
 }
 
 function renderStats(list){
@@ -730,32 +722,21 @@ function renderStats(list){
 }
 
 function renderPipeline(){
-  const list=filtered(
-    document.getElementById('f-status').value,
-    document.getElementById('f-tier').value,
-    document.getElementById('f-country').value,
-    document.getElementById('f-urgency').value,
-    document.getElementById('f-search').value
-  );
+  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value);
   renderStats(list);
-  const ov=list.filter(c=>urg(c)==='overdue').sort((a,b)=>{const da=new Date(a.callbackDate||'9999-12-31');const db=new Date(b.callbackDate||'9999-12-31');return da-db;});
+  const sortCb=(a,b)=>new Date(a.callbackDate||'9999-12-31')-new Date(b.callbackDate||'9999-12-31');
+  const ov=list.filter(c=>urg(c)==='overdue').sort(sortCb);
   const tod=list.filter(c=>urg(c)==='today');
-  const up=list.filter(c=>urg(c)==='upcoming').sort((a,b)=>{const da=new Date(a.callbackDate||'9999-12-31');const db=new Date(b.callbackDate||'9999-12-31');return da-db;});
+  const up=list.filter(c=>urg(c)==='upcoming').sort(sortCb);
   const no=list.filter(c=>urg(c)==='none');
-
   if(!window.pipelineSections)window.pipelineSections={overdue:true,today:true,upcoming:true,none:false};
-
   function section(key,label,items,headCls){
     if(!items.length)return'';
     const open=window.pipelineSections[key];
-    let html='<div class="section-head '+(headCls||'')+'" onclick="toggleSection(\''+key+'\')" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;">'+
-      '<span>'+label+' ('+items.length+')</span>'+
-      '<span style="font-size:12px;color:var(--text3);">'+(open?'▲':'▼')+'</span>'+
-    '</div>';
+    let html='<div class="section-head '+(headCls||'')+'" onclick="toggleSection(\''+key+'\')" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;"><span>'+label+' ('+items.length+')</span><span style="font-size:12px;color:var(--text3);">'+(open?'▲':'▼')+'</span></div>';
     if(open)items.forEach(c=>html+=rowHTML(c));
     return html;
   }
-
   let html='';
   html+=section('overdue','Overdue',ov,'section-overdue');
   html+=section('today','Today',tod,'section-today');
@@ -798,12 +779,7 @@ function renderAccounts(){
 }
 
 function renderAll(){
-  const list=filtered(
-    document.getElementById('fall-status').value,
-    document.getElementById('fall-tier').value,
-    document.getElementById('fall-country').value,
-    '',''
-  ).sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
+  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','').sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
   document.getElementById('all-content').innerHTML=list.map(c=>rowHTML(c)).join('')||'<div class="empty">No contacts match.</div>';
 }
 
@@ -849,7 +825,7 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
   tasks[taskIdx].done=true;
   c.tasks=JSON.stringify(tasks);
   updateTaskNavBadge();
-  var row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
+  const row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
   if(row){
     row.innerHTML='<input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:var(--orange);flex-shrink:0"><div><div style="font-size:13px;color:var(--text3);text-decoration:line-through">'+esc(tasks[taskIdx].text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(c.fname)+' '+esc(c.lname)+(c.company?' &middot; '+esc(c.company):'')+'</div></div>';
     row.style.opacity='0.4';
@@ -859,10 +835,8 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
     setTimeout(()=>renderGlobalTasks(),600);
   }catch(e){
     setSyncStatus('err','Save failed');
-    tasks[taskIdx].done=false;
-    c.tasks=JSON.stringify(tasks);
-    updateTaskNavBadge();
-    renderGlobalTasks();
+    tasks[taskIdx].done=false;c.tasks=JSON.stringify(tasks);
+    updateTaskNavBadge();renderGlobalTasks();
   }
 }
 
@@ -884,13 +858,7 @@ function openAdd(){
   document.getElementById('modal-title').textContent='Add contact';
   ['fname','lname','jobtitle','company','site','email','mobile','notes'].forEach(f=>document.getElementById('f-'+f).value='');
   ['ctry','tier2','stat'].forEach(f=>document.getElementById('f-'+f).value='');
-  document.getElementById('f-callback').value='';
-  document.getElementById('f-lastcontact').value='';
-  document.getElementById('f-calEventId').value='';
-  document.getElementById('f-notesHistory').value='';
-  document.getElementById('f-tasks').value='';
-  document.getElementById('f-lastTouchType').value='';
-  document.getElementById('f-lastTouchNote').value='';
+  ['f-callback','f-lastcontact','f-calEventId','f-notesHistory','f-tasks','f-lastTouchType','f-lastTouchNote'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -920,11 +888,12 @@ function openEdit(id){
 }
 
 async function saveContact(){
+  if(saving)return;
   const fname=document.getElementById('f-fname').value.trim(),lname=document.getElementById('f-lname').value.trim();
   if(!fname&&!lname){alert('Please enter a name.');return;}
+  saving=true;
   const contact={
-    id:editingId||'',
-    calEventId:document.getElementById('f-calEventId').value||'',
+    id:editingId||'',calEventId:document.getElementById('f-calEventId').value||'',
     notesHistory:document.getElementById('f-notesHistory').value||'',
     tasks:document.getElementById('f-tasks').value||'',
     lastTouchType:document.getElementById('f-lastTouchType').value||'',
@@ -950,6 +919,7 @@ async function saveContact(){
     closeModal();renderCurrent();
   }catch(e){setSyncStatus('err','Save failed: '+e.message);}
   btn.disabled=false;btn.textContent='Save';
+  saving=false;
 }
 
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
@@ -979,9 +949,17 @@ function closeDelModal(){document.getElementById('del-modal-bg').classList.remov
 async function snooze(id){
   const c=contacts.find(x=>x.id===id);if(!c)return;
   let baseStr=todayStr();
-  if(c.callbackDate){const parsed=new Date(c.callbackDate);if(!isNaN(parsed.getTime())){parsed.setHours(0,0,0,0);const today=new Date();today.setHours(0,0,0,0);if(parsed>=today){baseStr=parsed.toISOString().slice(0,10);}}}
-  const d=new Date(baseStr+'T00:00:00');d.setDate(d.getDate()+7);
-  c.callbackDate=d.toISOString().slice(0,10);
+  if(c.callbackDate){
+    const parts=String(c.callbackDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(parts){
+      const parsed=new Date(+parts[1],+parts[2]-1,+parts[3]);
+      const today=new Date();today.setHours(0,0,0,0);parsed.setHours(0,0,0,0);
+      if(parsed>=today)baseStr=c.callbackDate;
+    }
+  }
+  const p=baseStr.split('-');
+  const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
+  c.callbackDate=localDateStr(d);
   setSyncStatus('loading','Saving...');
   try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));renderCurrent();}
   catch(e){setSyncStatus('err','Snooze failed: '+e.message);}
@@ -1020,47 +998,41 @@ function renderLogEntries(logs){
   el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' - '+esc(e.note):'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
 }
 
-// Optimistic update - UI updates instantly, API saves in background
 async function addLogEntry(){
-  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  if(saving)return;saving=true;
+  const c=contacts.find(x=>x.id===logContactId);if(!c){saving=false;return;}
   const type=document.getElementById('log-type').value;
   const note=document.getElementById('log-note').value.trim();
   const now=new Date();
-  const ts=fmtDate(now.toISOString().slice(0,10))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  const nineWeeks=new Date();nineWeeks.setDate(nineWeeks.getDate()+63);const nineWeeksStr=nineWeeks.toISOString().slice(0,10);
-  const oneWeek=new Date();oneWeek.setDate(oneWeek.getDate()+7);const oneWeekStr=oneWeek.toISOString().slice(0,10);
-  const fourDays=new Date();fourDays.setDate(fourDays.getDate()+4);const fourDaysStr=fourDays.toISOString().slice(0,10);
+  const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
-  // Callback rules by touchpoint type
+  // Apply callback rules using named constants
   if(type==='Called'||type==='Video call'||type==='Met in person'){
-    const existingCallback=c.callbackDate||'';
-    if(!existingCallback||existingCallback<=todayStr()||existingCallback>nineWeeksStr){c.callbackDate=nineWeeksStr;}
+    const longDate=addDays(CB_LONG);
+    const existing=c.callbackDate||'';
+    if(!existing||existing<=todayStr()||existing>longDate){c.callbackDate=longDate;}
   }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
-    c.callbackDate=oneWeekStr;
+    c.callbackDate=addDays(CB_MED);
   }else if(type==='Voicemail'||type==='LinkedIn connection request'){
-    c.callbackDate=fourDaysStr;
+    c.callbackDate=addDays(CB_SHORT);
   }
-  c.lastContactDate=now.toISOString().slice(0,10);
+  c.lastContactDate=localDateStr(now);
   c.lastTouchType=type;
   c.lastTouchNote=note;
 
-  // Show entry in UI immediately
+  // Optimistic UI update
   const currentEntries=document.getElementById('log-entries');
   const newRow='<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(type)+'</span>'+(note?' - '+esc(note):'')+'</div><div class="lts">'+ts+'</div></div>';
-  if(currentEntries.querySelector('.log-entry')){
-    currentEntries.insertAdjacentHTML('afterbegin',newRow);
-  }else{
-    currentEntries.innerHTML=newRow;
-  }
+  if(currentEntries.querySelector('.log-entry')){currentEntries.insertAdjacentHTML('afterbegin',newRow);}
+  else{currentEntries.innerHTML=newRow;}
   document.getElementById('log-note').value='';
   renderCurrent();
 
-  // Save to API in background
   try{
     await api({action:'addLog',entry:JSON.stringify({contactId:logContactId,type,note,ts})});
-    await api({action:'save',contact:JSON.stringify(c)});
-    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+    await saveInBackground(c);
   }catch(e){setSyncStatus('err','Log failed - refresh to resync');}
+  saving=false;
 }
 
 function closeLogModal(){document.getElementById('log-modal-bg').classList.remove('open');logContactId=null;}
@@ -1074,24 +1046,21 @@ function renderTaskList(){
   el.innerHTML=tasks.map((t,i)=>'<div class="task-item"><input type="checkbox"'+(t.done?' checked':'')+' onchange="toggleTask('+i+')"><span style="'+(t.done?'text-decoration:line-through;color:var(--text3)':'')+'">'+esc(t.text)+'</span></div>').join('')+(hasDone?'<div style="margin-top:8px"><button class="btn btn-sm" onclick="clearCompletedTasks()">Clear completed</button></div>':'');
 }
 
-// Optimistic update for tasks
 async function addTask(){
-  const input=document.getElementById('task-input');const text=input.value.trim();if(!text)return;
-  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  if(saving)return;saving=true;
+  const input=document.getElementById('task-input');const text=input.value.trim();if(!text){saving=false;return;}
+  const c=contacts.find(x=>x.id===logContactId);if(!c){saving=false;return;}
   let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
   tasks.push({text,done:false,createdAt:Date.now()});
-  c.tasks=JSON.stringify(tasks);
-  input.value='';
+  c.tasks=JSON.stringify(tasks);input.value='';
   renderTaskList();
   const open=getOpenTasks(c);
   document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
-  updateTaskNavBadge();
-  renderCurrent();
-  try{await api({action:'save',contact:JSON.stringify(c)});}
-  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+  updateTaskNavBadge();renderCurrent();
+  await saveInBackground(c);
+  saving=false;
 }
 
-// Optimistic update for task toggle
 async function toggleTask(idx){
   const c=contacts.find(x=>x.id===logContactId);if(!c)return;
   let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
@@ -1100,10 +1069,8 @@ async function toggleTask(idx){
   renderTaskList();
   const open=getOpenTasks(c);
   document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
-  updateTaskNavBadge();
-  renderCurrent();
-  try{await api({action:'save',contact:JSON.stringify(c)});}
-  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+  updateTaskNavBadge();renderCurrent();
+  await saveInBackground(c);
 }
 
 async function clearCompletedTasks(){
@@ -1114,10 +1081,8 @@ async function clearCompletedTasks(){
   renderTaskList();
   const open=getOpenTasks(c);
   document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
-  updateTaskNavBadge();
-  renderCurrent();
-  try{await api({action:'save',contact:JSON.stringify(c)});}
-  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+  updateTaskNavBadge();renderCurrent();
+  await saveInBackground(c);
 }
 
 function renderNotesHistory(){
@@ -1135,20 +1100,20 @@ function openNotes(id){
   document.getElementById('notes-modal-bg').classList.add('open');
 }
 
-// Optimistic update for notes
 async function saveNotes(){
-  const c=contacts.find(x=>x.id===notesContactId);if(!c)return;
+  if(saving)return;saving=true;
+  const c=contacts.find(x=>x.id===notesContactId);if(!c){saving=false;return;}
   const newNote=document.getElementById('notes-edit').value.trim();
   if(c.notes&&c.notes!==newNote){
     let history=[];if(c.notesHistory){try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}}
-    const now=new Date();const ts=fmtDate(now.toISOString().slice(0,10))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const now=new Date();
+    const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     history.push({note:c.notes,ts});c.notesHistory=JSON.stringify(history);
   }
   c.notes=newNote;
-  closeNotesModal();
-  renderCurrent();
-  try{await api({action:'save',contact:JSON.stringify(c)});}
-  catch(e){setSyncStatus('err','Save failed - refresh to resync');}
+  closeNotesModal();renderCurrent();
+  await saveInBackground(c);
+  saving=false;
 }
 
 function closeNotesModal(){document.getElementById('notes-modal-bg').classList.remove('open');notesContactId=null;}
