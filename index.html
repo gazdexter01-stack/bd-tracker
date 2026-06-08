@@ -400,14 +400,6 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   <div class="modal" style="width:500px">
     <h3>Settings</h3>
     <div class="settings-section">
-      <h4>Tier labels</h4>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Rename the four tiers to match your market.</p>
-      <div class="settings-row"><label>Tier 1</label><input id="s-t1" placeholder="e.g. Manufacturer"></div>
-      <div class="settings-row"><label>Tier 2</label><input id="s-t2" placeholder="e.g. Consultancy"></div>
-      <div class="settings-row"><label>Tier 3</label><input id="s-t3" placeholder="e.g. Vendor"></div>
-      <div class="settings-row"><label>Tier 4</label><input id="s-t4" placeholder="e.g. Other"></div>
-    </div>
-    <div class="settings-section">
       <h4>Regions</h4>
       <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Enter your regions or countries separated by commas.</p>
       <div class="settings-row"><label>Regions</label><input id="s-regions" placeholder="UK, USA, Europe, Middle East"></div>
@@ -432,11 +424,10 @@ const CB_MED   = 7;   // 1 week:  Email, LinkedIn message, WhatsApp
 const CB_SHORT = 4;   // 4 days:  Voicemail, LinkedIn connection request
 // =========================================================
 
-const DEFAULT_TIERS   = ['T1 Manufacturer','T2 EPC/Consultancy','T3 Automation Vendors & Equip Suppliers','T1 MNC Pharma Manufacturer','T2 EPC & Engineering Consultancy','T3 CDMO'];
 const DEFAULT_REGIONS = ['UAE','Saudi Arabia','Qatar','Kuwait','Bahrain','Jordan','Oman','Singapore'];
 
 let contacts=[],editingId=null,logContactId=null,notesContactId=null,deletingId=null,currentView='pipeline',userPin='';
-let settings={tiers:[...DEFAULT_TIERS],regions:[...DEFAULT_REGIONS]};
+let settings={regions:[...DEFAULT_REGIONS]};
 let searchTimeout=null;
 let saving=false;
 
@@ -457,13 +448,7 @@ function loadSettings(){
 function saveSettingsToStorage(){localStorage.setItem('ve_settings',JSON.stringify(settings));}
 
 function rebuildDropdowns(){
-  ['f-tier','fa-tier','fall-tier','f-tier2'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const isFilter=id!=='f-tier2';const cur=el.value;
-    el.innerHTML=isFilter?'<option value="">All tiers</option>':'<option value="">Select tier</option>';
-    settings.tiers.forEach(t=>{if(t.trim())el.innerHTML+='<option value="'+esc(t)+'">'+esc(t)+'</option>';});
-    el.value=cur;
-  });
+  // Tiers are hardcoded in HTML with GCC/Singapore optgroups - do not rebuild
   ['f-country','fa-country','fall-country','f-ctry'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const isFilter=id!=='f-ctry';const cur=el.value;
@@ -474,21 +459,11 @@ function rebuildDropdowns(){
 }
 
 function openSettings(){
-  document.getElementById('s-t1').value=settings.tiers[0]||'';
-  document.getElementById('s-t2').value=settings.tiers[1]||'';
-  document.getElementById('s-t3').value=settings.tiers[2]||'';
-  document.getElementById('s-t4').value=settings.tiers[3]||'';
   document.getElementById('s-regions').value=settings.regions.join(', ');
   document.getElementById('settings-modal-bg').classList.add('open');
 }
 
 function saveSettings(){
-  settings.tiers=[
-    document.getElementById('s-t1').value.trim()||'Tier 1',
-    document.getElementById('s-t2').value.trim()||'Tier 2',
-    document.getElementById('s-t3').value.trim()||'Tier 3',
-    document.getElementById('s-t4').value.trim()||'Tier 4'
-  ];
   settings.regions=document.getElementById('s-regions').value.split(',').map(r=>r.trim()).filter(Boolean);
   if(!settings.regions.length)settings.regions=[...DEFAULT_REGIONS];
   saveSettingsToStorage();rebuildDropdowns();closeSettings();renderCurrent();
