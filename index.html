@@ -851,8 +851,8 @@ function openEdit(id){
   document.getElementById('f-mobile').value=c.mobile||'';
   document.getElementById('f-tier2').value=c.tier||'';
   document.getElementById('f-stat').value=c.status||'';
-  document.getElementById('f-callback').value=c.callbackDate||'';
-  document.getElementById('f-lastcontact').value=c.lastContactDate||'';
+  document.getElementById('f-callback').value=c.callbackDate?String(c.callbackDate).trim().slice(0,10):'';
+  document.getElementById('f-lastcontact').value=c.lastContactDate?String(c.lastContactDate).trim().slice(0,10):'';
   document.getElementById('f-notes').value=c.notes||'';
   document.getElementById('f-calEventId').value=c.calEventId||'';
   document.getElementById('f-notesHistory').value=c.notesHistory||'';
