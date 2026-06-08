@@ -192,6 +192,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .settings-row input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
 
 .empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.li-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:3px;background:#0077b5;color:#fff;font-size:9px;font-weight:700;text-decoration:none;margin-left:5px;vertical-align:middle;flex-shrink:0;line-height:1}
 .ve-footer{text-align:center;padding:20px 0 10px;font-size:11px;color:var(--text3)}
 
 @media (max-width:700px){
@@ -314,6 +315,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <div class="fgroup"><div class="flabel">Site / location</div><input id="f-site" placeholder="e.g. London office"></div>
       <div class="fgroup"><div class="flabel">Email</div><input id="f-email" type="email" placeholder="email@company.com"></div>
       <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00447..."></div>
+      <div class="fgroup full"><div class="flabel">LinkedIn URL</div><input id="f-linkedin" placeholder="https://www.linkedin.com/in/..."></div>
       <div class="fgroup">
         <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors. Singapore tiers shown separately.</span></span></div>
         <select id="f-tier2"><option value="">Select tier</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
@@ -552,8 +554,8 @@ async function loadContacts(){
 // ---------- CSV Export ----------
 function exportCSV(){
   if(!contacts.length){alert('No contacts to export.');return;}
-  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
-  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
+  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','LinkedIn','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
+  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.linkedIn,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
   const csv=[headers.map(h=>'"'+h+'"').join(','),...rows.map(r=>r.join(','))].join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
@@ -647,7 +649,7 @@ function lastTouchHTML(c){
   return'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:2px">'+
     '<div style="font-size:10px;color:var(--text3);margin-bottom:3px">Last touchpoint</div>'+
     touchBadge(c.lastTouchType)+
-    (c.lastTouchNote?'<div title="'+esc(c.lastTouchNote)+'" style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px;cursor:default;">'+esc(c.lastTouchNote)+'</div>':'')+
+    (c.lastTouchNote?'<div style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px;">'+esc(c.lastTouchNote)+'</div>':'')+
   '</div>';
 }
 
@@ -671,7 +673,7 @@ function rowHTML(c){
   const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate),u=urg(c);
   const cls=u==='overdue'?'crow overdue':u==='today'?'crow today-row':'crow';
   return'<div class="'+cls+'">'+
-    '<div><div class="cname">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">'+tierBadge(c.tier)+' '+statusBadge(c.status)+'</div></div>'+
+    '<div><div class="cname">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+(c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" class="li-icon" title="Open LinkedIn profile">in</a>':'')+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">'+tierBadge(c.tier)+' '+statusBadge(c.status)+'</div></div>'+
     '<div><div style="font-weight:500;font-size:13px;cursor:pointer;color:var(--orange)" onclick="goToAccount(\''+esc(c.company||'')+'\')">'+esc(c.company||'')+'</div><div class="csub">'+esc(c.site||'')+'</div><div class="csub">'+esc(c.country||'')+'</div>'+(c.email?'<div class="csub" style="margin-top:2px">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
     '<div><div class="notes-cell">'+(c.notes?esc(c.notes):'<span style="color:var(--text3)">No notes</span>')+'</div></div>'+
     '<div style="font-size:12px"><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Next callback</div><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+lastTouchHTML(c)+'</div>'+
@@ -740,7 +742,7 @@ function renderAccounts(){
     data.contacts.forEach(c=>{
       const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate);
       html+='<div class="csub-row">'+
-        '<div><div class="cname" style="font-size:13px">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:3px">'+statusBadge(c.status)+'</div></div>'+
+        '<div><div class="cname" style="font-size:13px">'+esc(c.fname)+' '+esc(c.lname)+taskBadgeHTML(c)+(c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" class="li-icon" title="Open LinkedIn profile">in</a>':'')+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:3px">'+statusBadge(c.status)+'</div></div>'+
         '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
         '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5">'+esc(c.notes||'')+'</div>'+
         '<div style="font-size:12px"><div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:4px"><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+lastTouchHTML(c)+'</div>'+
@@ -831,7 +833,7 @@ function clearFilters(){['f-status','f-tier','f-country','f-urgency','f-search']
 function openAdd(){
   editingId=null;
   document.getElementById('modal-title').textContent='Add contact';
-  ['fname','lname','jobtitle','company','site','email','mobile','notes'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['fname','lname','jobtitle','company','site','email','mobile','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
   ['ctry','tier2','stat'].forEach(f=>document.getElementById('f-'+f).value='');
   ['f-callback','f-lastcontact','f-calEventId','f-notesHistory','f-tasks','f-lastTouchType','f-lastTouchNote'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('modal-bg').classList.add('open');
@@ -849,10 +851,11 @@ function openEdit(id){
   document.getElementById('f-site').value=c.site||'';
   document.getElementById('f-email').value=c.email||'';
   document.getElementById('f-mobile').value=c.mobile||'';
+  document.getElementById('f-linkedin').value=c.linkedIn||'';
   document.getElementById('f-tier2').value=c.tier||'';
   document.getElementById('f-stat').value=c.status||'';
-  document.getElementById('f-callback').value=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';
-  document.getElementById('f-lastcontact').value=c.lastContactDate?localDateStr(new Date(c.lastContactDate)):'';
+  document.getElementById('f-callback').value=c.callbackDate||'';
+  document.getElementById('f-lastcontact').value=c.lastContactDate||'';
   document.getElementById('f-notes').value=c.notes||'';
   document.getElementById('f-calEventId').value=c.calEventId||'';
   document.getElementById('f-notesHistory').value=c.notesHistory||'';
@@ -880,6 +883,7 @@ async function saveContact(){
     site:document.getElementById('f-site').value.trim(),
     email:document.getElementById('f-email').value.trim(),
     mobile:document.getElementById('f-mobile').value.trim(),
+    linkedIn:document.getElementById('f-linkedin').value.trim(),
     tier:document.getElementById('f-tier2').value,
     status:document.getElementById('f-stat').value,
     callbackDate:document.getElementById('f-callback').value,
