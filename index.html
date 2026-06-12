@@ -270,9 +270,9 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <button class="nav-btn" onclick="showView('all',this)">All contacts</button>
     <button class="nav-btn" onclick="showView('tasks',this)" id="nav-tasks-btn">Tasks</button>
     <div class="nav-right">
-      <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add contact</button>
-      <button class="btn btn-sm" onclick="exportCSV()" title="Export contacts to CSV">&#8595; CSV</button>
-      <button class="btn btn-sm" onclick="loadContacts()" title="Refresh">&#8635;</button>
+      <button class="btn" onclick="openAdd()" style="color:var(--orange);border-color:var(--orange);font-size:11px;padding:3px 9px">+ Add contact</button>
+      <button class="btn" onclick="exportCSV()" title="Export contacts to CSV" style="font-size:11px;padding:3px 9px">&#8595; CSV</button>
+      <button class="btn" onclick="loadContacts()" title="Refresh" style="font-size:11px;padding:3px 9px">&#8635;</button>
       <span id="sync-status" class="sync-status sync-loading">Connecting...</span>
     </div>
   </nav>
@@ -384,7 +384,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
         <div class="notes-current-text" id="notes-current-display"></div>
         <div class="notes-update-row">
           <textarea class="notes-textarea" id="notes-edit" placeholder="Update notes..."></textarea>
-          <button class="btn btn-primary btn-sm" onclick="saveNotes()" style="align-self:flex-start;white-space:nowrap">Update notes</button>
+          <button class="btn btn-primary btn-sm" onclick="saveNotes()" style="align-self:flex-start;white-space:nowrap">Update</button>
         </div>
       </div>
       <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Previous versions</div>
@@ -845,7 +845,7 @@ function renderGlobalTasks(){
   allTasks.map(t=>'<div class="crow" style="grid-template-columns:auto 1fr auto;gap:12px;align-items:center" id="gtask-'+t.contactId+'-'+t.taskIdx+'">'+
     '<input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:var(--orange);flex-shrink:0" onchange="completeGlobalTask(\''+t.contactId+'\','+t.taskIdx+',this)">'+
     '<div><div style="font-size:13px;color:var(--text)">'+esc(t.text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(t.fname)+' '+esc(t.lname)+(t.company?' &middot; '+esc(t.company):'')+'</div></div>'+
-    '<button class="btn btn-sm" onclick="openLog(\''+t.contactId+'\',\'tasks\')" style="white-space:nowrap">View tasks</button>'+
+    '<button class="btn btn-sm" onclick="openLog(\''+t.contactId+'\',\'tasks\')">Tasks</button>'+
   '</div>').join('');
 }
 
