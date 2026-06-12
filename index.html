@@ -91,7 +91,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .btn-primary:hover{opacity:0.85}
 .btn-danger{color:var(--tl-red);border-color:#f7c1c1}
 .btn-danger:hover{background:var(--red-bg)}
-.btn-sm{font-size:11px;padding:3px 9px;min-width:44px;text-align:center}
+.btn-sm{font-size:11px;padding:3px 0;min-width:44px;width:44px;text-align:center}
 
 .sync-status{font-size:11px;padding:3px 9px;border-radius:var(--radius);white-space:nowrap}
 .sync-ok{background:var(--green-bg);color:var(--green-text)}
@@ -114,7 +114,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .section-overdue{color:var(--tl-red)}
 .section-today{color:var(--tl-amber)}
 
-.crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 125px;gap:10px;align-items:start}
+.crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
 .crow.overdue{border-left:3px solid var(--dot-red);border-radius:0 var(--radius) var(--radius) 0}
 .crow.today-row{border-left:3px solid var(--dot-amber);border-radius:0 var(--radius) var(--radius) 0}
 .cname{font-weight:500;font-size:13px}
@@ -122,7 +122,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 /* Notes cell now clickable */
 .notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer}
 .notes-cell:hover{color:var(--text)}
-.cactions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.cactions{display:grid;grid-template-columns:repeat(2,44px);gap:4px;justify-content:end}
 
 /* CHANGED: task badge now shows text label next to tier/status badges */
 .task-badge{display:inline-block;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:11px;font-weight:500;padding:2px 7px;vertical-align:middle}
