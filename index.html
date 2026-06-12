@@ -91,7 +91,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .btn-primary:hover{opacity:0.85}
 .btn-danger{color:var(--tl-red);border-color:#f7c1c1}
 .btn-danger:hover{background:var(--red-bg)}
-.btn-sm{font-size:11px;padding:3px 0;min-width:44px;width:44px;text-align:center}
+.btn-sm{font-size:11px;padding:3px 9px}
 
 .sync-status{font-size:11px;padding:3px 9px;border-radius:var(--radius);white-space:nowrap}
 .sync-ok{background:var(--green-bg);color:var(--green-text)}
@@ -122,7 +122,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 /* Notes cell now clickable */
 .notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer}
 .notes-cell:hover{color:var(--text)}
-.cactions{display:grid;grid-template-columns:repeat(2,44px);gap:4px;justify-content:end}
+.cactions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 
 /* CHANGED: task badge now shows text label next to tier/status badges */
 .task-badge{display:inline-block;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:11px;font-weight:500;padding:2px 7px;vertical-align:middle}
@@ -711,11 +711,11 @@ function rowHTML(c){
     '</div>'+
     // Col 5: action buttons (Log opens log tab, Notes opens notes history tab)
     '<div class="cactions">'+
-      '<button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button>'+
-      '<button class="btn btn-sm" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
-      '<button class="btn btn-sm" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
-      '<button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
-      '<button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
+      '<button class="btn btn-sm btn-danger" style="min-width:46px;text-align:center" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
     '</div>'+
   '</div>';
 }
@@ -796,11 +796,11 @@ function renderAccounts(){
           lastTouchHTML(c)+
         '</div>'+
         '<div class="cactions">'+
-          '<button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button>'+
-          '<button class="btn btn-sm" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
-          '<button class="btn btn-sm" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
-          '<button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
-          '<button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
+          '<button class="btn btn-sm btn-danger" style="min-width:46px;text-align:center" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
         '</div>'+
       '</div>';
     });
