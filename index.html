@@ -380,7 +380,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <!-- CHANGED: Notes history tab redesigned with editable current note -->
     <div id="tab-history" style="display:none">
       <div class="notes-current-box">
-        <div class="notes-current-label">Current note</div>
+        <div class="notes-current-label">Current note<span id="notes-current-label-ts" style="font-weight:400;color:var(--text3);margin-left:6px;font-size:11px"></span></div>
         <div class="notes-current-text" id="notes-current-display"></div>
         <div class="notes-update-row">
           <textarea class="notes-textarea" id="notes-edit" placeholder="Update notes..."></textarea>
@@ -1132,8 +1132,10 @@ async function clearCompletedTasks(){
 function renderNotesHistory(){
   const c=contacts.find(x=>x.id===logContactId);
   // Populate current note display and textarea
-  document.getElementById('notes-current-display').textContent=c&&c.notes?c.notes:'No notes added yet.';
-  document.getElementById('notes-edit').value=c&&c.notes?c.notes:'';
+const lcLabel=c&&c.lastContactDate?' · Last contact: '+fmtDate(c.lastContactDate):'';
+document.getElementById('notes-current-label-ts').textContent=lcLabel;
+document.getElementById('notes-current-display').textContent=c&&c.notes?c.notes:'No notes added yet.';
+document.getElementById('notes-edit').value=c&&c.notes?c.notes:'';
 
   const el=document.getElementById('history-content');
   if(!c||!c.notesHistory){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';return;}
