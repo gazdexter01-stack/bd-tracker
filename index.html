@@ -114,18 +114,15 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .section-overdue{color:var(--tl-red)}
 .section-today{color:var(--tl-amber)}
 
-.crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
+.crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 125px;gap:10px;align-items:start}
 .crow.overdue{border-left:3px solid var(--dot-red);border-radius:0 var(--radius) var(--radius) 0}
 .crow.today-row{border-left:3px solid var(--dot-amber);border-radius:0 var(--radius) var(--radius) 0}
 .cname{font-weight:500;font-size:13px}
 .csub{font-size:12px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* Notes cell now clickable */
-.notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer}
-.notes-cell:hover{color:var(--text)}
+.notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5}
 .cactions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 
-/* CHANGED: task badge now shows text label next to tier/status badges */
-.task-badge{display:inline-block;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:11px;font-weight:500;padding:2px 7px;vertical-align:middle}
+.task-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:10px;font-weight:600;padding:1px 6px;margin-left:4px;vertical-align:middle}
 
 .badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
 .badge-t1{background:var(--blue-bg);color:var(--blue-text)}
@@ -183,13 +180,6 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .task-add{display:flex;gap:7px;margin-top:10px}
 .task-add input{flex:1;font-size:13px;padding:6px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
 
-/* CHANGED: Notes history tab - current note editable at top */
-.notes-current-box{background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 14px;margin-bottom:14px}
-.notes-current-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
-.notes-current-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px}
-.notes-update-row{display:flex;gap:7px}
-.notes-textarea{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;min-height:70px}
-.notes-textarea:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
 .history-entry{background:var(--bg2);border-radius:var(--radius);padding:9px 11px;margin-bottom:8px}
 .history-ts{font-size:10px;color:var(--text3);margin-bottom:4px}
 .history-note{font-size:12px;color:var(--text2);line-height:1.5}
@@ -270,9 +260,9 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <button class="nav-btn" onclick="showView('all',this)">All contacts</button>
     <button class="nav-btn" onclick="showView('tasks',this)" id="nav-tasks-btn">Tasks</button>
     <div class="nav-right">
-      <button class="btn" onclick="openAdd()" style="color:var(--orange);border-color:var(--orange);font-size:11px;padding:3px 9px">+ Add contact</button>
-      <button class="btn" onclick="exportCSV()" title="Export contacts to CSV" style="font-size:11px;padding:3px 9px">&#8595; CSV</button>
-      <button class="btn" onclick="loadContacts()" title="Refresh" style="font-size:11px;padding:3px 9px">&#8635;</button>
+      <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add contact</button>
+      <button class="btn btn-sm" onclick="exportCSV()" title="Export contacts to CSV">&#8595; CSV</button>
+      <button class="btn btn-sm" onclick="loadContacts()" title="Refresh">&#8635;</button>
       <span id="sync-status" class="sync-status sync-loading">Connecting...</span>
     </div>
   </nav>
@@ -351,18 +341,17 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   </div>
 </div>
 
-<!-- Log / Tasks / Notes History modal (combined) -->
+<!-- Log / Tasks / History modal -->
 <div class="modal-bg" id="log-modal-bg">
-  <div class="modal" style="width:560px">
+  <div class="modal" style="width:520px">
     <h3 id="log-modal-title">Contact</h3>
-    <div style="font-size:12px;color:var(--text3);margin-top:-10px;margin-bottom:12px" id="log-modal-sub"></div>
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-btn-log" onclick="switchTab('log',this)">Log</button>
       <button class="tab-btn" id="tab-btn-tasks" onclick="switchTab('tasks',this)">Tasks</button>
       <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history',this)">Notes history</button>
     </div>
     <div id="tab-log">
-      <div id="log-entries" style="max-height:260px;overflow-y:auto;margin-bottom:12px"></div>
+      <div id="log-entries" style="max-height:220px;overflow-y:auto;margin-bottom:12px"></div>
       <div class="flabel" style="margin-bottom:5px">Add touchpoint</div>
       <div class="log-add">
         <select id="log-type"><option>Called</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Video call</option><option>Met in person</option></select>
@@ -371,26 +360,28 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       </div>
     </div>
     <div id="tab-tasks" style="display:none">
-      <div id="task-list" style="max-height:260px;overflow-y:auto;margin-bottom:4px"></div>
+      <div id="task-list" style="max-height:220px;overflow-y:auto;margin-bottom:4px"></div>
       <div class="task-add">
         <input id="task-input" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
         <button class="btn btn-primary btn-sm" onclick="addTask()">Add</button>
       </div>
     </div>
-    <!-- CHANGED: Notes history tab redesigned with editable current note -->
     <div id="tab-history" style="display:none">
-      <div class="notes-current-box">
-        <div class="notes-current-label">Current note</div>
-        <div class="notes-current-text" id="notes-current-display"></div>
-        <div class="notes-update-row">
-          <textarea class="notes-textarea" id="notes-edit" placeholder="Update notes..."></textarea>
-          <button class="btn btn-primary btn-sm" onclick="saveNotes()" style="align-self:flex-start;white-space:nowrap">Update</button>
-        </div>
-      </div>
-      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Previous versions</div>
-      <div id="history-content" style="max-height:220px;overflow-y:auto"></div>
+      <div id="history-content" style="max-height:280px;overflow-y:auto"></div>
     </div>
     <div class="mfooter"><button class="btn" onclick="closeLogModal()">Close</button></div>
+  </div>
+</div>
+
+<!-- Notes modal -->
+<div class="modal-bg" id="notes-modal-bg">
+  <div class="modal" style="width:440px">
+    <h3>Edit notes</h3>
+    <textarea id="notes-edit" rows="6" style="width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:8px;margin-bottom:12px;resize:vertical;font-family:inherit;background:var(--bg);color:var(--text)"></textarea>
+    <div class="mfooter">
+      <button class="btn" onclick="closeNotesModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNotes()">Save</button>
+    </div>
   </div>
 </div>
 
@@ -429,18 +420,20 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBjgEm5aeJ_Pw_54vXytAr6i8VLAD2970K183jevLnxGv3TMYRTmYJya0VYYsUYWSp3Q/exec';
 const PIN_CODE   = '3005';
 
-const CB_LONG  = 63;
-const CB_MED   = 7;
-const CB_SHORT = 4;
+// Callback durations in days
+const CB_LONG  = 63;  // 9 weeks: Called, Video call, Met in person
+const CB_MED   = 7;   // 1 week:  Email, LinkedIn message, WhatsApp
+const CB_SHORT = 4;   // 4 days:  Voicemail, LinkedIn connection request
 // =========================================================
 
 const DEFAULT_REGIONS = ['UAE','Saudi Arabia','Qatar','Kuwait','Bahrain','Jordan','Oman','Singapore'];
 
-let contacts=[],editingId=null,logContactId=null,deletingId=null,currentView='pipeline',userPin='';
+let contacts=[],editingId=null,logContactId=null,notesContactId=null,deletingId=null,currentView='pipeline',userPin='';
 let settings={regions:[...DEFAULT_REGIONS]};
 let searchTimeout=null;
 let saving=false;
 
+// ---------- Local date helpers (fixes UTC timezone bugs) ----------
 function localDateStr(d){
   d=d||new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -448,6 +441,7 @@ function localDateStr(d){
 function todayStr(){return localDateStr();}
 function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return localDateStr(d);}
 
+// ---------- Settings ----------
 function loadSettings(){
   try{const s=localStorage.getItem('ve_settings');if(s)settings=JSON.parse(s);}catch(e){}
   rebuildDropdowns();
@@ -456,6 +450,7 @@ function loadSettings(){
 function saveSettingsToStorage(){localStorage.setItem('ve_settings',JSON.stringify(settings));}
 
 function rebuildDropdowns(){
+  // Tiers are hardcoded in HTML with GCC/Singapore optgroups - do not rebuild
   ['f-country','fa-country','fall-country','f-ctry'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const isFilter=id!=='f-ctry';const cur=el.value;
@@ -478,6 +473,7 @@ function saveSettings(){
 
 function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
 
+// ---------- PIN / startup ----------
 function checkPin(){
   const val=document.getElementById('pin-input').value.trim();
   if(val===PIN_CODE){
@@ -500,6 +496,7 @@ function closeOnboarding(){
 
 window.addEventListener('load',()=>{
   loadSettings();
+  // Debounced search - runs 200ms after user stops typing instead of on every keystroke
   const searchEl=document.getElementById('f-search');
   if(searchEl)searchEl.oninput=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(renderPipeline,200);};
   const saved=localStorage.getItem('bd_pin');
@@ -517,6 +514,7 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+// ---------- JSONP API ----------
 let cbId=0;
 function api(params){
   return new Promise((resolve,reject)=>{
@@ -533,6 +531,7 @@ function api(params){
   });
 }
 
+// Shared background save - used by tasks, notes, log entries
 async function saveInBackground(c){
   try{
     await api({action:'save',contact:JSON.stringify(c)});
@@ -552,6 +551,7 @@ async function loadContacts(){
   catch(e){setSyncStatus('err','Failed: '+e.message);}
 }
 
+// ---------- CSV Export ----------
 function exportCSV(){
   if(!contacts.length){alert('No contacts to export.');return;}
   const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','LinkedIn','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
@@ -565,6 +565,7 @@ function exportCSV(){
   URL.revokeObjectURL(url);
 }
 
+// ---------- Date helpers ----------
 function daysDiff(ds){
   if(!ds||ds==='')return null;
   try{
@@ -609,6 +610,7 @@ function lcTraffic(ds){
 function urg(c){return cbTraffic(c.callbackDate).urg;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+// ---------- Badges ----------
 function tierBadge(t){
   if(!t)return'';
   const cls=t.startsWith('T1')?'badge-t1':t.startsWith('T2')?'badge-t2':'badge-t3';
@@ -640,22 +642,18 @@ function touchBadge(type){
 }
 
 function getOpenTasks(c){if(!c.tasks)return[];try{return JSON.parse(c.tasks).filter(t=>!t.done);}catch(e){return[];}}
-
-// CHANGED: task badge is now a text badge inline with tier/status badges
-function taskBadgeHTML(c){
-  const open=getOpenTasks(c);
-  return open.length?'<span class="task-badge">'+open.length+' task'+(open.length>1?'s':'')+'</span>':'';
-}
+function taskBadgeHTML(c){const open=getOpenTasks(c);return open.length?'<span class="task-badge">'+open.length+'</span>':'';}
 
 function lastTouchHTML(c){
   if(!c.lastTouchType)return'';
-  return'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:4px">'+
+  return'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:2px">'+
     '<div style="font-size:10px;color:var(--text3);margin-bottom:3px">Last touchpoint</div>'+
     touchBadge(c.lastTouchType)+
     (c.lastTouchNote?'<div title="'+esc(c.lastTouchNote)+'" style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px;cursor:default;">'+esc(c.lastTouchNote)+'</div>':'')+
   '</div>';
 }
 
+// ---------- Filtering ----------
 function filtered(status,tier,country,urgency,search){
   return contacts.filter(c=>{
     if(status&&c.status!==status)return false;
@@ -670,53 +668,16 @@ function filtered(status,tier,country,urgency,search){
   });
 }
 
-// CHANGED: notes cell now clickable (opens log modal on log tab)
-// Contact name still opens LinkedIn, company name still goes to accounts view
+// ---------- Row rendering ----------
 function rowHTML(c){
   const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate),u=urg(c);
   const cls=u==='overdue'?'crow overdue':u==='today'?'crow today-row':'crow';
-  const notesHTML=c.notes?esc(c.notes):'<span style="color:var(--text3)">No notes — click to add</span>';
   return'<div class="'+cls+'">'+
-    // Col 1: name, title, badges (task badge now inline with tier/status)
-    '<div>'+
-      '<div class="cname">'+
-        (c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
-      '</div>'+
-      '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
-      '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
-        tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+
-      '</div>'+
-    '</div>'+
-    // Col 2: company (clickable to accounts), site, country, email, mobile
-    '<div>'+
-      '<div style="font-weight:500;font-size:13px;cursor:pointer;color:var(--orange)" onclick="goToAccount(\''+esc(c.company||'')+'\')">'+esc(c.company||'')+'</div>'+
-      '<div class="csub">'+esc(c.site||'')+'</div>'+
-      '<div class="csub">'+esc(c.country||'')+'</div>'+
-      (c.email?'<div class="csub" style="margin-top:2px">'+esc(c.email)+'</div>':'')+
-      (c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+
-    '</div>'+
-    // Col 3: notes cell - clickable to open log modal
-    '<div class="notes-cell" onclick="openLog(\''+c.id+'\')" title="Click to open log">'+notesHTML+'</div>'+
-    // Col 4: callback dates and last touchpoint
-    '<div style="font-size:12px">'+
-      '<div style="margin-bottom:6px">'+
-        '<div style="font-size:10px;color:var(--text3);margin-bottom:1px">Next callback</div>'+
-        '<span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span>'+
-      '</div>'+
-      '<div style="margin-bottom:4px">'+
-        '<div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div>'+
-        '<span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span>'+
-      '</div>'+
-      lastTouchHTML(c)+
-    '</div>'+
-    // Col 5: action buttons (Log opens log tab, Notes opens notes history tab)
-    '<div class="cactions">'+
-      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
-      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
-      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
-      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
-      '<button class="btn btn-sm btn-danger" style="min-width:46px;text-align:center" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
-    '</div>'+
+    '<div><div class="cname">'+(c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">'+tierBadge(c.tier)+' '+statusBadge(c.status)+'</div></div>'+
+    '<div><div style="font-weight:500;font-size:13px;cursor:pointer;color:var(--orange)" onclick="goToAccount(\''+esc(c.company||'')+'\')">'+esc(c.company||'')+'</div><div class="csub">'+esc(c.site||'')+'</div><div class="csub">'+esc(c.country||'')+'</div>'+(c.email?'<div class="csub" style="margin-top:2px">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
+    '<div><div class="notes-cell">'+(c.notes?esc(c.notes):'<span style="color:var(--text3)">No notes</span>')+'</div></div>'+
+    '<div style="font-size:12px"><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Next callback</div><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:6px"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+lastTouchHTML(c)+'</div>'+
+    '<div class="cactions"><button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button><button class="btn btn-sm" onclick="openLog(\''+c.id+'\')">Log</button><button class="btn btn-sm" onclick="openNotes(\''+c.id+'\')">Notes</button><button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button><button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button></div>'+
   '</div>';
 }
 
@@ -781,27 +742,11 @@ function renderAccounts(){
     data.contacts.forEach(c=>{
       const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate);
       html+='<div class="csub-row">'+
-        '<div>'+
-          '<div class="cname" style="font-size:13px">'+
-            (c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
-          '</div>'+
-          '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
-          '<div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+statusBadge(c.status)+' '+taskBadgeHTML(c)+'</div>'+
-        '</div>'+
+        '<div><div class="cname" style="font-size:13px">'+(c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+taskBadgeHTML(c)+'</div><div class="csub">'+esc(c.jobTitle||'')+'</div><div style="margin-top:3px">'+statusBadge(c.status)+'</div></div>'+
         '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
-        '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer" onclick="openLog(\''+c.id+'\',\'log\')" title="Click to open log">'+esc(c.notes||'')+'</div>'+
-        '<div style="font-size:12px">'+
-          '<div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div>'+
-          '<div style="margin-bottom:4px"><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+
-          lastTouchHTML(c)+
-        '</div>'+
-        '<div class="cactions">'+
-          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
-          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
-          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
-          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
-          '<button class="btn btn-sm btn-danger" style="min-width:46px;text-align:center" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
-        '</div>'+
+        '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5">'+esc(c.notes||'')+'</div>'+
+        '<div style="font-size:12px"><div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div><div style="margin-bottom:4px"><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+lastTouchHTML(c)+'</div>'+
+        '<div class="cactions"><button class="btn btn-sm" onclick="snooze(\''+c.id+'\')">+1w</button><button class="btn btn-sm" onclick="openLog(\''+c.id+'\')">Log</button><button class="btn btn-sm" onclick="openNotes(\''+c.id+'\')">Notes</button><button class="btn btn-sm" onclick="openEdit(\''+c.id+'\')">Edit</button><button class="btn btn-sm btn-danger" onclick="openDelModal(\''+c.id+'\')">Del</button></div>'+
       '</div>';
     });
     html+='</div>';
@@ -822,6 +767,7 @@ function renderCurrent(){
   else renderAll();
 }
 
+// ---------- Tasks ----------
 function updateTaskNavBadge(){
   const total=contacts.reduce((sum,c)=>sum+getOpenTasks(c).length,0);
   const btn=document.getElementById('nav-tasks-btn');
@@ -845,7 +791,7 @@ function renderGlobalTasks(){
   allTasks.map(t=>'<div class="crow" style="grid-template-columns:auto 1fr auto;gap:12px;align-items:center" id="gtask-'+t.contactId+'-'+t.taskIdx+'">'+
     '<input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:var(--orange);flex-shrink:0" onchange="completeGlobalTask(\''+t.contactId+'\','+t.taskIdx+',this)">'+
     '<div><div style="font-size:13px;color:var(--text)">'+esc(t.text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(t.fname)+' '+esc(t.lname)+(t.company?' &middot; '+esc(t.company):'')+'</div></div>'+
-    '<button class="btn btn-sm" onclick="openLog(\''+t.contactId+'\',\'tasks\')">Tasks</button>'+
+    '<button class="btn btn-sm" onclick="openLog(\''+t.contactId+'\')" style="white-space:nowrap">View contact</button>'+
   '</div>').join('');
 }
 
@@ -871,6 +817,7 @@ async function completeGlobalTask(contactId,taskIdx,checkbox){
   }
 }
 
+// ---------- Views / nav ----------
 function showView(v,btn){
   currentView=v;
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
@@ -882,6 +829,7 @@ function showView(v,btn){
 
 function clearFilters(){['f-status','f-tier','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
 
+// ---------- Add / Edit contact ----------
 function openAdd(){
   editingId=null;
   document.getElementById('modal-title').textContent='Add contact';
@@ -955,6 +903,7 @@ async function saveContact(){
 
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
 
+// ---------- Delete ----------
 function openDelModal(id){
   deletingId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
   document.getElementById('del-msg').textContent='Delete '+c.fname+' '+c.lname+' from '+(c.company||'unknown company')+'? This cannot be undone.';
@@ -975,6 +924,7 @@ async function confirmDelete(){
 
 function closeDelModal(){document.getElementById('del-modal-bg').classList.remove('open');deletingId=null;}
 
+// ---------- Snooze ----------
 async function snooze(id){
   const c=contacts.find(x=>x.id===id);if(!c)return;
   let baseStr=todayStr();
@@ -994,53 +944,37 @@ async function snooze(id){
   catch(e){setSyncStatus('err','Snooze failed: '+e.message);}
 }
 
-// CHANGED: openLog now accepts optional tab parameter
-// Notes button calls openLog with 'history', Log button with 'log', notes cell click with 'log'
+// ---------- Log / Tasks / History modal ----------
 function switchTab(tab,btn){
   ['log','tasks','history'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+tab).style.display='block';
-  if(btn)btn.classList.add('active');
-  else document.getElementById('tab-btn-'+tab).classList.add('active');
+  btn.classList.add('active');
   if(tab==='tasks')renderTaskList();
   if(tab==='history')renderNotesHistory();
 }
 
-async function openLog(id, tab){
-  tab = tab || 'log';
+async function openLog(id){
   logContactId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
   document.getElementById('log-modal-title').textContent=c.fname+' '+c.lname;
-  document.getElementById('log-modal-sub').textContent=(c.jobTitle||'')+(c.company?' · '+c.company:'')+(c.country?' · '+c.country:'');
+  document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--text3)">Loading...</div>';
   document.getElementById('log-note').value='';
   document.getElementById('task-input').value='';
-
-  // Reset tabs
   ['log','tasks','history'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-
-  // Update tasks tab badge
+  document.getElementById('tab-log').style.display='block';
+  document.getElementById('tab-btn-log').classList.add('active');
   const open=getOpenTasks(c);
   document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
-
-  // Open on correct tab
-  document.getElementById('tab-'+tab).style.display='block';
-  document.getElementById('tab-btn-'+tab).classList.add('active');
-
   document.getElementById('log-modal-bg').classList.add('open');
-
-  if(tab==='log'){
-    document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--text3)">Loading...</div>';
-    try{const logs=await api({action:'getLogs',contactId:id});renderLogEntries(logs.slice().reverse());}
-    catch(e){document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--tl-red)">Failed to load log.</div>';}
-  }
-  if(tab==='tasks') renderTaskList();
-  if(tab==='history') renderNotesHistory();
+  try{const logs=await api({action:'getLogs',contactId:id});renderLogEntries(logs.slice().reverse());}
+  catch(e){document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--tl-red)">Failed to load log.</div>';}
 }
 
 function renderLogEntries(logs){
   const el=document.getElementById('log-entries');
   if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No touchpoints logged yet.</div>';return;}
-  el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' &mdash; '+esc(e.note):'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
+  el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' - '+esc(e.note):'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
 }
 
 async function addLogEntry(){
@@ -1051,6 +985,7 @@ async function addLogEntry(){
   const now=new Date();
   const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
+  // Apply callback rules using named constants
   if(type==='Called'||type==='Video call'||type==='Met in person'){
     const longDate=addDays(CB_LONG);
     const existing=c.callbackDate||'';
@@ -1064,8 +999,9 @@ async function addLogEntry(){
   c.lastTouchType=type;
   c.lastTouchNote=note;
 
+  // Optimistic UI update
   const currentEntries=document.getElementById('log-entries');
-  const newRow='<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(type)+'</span>'+(note?' &mdash; '+esc(note):'')+'</div><div class="lts">'+ts+'</div></div>';
+  const newRow='<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(type)+'</span>'+(note?' - '+esc(note):'')+'</div><div class="lts">'+ts+'</div></div>';
   if(currentEntries.querySelector('.log-entry')){currentEntries.insertAdjacentHTML('afterbegin',newRow);}
   else{currentEntries.innerHTML=newRow;}
   document.getElementById('log-note').value='';
@@ -1128,42 +1064,56 @@ async function clearCompletedTasks(){
   await saveInBackground(c);
 }
 
-// CHANGED: Notes history tab now shows editable current note at top + previous versions below
 function renderNotesHistory(){
-  const c=contacts.find(x=>x.id===logContactId);
-  // Populate current note display and textarea
-  document.getElementById('notes-current-display').textContent=c&&c.notes?c.notes:'No notes added yet.';
-  document.getElementById('notes-edit').value=c&&c.notes?c.notes:'';
-
-  const el=document.getElementById('history-content');
-  if(!c||!c.notesHistory){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';return;}
-  let history=[];try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}
-  if(!history.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';return;}
-  el.innerHTML=history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
+  const c=contacts.find(x=>x.id===logContactId);const el=document.getElementById('history-content');
+  if(!c){el.innerHTML='';return;}
+  let currentHTML='';
+  if(c.notes){
+    const lc=c.lastContactDate?'<span style="font-size:11px;color:var(--text3);font-weight:400"> &middot; Last contact: '+fmtDate(c.lastContactDate)+'</span>':'';
+    currentHTML='<div class="history-entry" style="margin-bottom:12px;border:0.5px solid var(--border2)"><div class="history-ts" style="font-weight:600;color:var(--text2)">Current note'+lc+'</div><div class="history-note">'+esc(c.notes)+'</div></div>';
+  }
+  let historyHTML='';
+  if(c.notesHistory){
+    let history=[];try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}
+    if(history.length){
+      historyHTML='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:8px">Previous versions</div>'+
+        history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
+    }else{
+      historyHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';
+    }
+  }else{
+    historyHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';
+  }
+  el.innerHTML=currentHTML+historyHTML;
 }
 
-// CHANGED: saveNotes now works from within the log modal (notes history tab)
+// ---------- Notes ----------
+function openNotes(id){
+  notesContactId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
+  document.getElementById('notes-edit').value=c.notes||'';
+  document.getElementById('notes-modal-bg').classList.add('open');
+}
+
 async function saveNotes(){
   if(saving)return;saving=true;
-  const c=contacts.find(x=>x.id===logContactId);if(!c){saving=false;return;}
+  const c=contacts.find(x=>x.id===notesContactId);if(!c){saving=false;return;}
   const newNote=document.getElementById('notes-edit').value.trim();
-  if(newNote===c.notes){saving=false;return;} // no change
-  if(c.notes){
+  if(c.notes&&c.notes!==newNote){
     let history=[];if(c.notesHistory){try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}}
     const now=new Date();
     const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     history.push({note:c.notes,ts});c.notesHistory=JSON.stringify(history);
   }
   c.notes=newNote;
-  // Update display immediately
-  document.getElementById('notes-current-display').textContent=newNote||'No notes added yet.';
-  renderNotesHistory();
-  renderCurrent();
+  closeNotesModal();renderCurrent();
   await saveInBackground(c);
   saving=false;
 }
 
-['modal-bg','log-modal-bg','del-modal-bg'].forEach(id=>{
+function closeNotesModal(){document.getElementById('notes-modal-bg').classList.remove('open');notesContactId=null;}
+
+// ---------- Modal backdrop click-to-close ----------
+['modal-bg','log-modal-bg','notes-modal-bg','del-modal-bg'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById(id).classList.remove('open');});
 });
 </script>
