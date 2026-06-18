@@ -375,16 +375,8 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 
 <!-- Notes modal -->
 <div class="modal-bg" id="notes-modal-bg">
-  <div class="modal" style="width:480px">
-    <h3 id="notes-modal-title">Notes</h3>
-    <div id="notes-current" style="margin-bottom:14px;display:none">
-      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
-        <span>Current note</span>
-        <span id="notes-timestamp" style="font-weight:400;font-size:11px;color:var(--text3)"></span>
-      </div>
-      <div id="notes-current-text" style="font-size:12px;color:var(--text2);line-height:1.6;background:var(--bg2);border-radius:var(--radius);padding:10px 12px;border:0.5px solid var(--border)"></div>
-    </div>
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:6px">Edit</div>
+  <div class="modal" style="width:440px">
+    <h3>Edit notes</h3>
     <textarea id="notes-edit" rows="6" style="width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:8px;margin-bottom:12px;resize:vertical;font-family:inherit;background:var(--bg);color:var(--text)"></textarea>
     <div class="mfooter">
       <button class="btn" onclick="closeNotesModal()">Cancel</button>
@@ -1074,26 +1066,31 @@ async function clearCompletedTasks(){
 
 function renderNotesHistory(){
   const c=contacts.find(x=>x.id===logContactId);const el=document.getElementById('history-content');
-  if(!c||!c.notesHistory){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous notes saved yet.</div>';return;}
-  let history=[];try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}
-  if(!history.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous notes saved yet.</div>';return;}
-  el.innerHTML=history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
+  if(!c){el.innerHTML='';return;}
+  let currentHTML='';
+  if(c.notes){
+    const lc=c.lastContactDate?'<span style="font-size:11px;color:var(--text3);font-weight:400"> &middot; Last contact: '+fmtDate(c.lastContactDate)+'</span>':'';
+    currentHTML='<div class="history-entry" style="margin-bottom:12px;border:0.5px solid var(--border2)"><div class="history-ts" style="font-weight:600;color:var(--text2)">Current note'+lc+'</div><div class="history-note">'+esc(c.notes)+'</div></div>';
+  }
+  let historyHTML='';
+  if(c.notesHistory){
+    let history=[];try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}
+    if(history.length){
+      historyHTML='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:8px">Previous versions</div>'+
+        history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
+    }else{
+      historyHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';
+    }
+  }else{
+    historyHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';
+  }
+  el.innerHTML=currentHTML+historyHTML;
 }
 
 // ---------- Notes ----------
 function openNotes(id){
   notesContactId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
-  document.getElementById('notes-modal-title').textContent=c.fname+' '+c.lname+' - Notes';
   document.getElementById('notes-edit').value=c.notes||'';
-  const currentDiv=document.getElementById('notes-current');
-  if(c.notes){
-    document.getElementById('notes-current-text').textContent=c.notes;
-    const ts=c.lastContactDate?'Last contact: '+fmtDate(c.lastContactDate):'';
-    document.getElementById('notes-timestamp').textContent=ts;
-    currentDiv.style.display='block';
-  }else{
-    currentDiv.style.display='none';
-  }
   document.getElementById('notes-modal-bg').classList.add('open');
 }
 
