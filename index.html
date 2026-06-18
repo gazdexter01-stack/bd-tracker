@@ -1040,7 +1040,7 @@ async function openLog(id, tab){
 function renderLogEntries(logs){
   const el=document.getElementById('log-entries');
   if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No touchpoints logged yet.</div>';return;}
-  el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' &mdash; '+esc(e.note):'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
+  el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0;overflow:hidden"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' &mdash; <span title="'+esc(e.note)+'" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:inline-block;max-width:280px;vertical-align:bottom;cursor:default;">'+esc(e.note)+'</span>':'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
 }
 
 async function addLogEntry(){
