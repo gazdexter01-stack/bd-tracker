@@ -1053,13 +1053,13 @@ async function addLogEntry(){
 
   if(type==='Called'||type==='Video call'||type==='Met in person'){
     const longDate=addDays(CB_LONG);
-    const existing=c.callbackDate||'';
+    const existing=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';
     if(!existing||existing<=todayStr()||existing>longDate){c.callbackDate=longDate;}
   }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
-    const medDate=addDays(CB_MED);if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<medDate){c.callbackDate=medDate;}
+    const medDate=addDays(CB_MED);const cbStr=c.callbackDate?localDateStr(new     Date(c.callbackDate)):'';if(!cbStr||cbStr<=todayStr()||cbStr<medDate){c.callbackDate=medDate;}
     if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<medDate){c.callbackDate=medDate;}
-  }else if(type==='Voicemail'||type==='LinkedIn connection request'){
-    c.callbackDate=addDays(CB_SHORT);if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<shortDate){c.callbackDate=shortDate;}
+ }else if(type==='Voicemail'||type==='LinkedIn connection request'){
+    const shortDate=addDays(CB_SHORT);const cbStr2=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';if(!cbStr2||cbStr2<=todayStr()||cbStr2<shortDate){c.callbackDate=shortDate;}
   }
   c.lastContactDate=localDateStr(now);
   c.lastTouchType=type;
