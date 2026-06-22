@@ -1056,10 +1056,10 @@ async function addLogEntry(){
     const existing=c.callbackDate||'';
     if(!existing||existing<=todayStr()||existing>longDate){c.callbackDate=longDate;}
   }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
-    c.callbackDate=addDays(CB_MED);
+    const medDate=addDays(CB_MED);if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<medDate){c.callbackDate=medDate;}
     if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<medDate){c.callbackDate=medDate;}
   }else if(type==='Voicemail'||type==='LinkedIn connection request'){
-    c.callbackDate=addDays(CB_SHORT);
+    c.callbackDate=addDays(CB_SHORT);if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<shortDate){c.callbackDate=shortDate;}
   }
   c.lastContactDate=localDateStr(now);
   c.lastTouchType=type;
