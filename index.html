@@ -120,7 +120,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .cname{font-weight:500;font-size:13px}
 .csub{font-size:12px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Notes cell now clickable */
-.notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer}
+.notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer;white-space:pre-wrap}
 .notes-cell:hover{color:var(--text)}
 .cactions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 
@@ -186,7 +186,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 /* CHANGED: Notes history tab - current note editable at top */
 .notes-current-box{background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 14px;margin-bottom:14px}
 .notes-current-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
-.notes-current-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px}
+.notes-current-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
 .notes-update-row{display:flex;gap:7px}
 .notes-textarea{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;min-height:70px}
 .notes-textarea:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
