@@ -115,6 +115,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 .section-today{color:var(--tl-amber)}
 
 .crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
+.crow.has-cb{grid-template-columns:20px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;}
 .crow.overdue{border-left:3px solid var(--dot-red);border-radius:0 var(--radius) var(--radius) 0}
 .crow.today-row{border-left:3px solid var(--dot-amber);border-radius:0 var(--radius) var(--radius) 0}
 .cname{font-weight:500;font-size:13px}
@@ -147,7 +148,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 
 .company-block{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden}
 .company-head{padding:10px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.csub-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px 125px;gap:10px;align-items:start}
+.csub-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
 .csub-row:last-child{border-bottom:none}
 
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;padding:24px 16px;justify-content:center;align-items:flex-start;overflow-y:auto}
@@ -286,6 +287,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <select id="f-country" onchange="renderPipeline()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
       <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option></select>
       <button class="btn btn-sm" onclick="clearFilters()">Clear</button>
+      <button class="btn btn-sm btn-primary" id="bulk-snooze-btn" style="display:none" onclick="bulkSnooze()">Snooze selected (<span id="bulk-count">0</span>)</button>
     </div>
     <div id="pipeline-content"></div>
   </div>
@@ -672,11 +674,12 @@ function filtered(status,tier,country,urgency,search){
 
 // CHANGED: notes cell now clickable (opens log modal on log tab)
 // Contact name still opens LinkedIn, company name still goes to accounts view
-function rowHTML(c){
+function rowHTML(c,showCheckbox=false){
   const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate),u=urg(c);
-  const cls=u==='overdue'?'crow overdue':u==='today'?'crow today-row':'crow';
+  const cls=(u==='overdue'?'crow overdue':u==='today'?'crow today-row':'crow')+(showCheckbox?' has-cb':'');
   const notesHTML=c.notes?esc(c.notes):'<span style="color:var(--text3)">No notes — click to add</span>';
   return'<div class="'+cls+'">'+
+    (showCheckbox?'<div style="display:flex;align-items:flex-start;padding-top:2px"><input type="checkbox" class="bulk-cb" data-id="'+c.id+'" onchange="updateBulkCount()" style="accent-color:var(--orange);margin-top:2px"></div>':'')+
     // Col 1: name, title, badges (task badge now inline with tier/status)
     '<div>'+
       '<div class="cname">'+
@@ -750,7 +753,7 @@ function renderPipeline(){
     if(!items.length)return'';
     const open=window.pipelineSections[key];
     let html='<div class="section-head '+(headCls||'')+'" onclick="toggleSection(\''+key+'\')" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;"><span>'+label+' ('+items.length+')</span><span style="font-size:12px;color:var(--text3);">'+(open?'▲':'▼')+'</span></div>';
-    if(open)items.forEach(c=>html+=rowHTML(c));
+    if(open)items.forEach(c=>html+=rowHTML(c,true));
     return html;
   }
   let html='';
@@ -974,6 +977,34 @@ async function confirmDelete(){
 }
 
 function closeDelModal(){document.getElementById('del-modal-bg').classList.remove('open');deletingId=null;}
+
+function updateBulkCount(){
+  const checked=document.querySelectorAll('.bulk-cb:checked');
+  const btn=document.getElementById('bulk-snooze-btn');
+  const countEl=document.getElementById('bulk-count');
+  if(checked.length>0){btn.style.display='inline-block';countEl.textContent=checked.length;}
+  else{btn.style.display='none';}
+}
+
+async function bulkSnooze(){
+  const checked=[...document.querySelectorAll('.bulk-cb:checked')];
+  if(!checked.length)return;
+  setSyncStatus('loading','Snoozing '+checked.length+' contacts...');
+  let done=0;
+  for(const cb of checked){
+    const id=cb.dataset.id;
+    const c=contacts.find(x=>x.id===id);if(!c)continue;
+    let baseStr=todayStr();
+    if(c.callbackDate){const parts=String(c.callbackDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(parts){const parsed=new Date(+parts[1],+parts[2]-1,+parts[3]);const today=new Date();today.setHours(0,0,0,0);parsed.setHours(0,0,0,0);if(parsed>=today)baseStr=c.callbackDate;}}
+    const p=baseStr.split('-');const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
+    c.callbackDate=localDateStr(d);
+    try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;done++;}
+    catch(e){setSyncStatus('err','Snooze failed on one contact');}
+  }
+  document.getElementById('bulk-snooze-btn').style.display='none';
+  setSyncStatus('ok',done+' contact'+(done!==1?'s':'')+' snoozed');
+  renderCurrent();
+}
 
 async function snooze(id){
   const c=contacts.find(x=>x.id===id);if(!c)return;
