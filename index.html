@@ -525,7 +525,7 @@ async function api(params){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(params)
     }),
-    new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout')),20000))
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout')),45000))
   ]);
   if(!resp.ok)throw new Error('HTTP '+resp.status);
   const data=await resp.json();
