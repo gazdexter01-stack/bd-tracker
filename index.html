@@ -1052,9 +1052,7 @@ async function addLogEntry(){
   const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
   if(type==='Called'||type==='Video call'||type==='Met in person'){
-    const longDate=addDays(CB_LONG);
-    const existing=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';
-    if(!existing||existing<=todayStr()||existing>longDate){c.callbackDate=longDate;}
+    c.callbackDate=addDays(CB_LONG); 
   }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
     const medDate=addDays(CB_MED);const cbStr=c.callbackDate?localDateStr(new     Date(c.callbackDate)):'';if(!cbStr||cbStr<=todayStr()||cbStr<medDate){c.callbackDate=medDate;}
     if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<medDate){c.callbackDate=medDate;}
