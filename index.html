@@ -531,7 +531,6 @@ async function api(params){
   const data=await resp.json();
   if(data.success)return data.data;
   throw new Error(data.error||'API error');
-
 }
 
 async function saveInBackground(c){
@@ -1030,9 +1029,9 @@ async function openLog(id, tab){
   document.getElementById('log-modal-bg').classList.add('open');
 
   if(tab==='log'){
-    document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--text3)">Loading...</div>';
-    try{const logs=await api({action:'getLogs',contactId:id});renderLogEntries(logs.slice().reverse());}
-    catch(e){document.getElementById('log-entries').innerHTML='<div style="font-size:12px;color:var(--tl-red)">Failed to load log.</div>';}
+    let logEntries=[];
+    try{logEntries=JSON.parse(c.logEntries||'');}catch(e){}
+    renderLogEntries(logEntries.slice().reverse());
   }
   if(tab==='tasks') renderTaskList();
   if(tab==='history') renderNotesHistory();
@@ -1072,7 +1071,10 @@ async function addLogEntry(){
   renderCurrent();
 
   try{
-    await api({action:'addLog',entry:JSON.stringify({contactId:logContactId,type,note,ts})});
+    let entries=[];
+    try{entries=JSON.parse(c.logEntries||'');}catch(e){}
+    entries.push({id:crypto.randomUUID(),contactId:logContactId,type,note,ts});
+    c.logEntries=JSON.stringify(entries);
     await saveInBackground(c);
   }catch(e){setSyncStatus('err','Log failed - refresh to resync');}
   saving=false;
