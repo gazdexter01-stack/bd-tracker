@@ -923,40 +923,101 @@ function openEdit(id){
   document.getElementById('modal-bg').classList.add('open');
 }
 
-async function saveContact(){
-  if(saving)return;
-  const fname=document.getElementById('f-fname').value.trim(),lname=document.getElementById('f-lname').value.trim();
-  if(!fname&&!lname){alert('Please enter a name.');return;}
-  saving=true;
-  const contact={
-    id:editingId||'',calEventId:document.getElementById('f-calEventId').value||'',
-    notesHistory:document.getElementById('f-notesHistory').value||'',
-    tasks:document.getElementById('f-tasks').value||'',
-    lastTouchType:document.getElementById('f-lastTouchType').value||'',
-    lastTouchNote:document.getElementById('f-lastTouchNote').value||'',
-    fname,lname,
-    jobTitle:document.getElementById('f-jobtitle').value.trim(),
-    company:document.getElementById('f-company').value.trim(),
-    country:document.getElementById('f-ctry').value,
-    site:document.getElementById('f-site').value.trim(),
-    email:document.getElementById('f-email').value.trim(),
-    mobile:document.getElementById('f-mobile').value.trim(),
-    linkedIn:document.getElementById('f-linkedin').value.trim(),
-    tier:document.getElementById('f-tier2').value,
-    status:document.getElementById('f-stat').value,
-    callbackDate:document.getElementById('f-callback').value,
-    lastContactDate:document.getElementById('f-lastcontact').value,
-    notes:document.getElementById('f-notes').value.trim()
+async function saveContact() {
+  // If the tracker is currently saving, exit to avoid duplicate network clicks
+  if (saving) {
+    console.warn("Save requested, but application is locked in a saving state. Unlocking and retrying...");
+    saving = false; 
+  }
+  
+  saving = true;
+  const btn = document.getElementById('save-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+  }
+
+  // Generate a random unique ID if it's a completely new contact row entry
+  const id = editingId || 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+  
+  // Construct a perfectly structured flat JSON payload matching the Worker D1 columns
+  const contactObj = {
+    id: id,
+    fname: document.getElementById('f-fname').value.trim(),
+    lname: document.getElementById('f-lname').value.trim(),
+    jobTitle: document.getElementById('f-jobtitle').value.trim(),
+    company: document.getElementById('f-company').value.trim(),
+    country: document.getElementById('f-ctry').value,
+    site: document.getElementById('f-site').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    mobile: document.getElementById('f-mobile').value.trim(),
+    linkedIn: document.getElementById('f-linkedin').value.trim(),
+    tier: document.getElementById('f-tier2').value,
+    status: document.getElementById('f-stat').value,
+    callbackDate: document.getElementById('f-callback').value || null,
+    lastContactDate: document.getElementById('f-lastcontact').value || null,
+    notes: document.getElementById('f-notes').value.trim(),
+    calEventId: document.getElementById('f-calEventId').value || null,
+    notesHistory: document.getElementById('f-notesHistory').value || null,
+    tasks: document.getElementById('f-tasks').value || null,
+    lastTouchType: document.getElementById('f-lastTouchType').value || null,
+    lastTouchNote: document.getElementById('f-lastTouchNote').value || null,
+    logEntries: '[]' // Base empty array for new entries
   };
-  const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Saving...';
-  try{
-    const saved=await api({action:'save',contact:JSON.stringify(contact)});
-    if(editingId){const idx=contacts.findIndex(c=>c.id===editingId);if(idx>=0)contacts[idx]=saved;}else{contacts.push(saved);}
-    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
-    closeModal();renderCurrent();
-  }catch(e){setSyncStatus('err','Save failed: '+e.message);}
-  btn.disabled=false;btn.textContent='Save';
-  saving=false;
+
+  // If editing an existing contact, preserve its historic logs/history arrays safely
+  if (editingId) {
+    const original = contacts.find(x => x.id === editingId);
+    if (original) {
+      contactObj.logEntries = original.logEntries || '[]';
+      contactObj.notesHistory = original.notesHistory || null;
+      contactObj.tasks = original.tasks || null;
+      contactObj.lastTouchType = original.lastTouchType || null;
+      contactObj.lastTouchNote = original.lastTouchNote || null;
+    }
+  }
+
+  console.log("Sending clean production contact payload to Worker:", contactObj);
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'save',
+        pin: userPin || PIN_CODE,
+        contact: contactObj
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error response state: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Worker execution response returned:", result);
+
+    if (result.success) {
+      setStatus('Saved successfully', 'ok');
+      closeModal();
+      await loadContacts(); // Re-trigger smooth background download sync
+    } else {
+      alert("Worker rejection error: " + (result.error || 'Unknown failure'));
+      setStatus('Save failed', 'err');
+    }
+  } catch (err) {
+    console.error("Fatal tracker frontend network failure:", err);
+    alert("Could not connect to backend server proxy: " + err.message);
+    setStatus('Connection error', 'err');
+  } finally {
+    // CRITICAL FIX: Always release the saving lock, no matter what happens
+    saving = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Save';
+    }
+  }
+}
 }
 
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
