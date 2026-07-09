@@ -929,7 +929,7 @@ async function saveContact(){
   if(!fname&&!lname){alert('Please enter a name.');return;}
   saving=true;
   const contact={
-    id:editingId||'',calEventId:document.getElementById('f-calEventId').value||'',
+    id:editingId||crypto.randomUUID(),calEventId:document.getElementById('f-calEventId').value||'',
     notesHistory:document.getElementById('f-notesHistory').value||'',
     tasks:document.getElementById('f-tasks').value||'',
     lastTouchType:document.getElementById('f-lastTouchType').value||'',
