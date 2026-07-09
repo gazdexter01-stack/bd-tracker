@@ -13,508 +13,314 @@
   --text:#1a1a1a;--text2:#555;--text3:#999;
   --blue-bg:#e6f1fb;--blue-text:#0c447c;
   --green-bg:#eaf3de;--green-text:#27500a;
-  --amber-bg:#faeeda;--amber-text:#633806;
-  --gray-bg:#f1efe8;--gray-text:#444441;
-  --red-bg:#fcebeb;--red-text:#791f1f;
-  --dot-green:#639922;--dot-amber:#BA7517;--dot-red:#E24B4A;
-  --tl-green:#3b6d11;--tl-amber:#BA7517;--tl-red:#a32d2d;
-  --orange:#E8620A;--orange-light:#fdf0e8;--orange-dark:#c4520a;
-  --radius:8px;--radius-lg:12px;
+  --amber-bg:#faeeda;--amber-text:#61410b;
+  --red-bg:#fdf0ed;--red-text:#7d1212;
+  --gray-bg:#f4f4f4;--gray-text:#444;
 }
 
-@media (prefers-color-scheme:dark) {
-  :root {
-    --bg:#1a1a1a;--bg2:#222222;--bg3:#141414;
-    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
-    --text:#e8e8e8;--text2:#aaa;--text3:#666;
-    --blue-bg:#0d2a45;--blue-text:#7ab8f5;
-    --green-bg:#0d2a14;--green-text:#6fcf7a;
-    --amber-bg:#2a1a05;--amber-text:#f0a854;
-    --gray-bg:#242424;--gray-text:#999;
-    --red-bg:#2a0d0d;--red-text:#f47a7a;
-    --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
-    --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
-    --orange-light:#2a1505;
-  }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background-color:var(--bg2);
+  color:var(--text);
+  line-height:1.4;
+  -webkit-font-smoothing:antialiased;
 }
 
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
-
-#pin-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.pin-box{background:var(--bg);border-radius:var(--radius-lg);padding:36px 32px;width:340px;border:0.5px solid var(--border2);text-align:center}
-.pin-logo{margin-bottom:20px}
-.pin-box p{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
-.pin-box input{width:100%;padding:10px 12px;font-size:22px;letter-spacing:0.3em;text-align:center;border:0.5px solid var(--border2);border-radius:var(--radius);margin-bottom:10px;background:var(--bg);color:var(--text);font-family:inherit}
-.pin-box input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
-.pin-btn{width:100%;padding:11px;font-size:14px;cursor:pointer;border:none;border-radius:var(--radius);background:var(--orange);color:#fff;font-family:inherit;font-weight:500}
-.pin-btn:hover{background:var(--orange-dark)}
-.pin-error{font-size:12px;color:var(--tl-red);margin-top:8px;display:none}
-
-#onboarding-screen{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;padding:20px}
-#onboarding-screen.open{display:flex}
-.onboarding-box{background:var(--bg);border-radius:var(--radius-lg);padding:32px;width:480px;max-width:100%;border:0.5px solid var(--border2)}
-.onboarding-box h2{font-size:18px;font-weight:500;margin-bottom:6px}
-.onboarding-box .sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.5}
-.onboard-steps{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
-.onboard-step{display:flex;gap:14px;align-items:flex-start}
-.step-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.step-body .step-title{font-weight:500;font-size:14px;margin-bottom:3px}
-.step-body .step-desc{font-size:12px;color:var(--text2);line-height:1.5}
-
-#app{display:none;max-width:1200px;margin:0 auto;padding:16px}
-
-nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.nav-divider{width:1px;height:20px;background:var(--border2);margin:0 4px}
-.nav-btn{background:none;border:none;font-size:13px;font-weight:500;padding:6px 14px;border-radius:var(--radius);color:var(--text2);cursor:pointer}
-.nav-btn:hover{background:var(--bg2)}
-.nav-btn.active{background:var(--bg);border:0.5px solid var(--border2);color:var(--text)}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.btn{font-size:13px;cursor:pointer;border:0.5px solid var(--border2);border-radius:var(--radius);padding:6px 14px;background:var(--bg);color:var(--text);font-family:inherit}
-.btn:hover{background:var(--bg2)}
-.btn:disabled{opacity:0.5;cursor:default}
-.btn-primary{background:var(--orange-light);color:var(--orange);border-color:var(--orange)}
-.btn-primary:hover{opacity:0.85}
-.btn-danger{color:var(--tl-red);border-color:#f7c1c1}
-.btn-danger:hover{background:var(--red-bg)}
-.btn-sm{font-size:11px;padding:3px 9px}
-
-.sync-status{font-size:11px;padding:3px 9px;border-radius:var(--radius);white-space:nowrap}
-.sync-ok{background:var(--green-bg);color:var(--green-text)}
-.sync-loading{background:var(--gray-bg);color:var(--gray-text)}
-.sync-err{background:var(--red-bg);color:var(--red-text)}
-
-.view{display:none}
-.view.active{display:block}
-
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-.stat-card{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 14px}
-.stat-card .slabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px}
-.stat-card .sval{font-size:22px;font-weight:500}
-
-.filter-bar{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center;position:sticky;top:58px;z-index:99;background:var(--bg3);padding:6px 0;}
-.filter-bar select,.filter-bar input{font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;width:auto}
-.search-input{width:190px !important}
-
-.section-head{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text2);margin:18px 0 8px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
-.section-overdue{color:var(--tl-red)}
-.section-today{color:var(--tl-amber)}
-
-.crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
-.crow.has-cb{grid-template-columns:20px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;}
-.crow.overdue{border-left:3px solid var(--dot-red);border-radius:0 var(--radius) var(--radius) 0}
-.crow.today-row{border-left:3px solid var(--dot-amber);border-radius:0 var(--radius) var(--radius) 0}
-.cname{font-weight:500;font-size:13px}
-.csub{font-size:12px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* Notes cell now clickable */
-.notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer;white-space:pre-wrap}
-.notes-cell:hover{color:var(--text)}
-.cactions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
-
-/* CHANGED: task badge now shows text label next to tier/status badges */
-.task-badge{display:inline-block;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:11px;font-weight:500;padding:2px 7px;vertical-align:middle}
-
-.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
-.badge-t1{background:var(--blue-bg);color:var(--blue-text)}
-.badge-t2{background:var(--green-bg);color:var(--green-text)}
-.badge-t3{background:var(--amber-bg);color:var(--amber-text)}
-.badge-t4{background:var(--gray-bg);color:var(--gray-text)}
-.badge-cold{background:var(--gray-bg);color:var(--gray-text)}
-.badge-warm{background:var(--amber-bg);color:var(--amber-text)}
-.badge-active{background:var(--green-bg);color:var(--green-text)}
-
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
-.dot-g{background:var(--dot-green)}.dot-a{background:var(--dot-amber)}.dot-r{background:var(--dot-red)}
-.tl-g{color:var(--tl-green)}.tl-a{color:var(--tl-amber)}.tl-r{color:var(--tl-red)}
-
-.tooltip-wrap{position:relative;display:inline-block;margin-left:4px;vertical-align:middle}
-.tooltip-icon{width:14px;height:14px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text3);font-size:10px;cursor:default;display:inline-flex;align-items:center;justify-content:center;font-weight:500}
-.tooltip-text{display:none;position:absolute;left:20px;top:-4px;background:var(--text);color:var(--bg);font-size:11px;padding:6px 10px;border-radius:var(--radius);width:200px;line-height:1.5;z-index:100}
-.tooltip-wrap:hover .tooltip-text{display:block}
-
-.company-block{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden}
-.company-head{padding:10px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.csub-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
-.csub-row:last-child{border-bottom:none}
-
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;padding:24px 16px;justify-content:center;align-items:flex-start;overflow-y:auto}
-.modal-bg.open{display:flex}
-.modal{background:var(--bg);border-radius:var(--radius-lg);padding:22px;width:580px;max-width:100%;border:0.5px solid var(--border2);margin-top:auto;margin-bottom:auto}
-.modal h3{font-size:16px;font-weight:500;margin-bottom:16px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form-grid .full{grid-column:1/-1}
-.fgroup{display:flex;flex-direction:column}
-.flabel{font-size:11px;color:var(--text2);margin-bottom:3px;display:flex;align-items:center;gap:2px}
-.fgroup input,.fgroup select,.fgroup textarea{font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);width:100%;font-family:inherit}
-.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
-.mfooter{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-.cal-note{font-size:11px;color:var(--text3);margin-top:8px}
-
-.tab-bar{display:flex;gap:0;margin-bottom:14px;border-bottom:0.5px solid var(--border)}
-.tab-btn{background:none;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:500;padding:7px 14px;color:var(--text2);cursor:pointer;border-radius:0;margin-bottom:-1px}
-.tab-btn:hover{color:var(--text);background:none}
-.tab-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
-
-.log-entry{font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--border);color:var(--text2);display:flex;justify-content:space-between;gap:8px}
-.log-entry:last-child{border-bottom:none}
-.ltype{font-weight:500;color:var(--text);white-space:nowrap}
-.lts{color:var(--text3);white-space:nowrap;font-size:11px}
-.log-add{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
-.log-add select,.log-add input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
-.log-add select{flex:1;min-width:140px}
-.log-add input{flex:2}
-
-.task-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px}
-.task-item:last-child{border-bottom:none}
-.task-item input[type=checkbox]{width:auto;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--orange)}
-.task-add{display:flex;gap:7px;margin-top:10px}
-.task-add input{flex:1;font-size:13px;padding:6px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
-
-/* CHANGED: Notes history tab - current note editable at top */
-.notes-current-box{background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 14px;margin-bottom:14px}
-.notes-current-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
-.notes-current-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
-.notes-update-row{display:flex;gap:7px}
-.notes-textarea{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;min-height:70px}
-.notes-textarea:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
-.history-entry{background:var(--bg2);border-radius:var(--radius);padding:9px 11px;margin-bottom:8px}
-.history-ts{font-size:10px;color:var(--text3);margin-bottom:4px}
-.history-note{font-size:12px;color:var(--text2);line-height:1.5}
-
-.settings-section{margin-bottom:20px}
-.settings-section h4{font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em}
-.settings-row{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:8px}
-.settings-row label{font-size:12px;color:var(--text2)}
-.settings-row input{font-size:13px;padding:6px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
-.settings-row input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
-
-.empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
-.li-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:3px;background:#0077b5;color:#fff;font-size:9px;font-weight:700;text-decoration:none;margin-left:5px;vertical-align:middle;flex-shrink:0;line-height:1}
-.ve-footer{text-align:center;padding:20px 0 10px;font-size:11px;color:var(--text3)}
-
-@media (max-width:700px){
-  #app{padding:10px}
-  nav{padding:8px 12px;gap:6px}
-  .nav-btn{font-size:12px;padding:5px 10px}
-  .stat-grid{grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:10px}
-  .stat-card .sval{font-size:18px}
-  .filter-bar{gap:5px}
-  .filter-bar select,.filter-bar input{font-size:11px;padding:4px 6px}
-  .search-input{width:100% !important}
-  .crow{grid-template-columns:1fr;gap:8px;padding:12px}
-  .crow.has-cb{grid-template-columns:1fr;}
-  .crow>div:nth-child(4){display:flex;gap:16px;background:var(--bg2);border-radius:var(--radius);padding:8px 10px}
-  .crow>div:nth-child(4)>div{margin-bottom:0;flex:1}
-  .bulk-cb{display:none}
-  #bulk-snooze-btn{display:none!important}
-  .cactions{justify-content:flex-start;flex-wrap:wrap;gap:5px}
-  .cactions .btn{flex:1;min-width:0;text-align:center;padding:6px 4px;font-size:11px}
-  .notes-cell{max-height:60px}
-  .csub-row{grid-template-columns:1fr;gap:6px;padding:10px 12px}
-  .form-grid{grid-template-columns:1fr}
-  .form-grid .full{grid-column:1}
-  .modal{padding:16px}
-  .tab-btn{font-size:12px;padding:6px 10px}
-  .log-add{flex-direction:column}
-  .log-add select,.log-add input{width:100%}
-  .task-add{flex-direction:column}
-  .mfooter{gap:6px}
-  .mfooter .btn{flex:1;text-align:center}
-  .section-head{font-size:10px;margin:14px 0 6px}
-  .settings-row{grid-template-columns:1fr;gap:4px}
-}
-</style>
-</head>
-<body>
-
-<div id="pin-screen">
-  <div class="pin-box">
-    <div class="pin-logo"><span style="font-size:34px;font-weight:500;color:var(--text)">BD Tracker</span></div>
-    <p>Enter your PIN to access your contacts.</p>
-    <input type="password" id="pin-input" maxlength="8" placeholder="&bull; &bull; &bull; &bull;" onkeydown="if(event.key==='Enter')checkPin()">
-    <button class="pin-btn" onclick="checkPin()">Unlock</button>
-    <div class="pin-error" id="pin-error">Incorrect PIN. Try again.</div>
-  </div>
-</div>
-
-<div id="onboarding-screen">
-  <div class="onboarding-box">
-    <div style="margin-bottom:16px"><span style="font-size:24px;font-weight:500;color:var(--text)">BD Tracker</span></div>
-    <h2>Welcome back</h2>
-    <p class="sub">Your GCC pharma BD tracker. Everything you need to manage your pipeline.</p>
-    <div class="onboard-steps">
-      <div class="onboard-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Check your pipeline</div><div class="step-desc">Red rows are overdue, amber is this week. Work through those first before moving to green.</div></div></div>
-      <div class="onboard-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Log every touchpoint</div><div class="step-desc">After every call, WhatsApp or LinkedIn message click Log and record what happened.</div></div></div>
-      <div class="onboard-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Use the Tasks view</div><div class="step-desc">Check the Tasks tab in the nav for a full list of outstanding actions across all contacts.</div></div></div>
-    </div>
-    <button class="pin-btn" onclick="closeOnboarding()">Get started</button>
-  </div>
-</div>
-
-<div id="app">
-  <nav>
-    <div style="font-weight:500;font-size:15px;color:var(--text)">BD Tracker</div>
-    <div class="nav-divider"></div>
-    <button class="nav-btn active" onclick="showView('pipeline',this)">Pipeline</button>
-    <button class="nav-btn" onclick="showView('accounts',this)">Accounts</button>
-    <button class="nav-btn" onclick="showView('all',this)">All contacts</button>
-    <button class="nav-btn" onclick="showView('tasks',this)" id="nav-tasks-btn">Tasks</button>
-    <div class="nav-right">
-      <button class="btn" onclick="openAdd()" style="color:var(--orange);border-color:var(--orange);font-size:11px;padding:3px 9px">+ Add contact</button>
-      <button class="btn" onclick="exportCSV()" title="Export contacts to CSV" style="font-size:11px;padding:3px 9px">&#8595; CSV</button>
-      <button class="btn" onclick="loadContacts()" title="Refresh" style="font-size:11px;padding:3px 9px">&#8635;</button>
-      <span id="sync-status" class="sync-status sync-loading">Connecting...</span>
-    </div>
-  </nav>
-
-  <div id="v-pipeline" class="view active">
-    <div class="stat-grid" id="stats"></div>
-    <div class="filter-bar">
-      <input class="search-input" id="f-search" placeholder="Search name, company, mobile, email...">
-      <select id="f-status" onchange="renderPipeline()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
-      <select id="f-tier" onchange="renderPipeline()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
-      <select id="f-country" onchange="renderPipeline()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
-      <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option></select>
-      <button class="btn btn-sm" onclick="clearFilters()">Clear</button>
-      <button class="btn btn-sm btn-primary" id="bulk-snooze-btn" style="display:none" onclick="bulkSnooze()">Snooze selected (<span id="bulk-count">0</span>)</button>
-    </div>
-    <div id="pipeline-content"></div>
-  </div>
-
-  <div id="v-accounts" class="view">
-    <div class="filter-bar">
-      <select id="fa-tier" onchange="renderAccounts()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
-      <select id="fa-country" onchange="renderAccounts()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
-      <input id="fa-search" placeholder="Search company or site..." style="width:200px" oninput="renderAccounts()">
-    </div>
-    <div id="accounts-content"></div>
-  </div>
-
-  <div id="v-all" class="view">
-    <div class="filter-bar">
-      <select id="fall-status" onchange="renderAll()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
-      <select id="fall-tier" onchange="renderAll()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
-      <select id="fall-country" onchange="renderAll()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
-    </div>
-    <div id="all-content"></div>
-  </div>
-
-  <div id="v-tasks" class="view"><div id="global-tasks-content"></div></div>
-  <div class="ve-footer"><span style="color:var(--text3)">BD Tracker</span> &nbsp;·&nbsp; GCC Pharma</div>
-</div>
-
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <h3 id="modal-title">Add contact</h3>
-    <div class="form-grid">
-      <div class="fgroup"><div class="flabel">First name</div><input id="f-fname" placeholder="First name"></div>
-      <div class="fgroup"><div class="flabel">Last name</div><input id="f-lname" placeholder="Last name"></div>
-      <div class="fgroup"><div class="flabel">Job title</div><input id="f-jobtitle" placeholder="Job title"></div>
-      <div class="fgroup"><div class="flabel">Company</div><input id="f-company" placeholder="Company name"></div>
-      <div class="fgroup"><div class="flabel">Region / country</div><select id="f-ctry"><option value="">Select country</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select></div>
-      <div class="fgroup"><div class="flabel">Site / location</div><input id="f-site" placeholder="e.g. London office"></div>
-      <div class="fgroup"><div class="flabel">Email</div><input id="f-email" type="email" placeholder="email@company.com"></div>
-      <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00447..."></div>
-      <div class="fgroup full"><div class="flabel">LinkedIn URL</div><input id="f-linkedin" placeholder="https://www.linkedin.com/in/..."></div>
-      <div class="fgroup">
-        <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors. Singapore tiers shown separately.</span></span></div>
-        <select id="f-tier2"><option value="">Select tier</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
-      </div>
-      <div class="fgroup">
-        <div class="flabel">Status <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Cold: no prior relationship. Warm: engaged but no active need. Active: current live opportunity or conversation.</span></span></div>
-        <select id="f-stat"><option value="">Select status</option><option>Cold</option><option>Warm</option><option>Active</option></select>
-      </div>
-      <div class="fgroup"><div class="flabel">Next callback date</div><input id="f-callback" type="date"></div>
-      <div class="fgroup"><div class="flabel">Last contact date</div><input id="f-lastcontact" type="date"></div>
-      <div class="fgroup full"><div class="flabel">Notes</div><textarea id="f-notes" rows="3" placeholder="Short summary of where things stand..."></textarea></div>
-    </div>
-    <input type="hidden" id="f-calEventId">
-    <input type="hidden" id="f-notesHistory">
-    <input type="hidden" id="f-tasks">
-    <input type="hidden" id="f-lastTouchType">
-    <input type="hidden" id="f-lastTouchNote">
-    <div class="cal-note">Callback dates are automatically added to your Google Calendar as reminders.</div>
-    <div class="mfooter">
-      <button class="btn" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="save-btn" onclick="saveContact()">Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-bg" id="log-modal-bg">
-  <div class="modal" style="width:560px">
-    <h3 id="log-modal-title">Contact</h3>
-    <div style="font-size:12px;color:var(--text3);margin-top:-10px;margin-bottom:12px" id="log-modal-sub"></div>
-    <div class="tab-bar">
-      <button class="tab-btn active" id="tab-btn-log" onclick="switchTab('log',this)">Log</button>
-      <button class="tab-btn" id="tab-btn-tasks" onclick="switchTab('tasks',this)">Tasks</button>
-      <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history',this)">Notes history</button>
-    </div>
-    <div id="tab-log">
-      <div id="log-entries" style="max-height:260px;overflow-y:auto;margin-bottom:12px"></div>
-      <div class="flabel" style="margin-bottom:5px">Add touchpoint</div>
-      <div class="log-add">
-        <select id="log-type"><option>Called</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Video call</option><option>Met in person</option></select>
-        <input id="log-note" placeholder="Optional note">
-        <button class="btn btn-primary btn-sm" onclick="addLogEntry()">Add</button>
-      </div>
-    </div>
-    <div id="tab-tasks" style="display:none">
-      <div id="task-list" style="max-height:260px;overflow-y:auto;margin-bottom:4px"></div>
-      <div class="task-add">
-        <input id="task-input" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
-        <button class="btn btn-primary btn-sm" onclick="addTask()">Add</button>
-      </div>
-    </div>
-    <div id="tab-history" style="display:none">
-      <div class="notes-current-box">
-        <div class="notes-current-label">Current note<span id="notes-current-label-ts" style="font-weight:400;color:var(--text3);margin-left:6px;font-size:11px"></span></div>
-        <div class="notes-current-text" id="notes-current-display"></div>
-        <div class="notes-update-row">
-          <textarea class="notes-textarea" id="notes-edit" placeholder="Update notes..."></textarea>
-          <button class="btn btn-primary btn-sm" onclick="saveNotes()" style="align-self:flex-start;white-space:nowrap">Update</button>
-        </div>
-      </div>
-      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Previous versions</div>
-      <div id="history-content" style="max-height:220px;overflow-y:auto"></div>
-    </div>
-    <div class="mfooter"><button class="btn" onclick="closeLogModal()">Close</button></div>
-  </div>
-</div>
-
-<div class="modal-bg" id="del-modal-bg">
-  <div class="modal" style="width:360px">
-    <h3>Delete contact</h3>
-    <p id="del-msg" style="font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6"></p>
-    <div class="mfooter">
-      <button class="btn" onclick="closeDelModal()">Cancel</button>
-      <button class="btn btn-danger" id="del-confirm-btn" onclick="confirmDelete()">Delete</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-bg" id="settings-modal-bg">
-  <div class="modal" style="width:500px">
-    <h3>Settings</h3>
-    <div class="settings-section">
-      <h4>Regions</h4>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Enter your regions or countries separated by commas.</p>
-      <div class="settings-row"><label>Regions</label><input id="s-regions" placeholder="UK, USA, Europe, Middle East"></div>
-    </div>
-    <div class="mfooter">
-      <button class="btn" onclick="closeSettings()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveSettings()">Save settings</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// =========================================================
-// CONFIGURATION
-// =========================================================
-const SCRIPT_URL = 'https://bd-tracker-proxy.gazdexter01.workers.dev';
-const PIN_CODE = '3005';
-const CB_LONG = 63;
-const CB_MED = 7;
-const CB_SHORT = 4;
-// =========================================================
-const DEFAULT_REGIONS = ['UAE','Saudi Arabia','Qatar','Kuwait','Bahrain','Jordan','Oman','Singapore'];
-let contacts=[],editingId=null,logContactId=null,deletingId=null,currentView='pipeline',userPin='';
-let settings={regions:[...DEFAULT_REGIONS]};
-let searchTimeout=null;
-let saving=false;
-
-function localDateStr(d){
-  const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,'0');
-  const r=String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${r}`;
+#pin-screen {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  background-color:var(--bg2);
+  padding:20px;
 }
 
-function fmtDate(s){
-  if(!s)return '';
-  const p=s.split('-');if(p.length!==3)return s;
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const mIdx=parseInt(p[1],10)-1;
-  return `${p[2]} ${months[mIdx]||p[1]} ${p[0].substr(2)}`;
+.pin-box {
+  background:var(--bg);
+  padding:32px 28px;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.06);
+  border:1px solid var(--border);
+  width:100%;
+  max-width:340px;
+  text-align:center;
 }
 
-function esc(s){
-  if(!s)return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+.pin-title {
+  font-weight:600;
+  font-size:18px;
+  margin-bottom:6px;
+  letter-spacing:-0.01em;
 }
 
-window.onload=function(){
-  document.getElementById('f-search').addEventListener('input',()=>{
-    clearTimeout(searchTimeout);
-    searchTimeout=setTimeout(()=>{renderPipeline();},250);
-  });
-  const savedPin=localStorage.getItem('ve_bd_pin');
-  if(savedPin){
-    userPin=savedPin;
-    document.getElementById('pin-screen').style.display='none';
-    document.getElementById('app').style.display='block';
-    loadContacts();
-    if(!localStorage.getItem('ve_bd_onboarded')){
-      document.getElementById('onboarding-screen').classList.add('open');
-    }
-  }
-};
-
-function checkPin(){
-  const val=document.getElementById('pin-input').value.trim();
-  if(val===PIN_CODE){
-    userPin=val;
-    localStorage.setItem('ve_bd_pin',val);
-    document.getElementById('pin-screen').style.display='none';
-    document.getElementById('app').style.display='block';
-    loadContacts();
-    if(!localStorage.getItem('ve_bd_onboarded')){
-      document.getElementById('onboarding-screen').classList.add('open');
-    }
-  }else{
-    document.getElementById('pin-error').style.display='block';
-  }
+.pin-sub {
+  font-size:13px;
+  color:var(--text2);
+  margin-bottom:24px;
 }
 
-function closeOnboarding(){
-  localStorage.setItem('ve_bd_onboarded','1');
-  document.getElementById('onboarding-screen').classList.remove('open');
+.pin-input {
+  width:100%;
+  padding:12px;
+  font-size:18px;
+  text-align:center;
+  letter-spacing:6px;
+  border:1px solid var(--border2);
+  border-radius:6px;
+  margin-bottom:16px;
+  background:var(--bg);
+  color:var(--text);
 }
 
-function setStatus(msg,type){
-  const el=document.getElementById('sync-status');if(!el)return;
-  el.textContent=msg;
-  el.className='sync-status';
-  if(type==='ok')el.classList.add('sync-ok');
-  else if(type==='err')el.classList.add('sync-err');
-  else el.classList.add('sync-loading');
+.pin-btn {
+  width:100%;
+  padding:12px;
+  background:var(--text);
+  color:var(--bg);
+  border:none;
+  border-radius:6px;
+  font-weight:500;
+  cursor:pointer;
+  font-size:14px;
 }
 
-async function loadContacts(){
-  setStatus('Loading...','load');
-  try{
-    const res=await fetch(`${SCRIPT_URL}?pin=${userPin||PIN_CODE}&action=list`);
-    if(!res.ok)throw new Error('HTTP status '+res.status);
-    const data=await res.json();
-    if(data.success){
-      contacts=data.contacts||[];
-      if(data.settings){
-        try{settings=typeof data.settings==='string'?JSON.parse(data.settings):data.settings;}catch(e){}
-        if(!settings.regions||!settings.regions.length)settings.regions=[...DEFAULT_REGIONS];
-      }
-      buildRegionDropdowns();
-      renderPipeline();
-      renderAccounts();
-      renderAll();
-      renderGlobalTasks();
-      setStatus('Connected','ok');
-    }else{
-      setStatus('Auth failure','err');
-    }
-  }catch(e){
-    console.error(e);
-    setStatus('Connection error','err');
-  }
+.pin-btn:hover {
+  opacity:0.9;
 }
 
-function buildRegionDropdown
+.pin-err {
+  color:var(--red-text);
+  background:var(--red-bg);
+  padding:8px;
+  font-size:12px;
+  border-radius:4px;
+  margin-top:12px;
+  display:none;
+}
+
+#app {
+  display:none;
+}
+
+.header {
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:90;
+}
+
+.h-top {
+  display:flex;
+  align-items:center;
+  justify-content:between;
+  padding:12px 20px;
+  border-bottom:1px solid rgba(0,0,0,0.05);
+}
+
+.logo-area {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo-mark {
+  background:var(--text);
+  color:var(--bg);
+  font-weight:700;
+  font-size:13px;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+  letter-spacing:-0.5px;
+}
+
+.logo-txt {
+  font-weight:600;
+  font-size:15px;
+  letter-spacing:-0.02em;
+}
+
+.sync-status {
+  font-size:11px;
+  font-weight:500;
+  padding:4px 8px;
+  border-radius:12px;
+  background:var(--bg3);
+  color:var(--text2);
+}
+
+.sync-ok { background:var(--green-bg); color:var(--green-text); }
+.sync-err { background:var(--red-bg); color:var(--red-text); }
+.sync-loading { background:var(--blue-bg); color:var(--blue-text); }
+
+.h-nav {
+  display:flex;
+  align-items:center;
+  justify-content:between;
+  padding:0 20px;
+  height:44px;
+}
+
+.nav-tabs {
+  display:flex;
+  gap:4px;
+  height:100%;
+  align-items:center;
+}
+
+.nav-btn {
+  background:none;
+  border:none;
+  padding:0 12px;
+  height:32px;
+  font-size:13px;
+  font-weight:500;
+  color:var(--text2);
+  cursor:pointer;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+}
+
+.nav-btn:hover {
+  background:var(--bg2);
+  color:var(--text);
+}
+
+.nav-btn.active {
+  background:var(--bg3);
+  color:var(--text);
+}
+
+.h-actions {
+  display:flex;
+  gap:8px;
+}
+
+.btn {
+  background:var(--bg);
+  border:1px solid var(--border2);
+  color:var(--text);
+  padding:6px 12px;
+  font-size:13px;
+  font-weight:500;
+  border-radius:6px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+.btn:hover { background:var(--bg2); }
+.btn-primary { background:var(--text); color:var(--bg); border-color:var(--text); }
+.btn-primary:hover { opacity:0.9; background:var(--text); }
+.btn-sm { padding:4px 8px; font-size:12px; border-radius:4px; }
+.btn-danger { color:var(--red-text); border-color:rgba(125,18,18,0.2); }
+.btn-danger:hover { background:var(--red-bg); }
+
+.main {
+  padding:20px;
+  max-width:1440px;
+  margin:0 auto;
+}
+
+.view { display:none; }
+.view.active { display:block; }
+
+.fbar {
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:16px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+
+.fbar input, .fbar select {
+  background:var(--bg);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:6px 10px;
+  font-size:13px;
+  color:var(--text);
+  outline:none;
+}
+
+.fbar input:focus, .fbar select:focus {
+  border-color:var(--text);
+}
+
+.f-search-wrap { flex:1; min-width:200px; }
+.f-search-wrap input { width:100%; }
+
+.stats-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.stat-card {
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px 16px;
+}
+
+.slabel { font-size:12px; color:var(--text2); font-weight:500; margin-bottom:4px; }
+.sval { font-size:22px; font-weight:700; letter-spacing:-0.02em; }
+
+.section-head {
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  color:var(--text2);
+  margin:24px 0 10px 0;
+  padding-bottom:4px;
+  border-bottom:1px solid var(--border);
+}
+
+.section-overdue { color:var(--red-text); border-color:rgba(125,18,18,0.15); }
+.section-today { color:var(--amber-text); border-color:rgba(97,65,11,0.15); }
+
+.table-scroller {
+  overflow-x:auto;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+}
+
+.crow {
+  display:grid;
+  grid-template-columns:30px 220px 200px 160px 1fr 110px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  align-items:start;
+  gap:12px;
+  background:var(--bg);
+}
+
+.crow:last-child { border-bottom:none; }
+.crow:hover { background:var(--bg2); }
+
+.overdue { border-left:3px solid #db4437; }
+.today-row { border-left:3px solid #f4b400; }
+
+.tl-r { color:#db4437; }
+
+.cname { font-weight:600; font-size:13.5px; display:flex; align-items:center; gap:6px; }
+.csub { font-size:12px; color:var(--text2); margin-top:2px; }
+.badge {
+  display:inline-block;
+  font-size:10.5px;
+  font-weight:600;
+  padding:2
