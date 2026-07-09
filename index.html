@@ -4,6 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GCC Pharma BD Tracker</title>
+<!--
+=========================================================
+  vantEdge BD Tracker
+  © Gary Dexter 2026 - vantEdge
+  All rights reserved.
+
+  Licensed for single user use only.
+  Redistribution, resale, sharing or republishing
+  of this code in whole or in part is strictly prohibited.
+
+  Licenced to: [BUYER NAME]
+  Licence issued: [DATE]
+  Contact: gary@thevantedge.co
+=========================================================
+-->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -13,314 +28,1182 @@
   --text:#1a1a1a;--text2:#555;--text3:#999;
   --blue-bg:#e6f1fb;--blue-text:#0c447c;
   --green-bg:#eaf3de;--green-text:#27500a;
-  --amber-bg:#faeeda;--amber-text:#61410b;
-  --red-bg:#fdf0ed;--red-text:#7d1212;
-  --gray-bg:#f4f4f4;--gray-text:#444;
+  --amber-bg:#faeeda;--amber-text:#633806;
+  --gray-bg:#f1efe8;--gray-text:#444441;
+  --red-bg:#fcebeb;--red-text:#791f1f;
+  --dot-green:#639922;--dot-amber:#BA7517;--dot-red:#E24B4A;
+  --tl-green:#3b6d11;--tl-amber:#BA7517;--tl-red:#a32d2d;
+  --orange:#E8620A;--orange-light:#fdf0e8;--orange-dark:#c4520a;
+  --radius:8px;--radius-lg:12px;
 }
 
-body {
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background-color:var(--bg2);
-  color:var(--text);
-  line-height:1.4;
-  -webkit-font-smoothing:antialiased;
+@media (prefers-color-scheme:dark) {
+  :root {
+    --bg:#1a1a1a;--bg2:#222222;--bg3:#141414;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+    --text:#e8e8e8;--text2:#aaa;--text3:#666;
+    --blue-bg:#0d2a45;--blue-text:#7ab8f5;
+    --green-bg:#0d2a14;--green-text:#6fcf7a;
+    --amber-bg:#2a1a05;--amber-text:#f0a854;
+    --gray-bg:#242424;--gray-text:#999;
+    --red-bg:#2a0d0d;--red-text:#f47a7a;
+    --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
+    --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
+    --orange-light:#2a1505;
+  }
 }
 
-#pin-screen {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  min-height:100vh;
-  background-color:var(--bg2);
-  padding:20px;
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
+
+#pin-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.pin-box{background:var(--bg);border-radius:var(--radius-lg);padding:36px 32px;width:340px;border:0.5px solid var(--border2);text-align:center}
+.pin-logo{margin-bottom:20px}
+.pin-box p{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.pin-box input{width:100%;padding:10px 12px;font-size:22px;letter-spacing:0.3em;text-align:center;border:0.5px solid var(--border2);border-radius:var(--radius);margin-bottom:10px;background:var(--bg);color:var(--text);font-family:inherit}
+.pin-box input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
+.pin-btn{width:100%;padding:11px;font-size:14px;cursor:pointer;border:none;border-radius:var(--radius);background:var(--orange);color:#fff;font-family:inherit;font-weight:500}
+.pin-btn:hover{background:var(--orange-dark)}
+.pin-error{font-size:12px;color:var(--tl-red);margin-top:8px;display:none}
+
+#onboarding-screen{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;padding:20px}
+#onboarding-screen.open{display:flex}
+.onboarding-box{background:var(--bg);border-radius:var(--radius-lg);padding:32px;width:480px;max-width:100%;border:0.5px solid var(--border2)}
+.onboarding-box h2{font-size:18px;font-weight:500;margin-bottom:6px}
+.onboarding-box .sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.5}
+.onboard-steps{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+.onboard-step{display:flex;gap:14px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body .step-title{font-weight:500;font-size:14px;margin-bottom:3px}
+.step-body .step-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+#app{display:none;max-width:1200px;margin:0 auto;padding:16px}
+
+nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.nav-divider{width:1px;height:20px;background:var(--border2);margin:0 4px}
+.nav-btn{background:none;border:none;font-size:13px;font-weight:500;padding:6px 14px;border-radius:var(--radius);color:var(--text2);cursor:pointer}
+.nav-btn:hover{background:var(--bg2)}
+.nav-btn.active{background:var(--bg);border:0.5px solid var(--border2);color:var(--text)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{font-size:13px;cursor:pointer;border:0.5px solid var(--border2);border-radius:var(--radius);padding:6px 14px;background:var(--bg);color:var(--text);font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btn:disabled{opacity:0.5;cursor:default}
+.btn-primary{background:var(--orange-light);color:var(--orange);border-color:var(--orange)}
+.btn-primary:hover{opacity:0.85}
+.btn-danger{color:var(--tl-red);border-color:#f7c1c1}
+.btn-danger:hover{background:var(--red-bg)}
+.btn-sm{font-size:11px;padding:3px 9px}
+
+.sync-status{font-size:11px;padding:3px 9px;border-radius:var(--radius);white-space:nowrap}
+.sync-ok{background:var(--green-bg);color:var(--green-text)}
+.sync-loading{background:var(--gray-bg);color:var(--gray-text)}
+.sync-err{background:var(--red-bg);color:var(--red-text)}
+
+.view{display:none}
+.view.active{display:block}
+
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 14px}
+.stat-card .slabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px}
+.stat-card .sval{font-size:22px;font-weight:500}
+
+.filter-bar{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center;position:sticky;top:58px;z-index:99;background:var(--bg3);padding:6px 0;}
+.filter-bar select,.filter-bar input{font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;width:auto}
+.search-input{width:190px !important}
+
+.section-head{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text2);margin:18px 0 8px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+.section-overdue{color:var(--tl-red)}
+.section-today{color:var(--tl-amber)}
+
+.crow{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
+.crow.has-cb{grid-template-columns:20px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;}
+.crow.overdue{border-left:3px solid var(--dot-red);border-radius:0 var(--radius) var(--radius) 0}
+.crow.today-row{border-left:3px solid var(--dot-amber);border-radius:0 var(--radius) var(--radius) 0}
+.cname{font-weight:500;font-size:13px}
+.csub{font-size:12px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Notes cell now clickable */
+.notes-cell{max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer;white-space:pre-wrap}
+.notes-cell:hover{color:var(--text)}
+.cactions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+
+/* CHANGED: task badge now shows text label next to tier/status badges */
+.task-badge{display:inline-block;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:11px;font-weight:500;padding:2px 7px;vertical-align:middle}
+
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.badge-t1{background:var(--blue-bg);color:var(--blue-text)}
+.badge-t2{background:var(--green-bg);color:var(--green-text)}
+.badge-t3{background:var(--amber-bg);color:var(--amber-text)}
+.badge-t4{background:var(--gray-bg);color:var(--gray-text)}
+.badge-cold{background:var(--gray-bg);color:var(--gray-text)}
+.badge-warm{background:var(--amber-bg);color:var(--amber-text)}
+.badge-active{background:var(--green-bg);color:var(--green-text)}
+
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.dot-g{background:var(--dot-green)}.dot-a{background:var(--dot-amber)}.dot-r{background:var(--dot-red)}
+.tl-g{color:var(--tl-green)}.tl-a{color:var(--tl-amber)}.tl-r{color:var(--tl-red)}
+
+.tooltip-wrap{position:relative;display:inline-block;margin-left:4px;vertical-align:middle}
+.tooltip-icon{width:14px;height:14px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text3);font-size:10px;cursor:default;display:inline-flex;align-items:center;justify-content:center;font-weight:500}
+.tooltip-text{display:none;position:absolute;left:20px;top:-4px;background:var(--text);color:var(--bg);font-size:11px;padding:6px 10px;border-radius:var(--radius);width:200px;line-height:1.5;z-index:100}
+.tooltip-wrap:hover .tooltip-text{display:block}
+
+.company-block{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden}
+.company-head{padding:10px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.csub-row{padding:10px 14px;border-bottom:0.5px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px 150px;gap:10px;align-items:start}
+.csub-row:last-child{border-bottom:none}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;padding:24px 16px;justify-content:center;align-items:flex-start;overflow-y:auto}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius-lg);padding:22px;width:580px;max-width:100%;border:0.5px solid var(--border2);margin-top:auto;margin-bottom:auto}
+.modal h3{font-size:16px;font-weight:500;margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid .full{grid-column:1/-1}
+.fgroup{display:flex;flex-direction:column}
+.flabel{font-size:11px;color:var(--text2);margin-bottom:3px;display:flex;align-items:center;gap:2px}
+.fgroup input,.fgroup select,.fgroup textarea{font-size:13px;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);width:100%;font-family:inherit}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
+.mfooter{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.cal-note{font-size:11px;color:var(--text3);margin-top:8px}
+
+.tab-bar{display:flex;gap:0;margin-bottom:14px;border-bottom:0.5px solid var(--border)}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:500;padding:7px 14px;color:var(--text2);cursor:pointer;border-radius:0;margin-bottom:-1px}
+.tab-btn:hover{color:var(--text);background:none}
+.tab-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
+
+.log-entry{font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--border);color:var(--text2);display:flex;justify-content:space-between;gap:8px}
+.log-entry:last-child{border-bottom:none}
+.ltype{font-weight:500;color:var(--text);white-space:nowrap}
+.lts{color:var(--text3);white-space:nowrap;font-size:11px}
+.log-add{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.log-add select,.log-add input{font-size:13px;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+.log-add select{flex:1;min-width:140px}
+.log-add input{flex:2}
+
+.task-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.task-item:last-child{border-bottom:none}
+.task-item input[type=checkbox]{width:auto;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--orange)}
+.task-add{display:flex;gap:7px;margin-top:10px}
+.task-add input{flex:1;font-size:13px;padding:6px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+
+/* CHANGED: Notes history tab - current note editable at top */
+.notes-current-box{background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px 14px;margin-bottom:14px}
+.notes-current-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.notes-current-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
+.notes-update-row{display:flex;gap:7px}
+.notes-textarea{flex:1;font-size:13px;padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;min-height:70px}
+.notes-textarea:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
+.history-entry{background:var(--bg2);border-radius:var(--radius);padding:9px 11px;margin-bottom:8px}
+.history-ts{font-size:10px;color:var(--text3);margin-bottom:4px}
+.history-note{font-size:12px;color:var(--text2);line-height:1.5}
+
+.settings-section{margin-bottom:20px}
+.settings-section h4{font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em}
+.settings-row{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.settings-row label{font-size:12px;color:var(--text2)}
+.settings-row input{font-size:13px;padding:6px 9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit}
+.settings-row input:focus{outline:none;box-shadow:0 0 0 2px var(--orange)}
+
+.empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.li-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:3px;background:#0077b5;color:#fff;font-size:9px;font-weight:700;text-decoration:none;margin-left:5px;vertical-align:middle;flex-shrink:0;line-height:1}
+.ve-footer{text-align:center;padding:20px 0 10px;font-size:11px;color:var(--text3)}
+
+@media (max-width:700px){
+  #app{padding:10px}
+  nav{padding:8px 12px;gap:6px}
+  .nav-btn{font-size:12px;padding:5px 10px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:10px}
+  .stat-card .sval{font-size:18px}
+  .filter-bar{gap:5px}
+  .filter-bar select,.filter-bar input{font-size:11px;padding:4px 6px}
+  .search-input{width:100% !important}
+  .crow{grid-template-columns:1fr;gap:8px;padding:12px}
+  .crow.has-cb{grid-template-columns:1fr;}
+  .crow>div:nth-child(4){display:flex;gap:16px;background:var(--bg2);border-radius:var(--radius);padding:8px 10px}
+  .crow>div:nth-child(4)>div{margin-bottom:0;flex:1}
+  .bulk-cb{display:none}
+  #bulk-snooze-btn{display:none!important}
+  .cactions{justify-content:flex-start;flex-wrap:wrap;gap:5px}
+  .cactions .btn{flex:1;min-width:0;text-align:center;padding:6px 4px;font-size:11px}
+  .notes-cell{max-height:60px}
+  .csub-row{grid-template-columns:1fr;gap:6px;padding:10px 12px}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid .full{grid-column:1}
+  .modal{padding:16px}
+  .tab-btn{font-size:12px;padding:6px 10px}
+  .log-add{flex-direction:column}
+  .log-add select,.log-add input{width:100%}
+  .task-add{flex-direction:column}
+  .mfooter{gap:6px}
+  .mfooter .btn{flex:1;text-align:center}
+  .section-head{font-size:10px;margin:14px 0 6px}
+  .settings-row{grid-template-columns:1fr;gap:4px}
+}
+</style>
+</head>
+<body>
+
+<div id="pin-screen">
+  <div class="pin-box">
+    <div class="pin-logo"><span style="font-size:34px;font-weight:500;color:var(--text)">BD Tracker</span></div>
+    <p>Enter your PIN to access your contacts.</p>
+    <input type="password" id="pin-input" maxlength="8" placeholder="&bull; &bull; &bull; &bull;" onkeydown="if(event.key==='Enter')checkPin()">
+    <button class="pin-btn" onclick="checkPin()">Unlock</button>
+    <div class="pin-error" id="pin-error">Incorrect PIN. Try again.</div>
+  </div>
+</div>
+
+<div id="onboarding-screen">
+  <div class="onboarding-box">
+    <div style="margin-bottom:16px"><span style="font-size:24px;font-weight:500;color:var(--text)">BD Tracker</span></div>
+    <h2>Welcome back</h2>
+    <p class="sub">Your GCC pharma BD tracker. Everything you need to manage your pipeline.</p>
+    <div class="onboard-steps">
+      <div class="onboard-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Check your pipeline</div><div class="step-desc">Red rows are overdue, amber is this week. Work through those first before moving to green.</div></div></div>
+      <div class="onboard-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Log every touchpoint</div><div class="step-desc">After every call, WhatsApp or LinkedIn message click Log and record what happened.</div></div></div>
+      <div class="onboard-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Use the Tasks view</div><div class="step-desc">Check the Tasks tab in the nav for a full list of outstanding actions across all contacts.</div></div></div>
+    </div>
+    <button class="pin-btn" onclick="closeOnboarding()">Get started</button>
+  </div>
+</div>
+
+<div id="app">
+  <nav>
+    <div style="font-weight:500;font-size:15px;color:var(--text)">BD Tracker</div>
+    <div class="nav-divider"></div>
+    <button class="nav-btn active" onclick="showView('pipeline',this)">Pipeline</button>
+    <button class="nav-btn" onclick="showView('accounts',this)">Accounts</button>
+    <button class="nav-btn" onclick="showView('all',this)">All contacts</button>
+    <button class="nav-btn" onclick="showView('tasks',this)" id="nav-tasks-btn">Tasks</button>
+    <div class="nav-right">
+      <button class="btn" onclick="openAdd()" style="color:var(--orange);border-color:var(--orange);font-size:11px;padding:3px 9px">+ Add contact</button>
+      <button class="btn" onclick="exportCSV()" title="Export contacts to CSV" style="font-size:11px;padding:3px 9px">&#8595; CSV</button>
+      <button class="btn" onclick="loadContacts()" title="Refresh" style="font-size:11px;padding:3px 9px">&#8635;</button>
+      <span id="sync-status" class="sync-status sync-loading">Connecting...</span>
+    </div>
+  </nav>
+
+  <div id="v-pipeline" class="view active">
+    <div class="stat-grid" id="stats"></div>
+    <div class="filter-bar">
+      <input class="search-input" id="f-search" placeholder="Search name, company, mobile, email...">
+      <select id="f-status" onchange="renderPipeline()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
+      <select id="f-tier" onchange="renderPipeline()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      <select id="f-country" onchange="renderPipeline()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
+      <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option></select>
+      <button class="btn btn-sm" onclick="clearFilters()">Clear</button>
+      <button class="btn btn-sm btn-primary" id="bulk-snooze-btn" style="display:none" onclick="bulkSnooze()">Snooze selected (<span id="bulk-count">0</span>)</button>
+    </div>
+    <div id="pipeline-content"></div>
+  </div>
+
+  <div id="v-accounts" class="view">
+    <div class="filter-bar">
+      <select id="fa-tier" onchange="renderAccounts()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      <select id="fa-country" onchange="renderAccounts()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
+      <input id="fa-search" placeholder="Search company or site..." style="width:200px" oninput="renderAccounts()">
+    </div>
+    <div id="accounts-content"></div>
+  </div>
+
+  <div id="v-all" class="view">
+    <div class="filter-bar">
+      <select id="fall-status" onchange="renderAll()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
+      <select id="fall-tier" onchange="renderAll()"><option value="">All tiers</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      <select id="fall-country" onchange="renderAll()"><option value="">All countries</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select>
+    </div>
+    <div id="all-content"></div>
+  </div>
+
+  <div id="v-tasks" class="view"><div id="global-tasks-content"></div></div>
+  <div class="ve-footer"><span style="color:var(--text3)">BD Tracker</span> &nbsp;·&nbsp; GCC Pharma</div>
+</div>
+
+<!-- Add/Edit modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3 id="modal-title">Add contact</h3>
+    <div class="form-grid">
+      <div class="fgroup"><div class="flabel">First name</div><input id="f-fname" placeholder="First name"></div>
+      <div class="fgroup"><div class="flabel">Last name</div><input id="f-lname" placeholder="Last name"></div>
+      <div class="fgroup"><div class="flabel">Job title</div><input id="f-jobtitle" placeholder="Job title"></div>
+      <div class="fgroup"><div class="flabel">Company</div><input id="f-company" placeholder="Company name"></div>
+      <div class="fgroup"><div class="flabel">Region / country</div><select id="f-ctry"><option value="">Select country</option><option>UAE</option><option>Saudi Arabia</option><option>Qatar</option><option>Kuwait</option><option>Bahrain</option><option>Jordan</option><option>Oman</option><option>Singapore</option></select></div>
+      <div class="fgroup"><div class="flabel">Site / location</div><input id="f-site" placeholder="e.g. London office"></div>
+      <div class="fgroup"><div class="flabel">Email</div><input id="f-email" type="email" placeholder="email@company.com"></div>
+      <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00447..."></div>
+      <div class="fgroup full"><div class="flabel">LinkedIn URL</div><input id="f-linkedin" placeholder="https://www.linkedin.com/in/..."></div>
+      <div class="fgroup">
+        <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors. Singapore tiers shown separately.</span></span></div>
+        <select id="f-tier2"><option value="">Select tier</option><optgroup label="GCC"><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></optgroup><optgroup label="Singapore"><option>T1 MNC Pharma Manufacturer</option><option>T2 EPC &amp; Engineering Consultancy</option><option>T3 CDMO</option></optgroup></select>
+      </div>
+      <div class="fgroup">
+        <div class="flabel">Status <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Cold: no prior relationship. Warm: engaged but no active need. Active: current live opportunity or conversation.</span></span></div>
+        <select id="f-stat"><option value="">Select status</option><option>Cold</option><option>Warm</option><option>Active</option></select>
+      </div>
+      <div class="fgroup"><div class="flabel">Next callback date</div><input id="f-callback" type="date"></div>
+      <div class="fgroup"><div class="flabel">Last contact date</div><input id="f-lastcontact" type="date"></div>
+      <div class="fgroup full"><div class="flabel">Notes</div><textarea id="f-notes" rows="3" placeholder="Short summary of where things stand..."></textarea></div>
+    </div>
+    <input type="hidden" id="f-calEventId">
+    <input type="hidden" id="f-notesHistory">
+    <input type="hidden" id="f-tasks">
+    <input type="hidden" id="f-lastTouchType">
+    <input type="hidden" id="f-lastTouchNote">
+    <div class="cal-note">Callback dates are automatically added to your Google Calendar as reminders.</div>
+    <div class="mfooter">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveContact()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Log / Tasks / Notes History modal (combined) -->
+<div class="modal-bg" id="log-modal-bg">
+  <div class="modal" style="width:560px">
+    <h3 id="log-modal-title">Contact</h3>
+    <div style="font-size:12px;color:var(--text3);margin-top:-10px;margin-bottom:12px" id="log-modal-sub"></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-btn-log" onclick="switchTab('log',this)">Log</button>
+      <button class="tab-btn" id="tab-btn-tasks" onclick="switchTab('tasks',this)">Tasks</button>
+      <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history',this)">Notes history</button>
+    </div>
+    <div id="tab-log">
+      <div id="log-entries" style="max-height:260px;overflow-y:auto;margin-bottom:12px"></div>
+      <div class="flabel" style="margin-bottom:5px">Add touchpoint</div>
+      <div class="log-add">
+        <select id="log-type"><option>Called</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Video call</option><option>Met in person</option></select>
+        <input id="log-note" placeholder="Optional note">
+        <button class="btn btn-primary btn-sm" onclick="addLogEntry()">Add</button>
+      </div>
+    </div>
+    <div id="tab-tasks" style="display:none">
+      <div id="task-list" style="max-height:260px;overflow-y:auto;margin-bottom:4px"></div>
+      <div class="task-add">
+        <input id="task-input" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
+        <button class="btn btn-primary btn-sm" onclick="addTask()">Add</button>
+      </div>
+    </div>
+    <!-- CHANGED: Notes history tab redesigned with editable current note -->
+    <div id="tab-history" style="display:none">
+      <div class="notes-current-box">
+        <div class="notes-current-label">Current note<span id="notes-current-label-ts" style="font-weight:400;color:var(--text3);margin-left:6px;font-size:11px"></span></div>
+        <div class="notes-current-text" id="notes-current-display"></div>
+        <div class="notes-update-row">
+          <textarea class="notes-textarea" id="notes-edit" placeholder="Update notes..."></textarea>
+          <button class="btn btn-primary btn-sm" onclick="saveNotes()" style="align-self:flex-start;white-space:nowrap">Update</button>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Previous versions</div>
+      <div id="history-content" style="max-height:220px;overflow-y:auto"></div>
+    </div>
+    <div class="mfooter"><button class="btn" onclick="closeLogModal()">Close</button></div>
+  </div>
+</div>
+
+<!-- Delete modal -->
+<div class="modal-bg" id="del-modal-bg">
+  <div class="modal" style="width:360px">
+    <h3>Delete contact</h3>
+    <p id="del-msg" style="font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6"></p>
+    <div class="mfooter">
+      <button class="btn" onclick="closeDelModal()">Cancel</button>
+      <button class="btn btn-danger" id="del-confirm-btn" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-bg" id="settings-modal-bg">
+  <div class="modal" style="width:500px">
+    <h3>Settings</h3>
+    <div class="settings-section">
+      <h4>Regions</h4>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Enter your regions or countries separated by commas.</p>
+      <div class="settings-row"><label>Regions</label><input id="s-regions" placeholder="UK, USA, Europe, Middle East"></div>
+    </div>
+    <div class="mfooter">
+      <button class="btn" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save settings</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =========================================================
+// CONFIGURATION
+// =========================================================
+const SCRIPT_URL = 'https://bd-tracker-proxy.gazdexter01.workers.dev';
+const PIN_CODE   = '3005';
+
+const CB_LONG  = 63;
+const CB_MED   = 7;
+const CB_SHORT = 4;
+// =========================================================
+
+const DEFAULT_REGIONS = ['UAE','Saudi Arabia','Qatar','Kuwait','Bahrain','Jordan','Oman','Singapore'];
+
+let contacts=[],editingId=null,logContactId=null,deletingId=null,currentView='pipeline',userPin='';
+let settings={regions:[...DEFAULT_REGIONS]};
+let searchTimeout=null;
+let saving=false;
+
+function localDateStr(d){
+  d=d||new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function todayStr(){return localDateStr();}
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return localDateStr(d);}
+
+function loadSettings(){
+  try{const s=localStorage.getItem('ve_settings');if(s)settings=JSON.parse(s);}catch(e){}
+  rebuildDropdowns();
 }
 
-.pin-box {
-  background:var(--bg);
-  padding:32px 28px;
-  border-radius:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.06);
-  border:1px solid var(--border);
-  width:100%;
-  max-width:340px;
-  text-align:center;
+function saveSettingsToStorage(){localStorage.setItem('ve_settings',JSON.stringify(settings));}
+
+function rebuildDropdowns(){
+  ['f-country','fa-country','fall-country','f-ctry'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const isFilter=id!=='f-ctry';const cur=el.value;
+    el.innerHTML=isFilter?'<option value="">All regions</option>':'<option value="">Select region</option>';
+    settings.regions.forEach(r=>{if(r.trim())el.innerHTML+='<option value="'+esc(r)+'">'+esc(r)+'</option>';});
+    el.value=cur;
+  });
 }
 
-.pin-title {
-  font-weight:600;
-  font-size:18px;
-  margin-bottom:6px;
-  letter-spacing:-0.01em;
+function openSettings(){
+  document.getElementById('s-regions').value=settings.regions.join(', ');
+  document.getElementById('settings-modal-bg').classList.add('open');
 }
 
-.pin-sub {
-  font-size:13px;
-  color:var(--text2);
-  margin-bottom:24px;
+function saveSettings(){
+  settings.regions=document.getElementById('s-regions').value.split(',').map(r=>r.trim()).filter(Boolean);
+  if(!settings.regions.length)settings.regions=[...DEFAULT_REGIONS];
+  saveSettingsToStorage();rebuildDropdowns();closeSettings();renderCurrent();
 }
 
-.pin-input {
-  width:100%;
-  padding:12px;
-  font-size:18px;
-  text-align:center;
-  letter-spacing:6px;
-  border:1px solid var(--border2);
-  border-radius:6px;
-  margin-bottom:16px;
-  background:var(--bg);
-  color:var(--text);
+function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
+
+function checkPin(){
+  const val=document.getElementById('pin-input').value.trim();
+  if(val===PIN_CODE){
+    userPin=val;localStorage.setItem('bd_pin',val);
+    document.getElementById('pin-screen').style.display='none';
+    if(!localStorage.getItem('bd_seen_onboarding')){document.getElementById('onboarding-screen').classList.add('open');}
+    else{document.getElementById('app').style.display='block';loadContacts();}
+  }else{
+    document.getElementById('pin-error').style.display='block';
+    document.getElementById('pin-input').value='';
+  }
 }
 
-.pin-btn {
-  width:100%;
-  padding:12px;
-  background:var(--text);
-  color:var(--bg);
-  border:none;
-  border-radius:6px;
-  font-weight:500;
-  cursor:pointer;
-  font-size:14px;
+function closeOnboarding(){
+  localStorage.setItem('bd_seen_onboarding','1');
+  document.getElementById('onboarding-screen').classList.remove('open');
+  document.getElementById('app').style.display='block';
+  loadContacts();
 }
 
-.pin-btn:hover {
-  opacity:0.9;
+window.addEventListener('load',()=>{
+  loadSettings();
+  const searchEl=document.getElementById('f-search');
+  if(searchEl)searchEl.oninput=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(renderPipeline,200);};
+  const saved=localStorage.getItem('bd_pin');
+  if(saved===PIN_CODE){
+    userPin=saved;
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadContacts();
+  }
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'&&document.activeElement.tagName!=='SELECT'){
+    if(document.getElementById('app').style.display!=='none')openAdd();
+  }
+});
+
+async function api(params){
+  params.pin=userPin;
+  const resp=await Promise.race([
+    fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(params)
+    }),
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout')),45000))
+  ]);
+  if(!resp.ok)throw new Error('HTTP '+resp.status);
+  const data=await resp.json();
+  if(data.success)return data.data;
+  throw new Error(data.error||'API error');
 }
 
-.pin-err {
-  color:var(--red-text);
-  background:var(--red-bg);
-  padding:8px;
-  font-size:12px;
-  border-radius:4px;
-  margin-top:12px;
-  display:none;
+async function saveInBackground(c){
+  try{
+    await api({action:'save',contact:JSON.stringify(c)});
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+  }catch(e){setSyncStatus('err','Save failed - refresh to resync');}
 }
 
-#app {
-  display:none;
+function setSyncStatus(state,msg){
+  const el=document.getElementById('sync-status');
+  el.className='sync-status '+(state==='ok'?'sync-ok':state==='err'?'sync-err':'sync-loading');
+  el.textContent=msg;
 }
 
-.header {
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  z-index:90;
+async function loadContacts(){
+  setSyncStatus('loading','Loading...');
+  try{contacts=await api({action:'getAll'});setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));updateTaskNavBadge();renderCurrent();}
+  catch(e){setSyncStatus('err','Failed: '+e.message);}
 }
 
-.h-top {
-  display:flex;
-  align-items:center;
-  justify-content:between;
-  padding:12px 20px;
-  border-bottom:1px solid rgba(0,0,0,0.05);
+function exportCSV(){
+  if(!contacts.length){alert('No contacts to export.');return;}
+  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','LinkedIn','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
+  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.linkedIn,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
+  const csv=[headers.map(h=>'"'+h+'"').join(','),...rows.map(r=>r.join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='bd-tracker-'+todayStr()+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
-.logo-area {
-  display:flex;
-  align-items:center;
-  gap:12px;
+function daysDiff(ds){
+  if(!ds||ds==='')return null;
+  try{
+    const parts=String(ds).trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const d=parts?new Date(+parts[1],+parts[2]-1,+parts[3]):new Date(ds);
+    if(isNaN(d.getTime()))return null;
+    d.setHours(0,0,0,0);
+    const t=new Date();t.setHours(0,0,0,0);
+    return Math.round((d-t)/86400000);
+  }catch(e){return null;}
 }
 
-.logo-mark {
-  background:var(--text);
-  color:var(--bg);
-  font-weight:700;
-  font-size:13px;
-  width:24px;
-  height:24px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:4px;
-  letter-spacing:-0.5px;
+function fmtDate(s){
+  if(!s||s==='')return'';
+  try{
+    const parts=String(s).trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const d=parts?new Date(+parts[1],+parts[2]-1,+parts[3]):new Date(s);
+    if(isNaN(d.getTime()))return'';
+    return d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  }catch(e){return'';}
 }
 
-.logo-txt {
-  font-weight:600;
-  font-size:15px;
-  letter-spacing:-0.02em;
+function cbTraffic(ds){
+  if(!ds)return{dot:'',label:'No date set',cls:'',urg:'none'};
+  const d=daysDiff(ds);if(d===null)return{dot:'',label:'No date set',cls:'',urg:'none'};
+  const fmt=fmtDate(ds);
+  if(d<0)return{dot:'dot-r',label:'Overdue ('+fmt+')',cls:'tl-r',urg:'overdue'};
+  if(d===0)return{dot:'dot-a',label:'Today',cls:'tl-a',urg:'today'};
+  if(d<=7)return{dot:'dot-a',label:fmt,cls:'tl-a',urg:'upcoming'};
+  return{dot:'dot-g',label:fmt,cls:'tl-g',urg:'upcoming'};
 }
 
-.sync-status {
-  font-size:11px;
-  font-weight:500;
-  padding:4px 8px;
-  border-radius:12px;
-  background:var(--bg3);
-  color:var(--text2);
+function lcTraffic(ds){
+  if(!ds)return{dot:'dot-r',label:'Never',cls:'tl-r'};
+  const d=daysDiff(ds);if(d===null)return{dot:'dot-r',label:'Never',cls:'tl-r'};
+  const ago=Math.abs(d);const fmt=fmtDate(ds);
+  if(ago<=14)return{dot:'dot-g',label:fmt,cls:'tl-g'};
+  if(ago<=28)return{dot:'dot-a',label:fmt,cls:'tl-a'};
+  return{dot:'dot-r',label:fmt,cls:'tl-r'};
 }
 
-.sync-ok { background:var(--green-bg); color:var(--green-text); }
-.sync-err { background:var(--red-bg); color:var(--red-text); }
-.sync-loading { background:var(--blue-bg); color:var(--blue-text); }
+function urg(c){return cbTraffic(c.callbackDate).urg;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-.h-nav {
-  display:flex;
-  align-items:center;
-  justify-content:between;
-  padding:0 20px;
-  height:44px;
+function tierBadge(t){
+  if(!t)return'';
+  const cls=t.startsWith('T1')?'badge-t1':t.startsWith('T2')?'badge-t2':'badge-t3';
+  const s=t.startsWith('T1')?'T1':t.startsWith('T2')?'T2':'T3';
+  const region=(t.includes('MNC')||t.includes('CDMO')||t.includes('Engineering Consultancy'))?' (SG)':'';
+  return'<span class="badge '+cls+'">'+s+region+'</span>';
 }
 
-.nav-tabs {
-  display:flex;
-  gap:4px;
-  height:100%;
-  align-items:center;
+function statusBadge(s){
+  if(!s)return'';
+  const cls=s==='Cold'?'badge-cold':s==='Warm'?'badge-warm':'badge-active';
+  return'<span class="badge '+cls+'">'+s+'</span>';
 }
 
-.nav-btn {
-  background:none;
-  border:none;
-  padding:0 12px;
-  height:32px;
-  font-size:13px;
-  font-weight:500;
-  color:var(--text2);
-  cursor:pointer;
-  border-radius:6px;
-  display:flex;
-  align-items:center;
+function touchBadge(type){
+  if(!type)return'';
+  const map={
+    'Called':'var(--green-bg),var(--tl-green)',
+    'Video call':'var(--green-bg),var(--tl-green)',
+    'Met in person':'var(--green-bg),var(--tl-green)',
+    'Email / InMail':'var(--amber-bg),var(--amber-text)',
+    'WhatsApp':'var(--amber-bg),var(--amber-text)',
+    'LinkedIn message':'var(--blue-bg),var(--blue-text)',
+    'LinkedIn connection request':'var(--blue-bg),var(--blue-text)',
+    'Voicemail':'var(--gray-bg),var(--gray-text)'
+  };
+  const cols=(map[type]||'var(--gray-bg),var(--gray-text)').split(',');
+  return'<span style="font-size:11px;padding:2px 6px;border-radius:6px;font-weight:500;background:'+cols[0]+';color:'+cols[1]+'">'+esc(type)+'</span>';
 }
 
-.nav-btn:hover {
-  background:var(--bg2);
-  color:var(--text);
+function getOpenTasks(c){if(!c.tasks)return[];try{return JSON.parse(c.tasks).filter(t=>!t.done);}catch(e){return[];}}
+
+// CHANGED: task badge is now a text badge inline with tier/status badges
+function taskBadgeHTML(c){
+  const open=getOpenTasks(c);
+  return open.length?'<span class="task-badge">'+open.length+' task'+(open.length>1?'s':'')+'</span>':'';
 }
 
-.nav-btn.active {
-  background:var(--bg3);
-  color:var(--text);
+function lastTouchHTML(c){
+  if(!c.lastTouchType)return'';
+  return'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:4px">'+
+    '<div style="font-size:10px;color:var(--text3);margin-bottom:3px">Last touchpoint</div>'+
+    touchBadge(c.lastTouchType)+
+    (c.lastTouchNote?'<div title="'+esc(c.lastTouchNote)+'" style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px;cursor:default;">'+esc(c.lastTouchNote)+'</div>':'')+
+  '</div>';
 }
 
-.h-actions {
-  display:flex;
-  gap:8px;
+function filtered(status,tier,country,urgency,search){
+  return contacts.filter(c=>{
+    if(status&&c.status!==status)return false;
+    if(tier&&c.tier!==tier)return false;
+    if(country&&c.country!==country)return false;
+    if(urgency&&urg(c)!==urgency)return false;
+    if(search){
+      const s=search.toLowerCase();
+      if(!(c.fname+' '+c.lname).toLowerCase().includes(s)&&!(c.company||'').toLowerCase().includes(s)&&!(c.mobile||'').toLowerCase().includes(s)&&!(c.email||'').toLowerCase().includes(s))return false;
+    }
+    return true;
+  });
 }
 
-.btn {
-  background:var(--bg);
-  border:1px solid var(--border2);
-  color:var(--text);
-  padding:6px 12px;
-  font-size:13px;
-  font-weight:500;
-  border-radius:6px;
-  cursor:pointer;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
+// CHANGED: notes cell now clickable (opens log modal on log tab)
+// Contact name still opens LinkedIn, company name still goes to accounts view
+function rowHTML(c,showCheckbox=false){
+  const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate),u=urg(c);
+  const cls=(u==='overdue'?'crow overdue':u==='today'?'crow today-row':'crow')+(showCheckbox?' has-cb':'');
+  const notesHTML=c.notes?esc(c.notes):'<span style="color:var(--text3)">No notes — click to add</span>';
+  return'<div class="'+cls+'">'+
+    (showCheckbox?'<div style="display:flex;align-items:flex-start;padding-top:2px"><input type="checkbox" class="bulk-cb" data-id="'+c.id+'" onchange="updateBulkCount()" style="accent-color:var(--orange);margin-top:2px"></div>':'')+
+    // Col 1: name, title, badges (task badge now inline with tier/status)
+    '<div>'+
+      '<div class="cname">'+
+        (c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
+      '</div>'+
+      '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
+      '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
+        tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+
+      '</div>'+
+    '</div>'+
+    // Col 2: company (clickable to accounts), site, country, email, mobile
+    '<div>'+
+      '<div style="font-weight:500;font-size:13px;cursor:pointer;color:var(--orange)" onclick="goToAccount(\''+esc(c.company||'')+'\')">'+esc(c.company||'')+'</div>'+
+      '<div class="csub">'+esc(c.site||'')+'</div>'+
+      '<div class="csub">'+esc(c.country||'')+'</div>'+
+      (c.email?'<div class="csub" style="margin-top:2px">'+esc(c.email)+'</div>':'')+
+      (c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+
+    '</div>'+
+    // Col 3: notes cell - clickable to open log modal
+    '<div class="notes-cell" onclick="openLog(\''+c.id+'\')" title="Click to open log">'+notesHTML+'</div>'+
+    // Col 4: callback dates and last touchpoint
+    '<div style="font-size:12px">'+
+      '<div style="margin-bottom:6px">'+
+        '<div style="font-size:10px;color:var(--text3);margin-bottom:1px">Next callback</div>'+
+        '<span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span>'+
+      '</div>'+
+      '<div style="margin-bottom:4px">'+
+        '<div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div>'+
+        '<span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span>'+
+      '</div>'+
+      lastTouchHTML(c)+
+    '</div>'+
+    // Col 5: action buttons (Log opens log tab, Notes opens notes history tab)
+    '<div class="cactions">'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
+      '<button class="btn btn-sm btn-danger" style="min-width:46px;text-align:center" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
+    '</div>'+
+  '</div>';
 }
 
-.btn:hover { background:var(--bg2); }
-.btn-primary { background:var(--text); color:var(--bg); border-color:var(--text); }
-.btn-primary:hover { opacity:0.9; background:var(--text); }
-.btn-sm { padding:4px 8px; font-size:12px; border-radius:4px; }
-.btn-danger { color:var(--red-text); border-color:rgba(125,18,18,0.2); }
-.btn-danger:hover { background:var(--red-bg); }
-
-.main {
-  padding:20px;
-  max-width:1440px;
-  margin:0 auto;
+function goToAccount(company){
+  document.getElementById('fa-search').value=company;
+  document.getElementById('fa-tier').value='';
+  document.getElementById('fa-country').value='';
+  showView('accounts',document.querySelector('.nav-btn[onclick*="accounts"]'));
 }
 
-.view { display:none; }
-.view.active { display:block; }
-
-.fbar {
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:12px;
-  margin-bottom:16px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
+function renderStats(list){
+  const ov=list.filter(c=>urg(c)==='overdue').length,tod=list.filter(c=>urg(c)==='today').length;
+  const wk=list.filter(c=>{const d=daysDiff(c.callbackDate);return d!==null&&d>=0&&d<=7;}).length;
+  document.getElementById('stats').innerHTML=
+    '<div class="stat-card"><div class="slabel">Total</div><div class="sval">'+list.length+'</div></div>'+
+    '<div class="stat-card"><div class="slabel">Overdue</div><div class="sval" style="color:var(--tl-red)">'+ov+'</div></div>'+
+    '<div class="stat-card"><div class="slabel">Today</div><div class="sval" style="color:var(--tl-amber)">'+tod+'</div></div>'+
+    '<div class="stat-card"><div class="slabel">This week</div><div class="sval">'+wk+'</div></div>';
 }
 
-.fbar input, .fbar select {
-  background:var(--bg);
-  border:1px solid var(--border2);
-  border-radius:6px;
-  padding:6px 10px;
-  font-size:13px;
-  color:var(--text);
-  outline:none;
+function renderPipeline(){
+  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value);
+  renderStats(list);
+  const sortCb=(a,b)=>new Date(a.callbackDate||'9999-12-31')-new Date(b.callbackDate||'9999-12-31');
+  const ov=list.filter(c=>urg(c)==='overdue').sort(sortCb);
+  const tod=list.filter(c=>urg(c)==='today');
+  const up=list.filter(c=>urg(c)==='upcoming').sort(sortCb);
+  const no=list.filter(c=>urg(c)==='none');
+  if(!window.pipelineSections)window.pipelineSections={overdue:true,today:true,upcoming:true,none:false};
+  function section(key,label,items,headCls){
+    if(!items.length)return'';
+    const open=window.pipelineSections[key];
+    let html='<div class="section-head '+(headCls||'')+'" onclick="toggleSection(\''+key+'\')" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;"><span>'+label+' ('+items.length+')</span><span style="font-size:12px;color:var(--text3);">'+(open?'▲':'▼')+'</span></div>';
+    if(open)items.forEach(c=>html+=rowHTML(c,true));
+    return html;
+  }
+  let html='';
+  html+=section('overdue','Overdue',ov,'section-overdue');
+  html+=section('today','Today',tod,'section-today');
+  html+=section('upcoming','Upcoming',up,'');
+  html+=section('none','No callback set',no,'');
+  if(!list.length)html='<div class="empty">No contacts yet. Press <strong>N</strong> or click "+ Add contact" to get started.</div>';
+  document.getElementById('pipeline-content').innerHTML=html;
 }
 
-.fbar input:focus, .fbar select:focus {
-  border-color:var(--text);
+function toggleSection(key){
+  if(!window.pipelineSections)window.pipelineSections={overdue:true,today:true,upcoming:true,none:false};
+  window.pipelineSections[key]=!window.pipelineSections[key];
+  renderPipeline();
 }
 
-.f-search-wrap { flex:1; min-width:200px; }
-.f-search-wrap input { width:100%; }
-
-.stats-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-  gap:12px;
-  margin-bottom:20px;
+function renderAccounts(){
+  const t=document.getElementById('fa-tier').value,co=document.getElementById('fa-country').value;
+  const search=(document.getElementById('fa-search').value||'').toLowerCase();
+  const list=contacts.filter(c=>(!t||c.tier===t)&&(!co||c.country===co)&&(!search||(c.company||'').toLowerCase().includes(search)||(c.site||'').toLowerCase().includes(search)));
+  const companies={};
+  list.forEach(c=>{const k=c.company||'Unknown';if(!companies[k])companies[k]={tier:c.tier,contacts:[]};companies[k].contacts.push(c);});
+  let html='';
+  Object.entries(companies).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name,data])=>{
+    const sites=[...new Set(data.contacts.map(c=>c.site).filter(Boolean))];
+    html+='<div class="company-block"><div class="company-head"><span style="font-weight:500;font-size:15px;color:var(--orange)">'+esc(name)+'</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+tierBadge(data.tier)+'<span style="font-size:12px;color:var(--text2)">'+data.contacts.length+' contact'+(data.contacts.length>1?'s':'')+'</span>'+(sites.length?'<span style="font-size:12px;color:var(--text3)">'+sites.map(esc).join(' / ')+'</span>':'')+'</div></div>';
+    data.contacts.forEach(c=>{
+      const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate);
+      html+='<div class="csub-row">'+
+        '<div>'+
+          '<div class="cname" style="font-size:13px">'+
+            (c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
+          '</div>'+
+          '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
+          '<div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+statusBadge(c.status)+' '+taskBadgeHTML(c)+'</div>'+
+        '</div>'+
+        '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
+        '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer" onclick="openLog(\''+c.id+'\',\'log\')" title="Click to open log">'+esc(c.notes||'')+'</div>'+
+        '<div style="font-size:12px">'+
+          '<div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div>'+
+          '<div style="margin-bottom:4px"><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+
+          lastTouchHTML(c)+
+        '</div>'+
+        '<div class="cactions">'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
+          '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
+          '<button class="btn btn-sm btn-danger" style="min-width:46px;text-align:center" onclick="openDelModal(\''+c.id+'\')">Del</button>'+
+        '</div>'+
+      '</div>';
+    });
+    html+='</div>';
+  });
+  if(!html)html='<div class="empty">No contacts match.</div>';
+  document.getElementById('accounts-content').innerHTML=html;
 }
 
-.stat-card {
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:14px 16px;
+function renderAll(){
+  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','').sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
+  document.getElementById('all-content').innerHTML=list.map(c=>rowHTML(c)).join('')||'<div class="empty">No contacts match.</div>';
 }
 
-.slabel { font-size:12px; color:var(--text2); font-weight:500; margin-bottom:4px; }
-.sval { font-size:22px; font-weight:700; letter-spacing:-0.02em; }
-
-.section-head {
-  font-size:12px;
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:0.04em;
-  color:var(--text2);
-  margin:24px 0 10px 0;
-  padding-bottom:4px;
-  border-bottom:1px solid var(--border);
+function renderCurrent(){
+  if(currentView==='pipeline')renderPipeline();
+  else if(currentView==='accounts')renderAccounts();
+  else if(currentView==='tasks')renderGlobalTasks();
+  else renderAll();
 }
 
-.section-overdue { color:var(--red-text); border-color:rgba(125,18,18,0.15); }
-.section-today { color:var(--amber-text); border-color:rgba(97,65,11,0.15); }
-
-.table-scroller {
-  overflow-x:auto;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:8px;
+function updateTaskNavBadge(){
+  const total=contacts.reduce((sum,c)=>sum+getOpenTasks(c).length,0);
+  const btn=document.getElementById('nav-tasks-btn');
+  if(btn)btn.textContent=total?'Tasks ('+total+')':'Tasks';
 }
 
-.crow {
-  display:grid;
-  grid-template-columns:30px 220px 200px 160px 1fr 110px;
-  padding:12px 16px;
-  border-bottom:1px solid var(--border);
-  align-items:start;
-  gap:12px;
-  background:var(--bg);
+function renderGlobalTasks(){
+  const el=document.getElementById('global-tasks-content');
+  const allTasks=[];
+  contacts.forEach(c=>{
+    let tasks=[];
+    if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+    tasks.forEach((t,idx)=>{
+      if(!t.done)allTasks.push({contactId:c.id,taskIdx:idx,text:t.text,fname:c.fname,lname:c.lname,company:c.company||'',createdAt:t.createdAt||0});
+    });
+  });
+  allTasks.sort((a,b)=>b.createdAt-a.createdAt);
+  if(!allTasks.length){el.innerHTML='<div class="empty">No outstanding tasks. Good work.</div>';return;}
+  const contactCount=[...new Set(allTasks.map(t=>t.contactId))].length;
+  el.innerHTML='<div style="margin-bottom:12px;font-size:12px;color:var(--text3)">'+allTasks.length+' outstanding task'+(allTasks.length!==1?'s':'')+' across '+contactCount+' contact'+(contactCount!==1?'s':'')+'</div>'+
+  allTasks.map(t=>'<div class="crow" style="grid-template-columns:auto 1fr auto;gap:12px;align-items:center" id="gtask-'+t.contactId+'-'+t.taskIdx+'">'+
+    '<input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:var(--orange);flex-shrink:0" onchange="completeGlobalTask(\''+t.contactId+'\','+t.taskIdx+',this)">'+
+    '<div><div style="font-size:13px;color:var(--text)">'+esc(t.text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(t.fname)+' '+esc(t.lname)+(t.company?' &middot; '+esc(t.company):'')+'</div></div>'+
+    '<button class="btn btn-sm" onclick="openLog(\''+t.contactId+'\',\'tasks\')">Tasks</button>'+
+  '</div>').join('');
 }
 
-.crow:last-child { border-bottom:none; }
-.crow:hover { background:var(--bg2); }
+async function completeGlobalTask(contactId,taskIdx,checkbox){
+  const c=contacts.find(x=>x.id===contactId);if(!c)return;
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  if(!tasks[taskIdx]){renderGlobalTasks();return;}
+  tasks[taskIdx].done=true;
+  c.tasks=JSON.stringify(tasks);
+  updateTaskNavBadge();
+  const row=document.getElementById('gtask-'+contactId+'-'+taskIdx);
+  if(row){
+    row.innerHTML='<input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:var(--orange);flex-shrink:0"><div><div style="font-size:13px;color:var(--text3);text-decoration:line-through">'+esc(tasks[taskIdx].text)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+esc(c.fname)+' '+esc(c.lname)+(c.company?' &middot; '+esc(c.company):'')+'</div></div>';
+    row.style.opacity='0.4';
+  }
+  try{
+    await api({action:'save',contact:JSON.stringify(c)});
+    setTimeout(()=>renderGlobalTasks(),600);
+  }catch(e){
+    setSyncStatus('err','Save failed');
+    tasks[taskIdx].done=false;c.tasks=JSON.stringify(tasks);
+    updateTaskNavBadge();renderGlobalTasks();
+  }
+}
 
-.overdue { border-left:3px solid #db4437; }
-.today-row { border-left:3px solid #f4b400; }
+function showView(v,btn){
+  currentView=v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('v-'+v).classList.add('active');
+  btn.classList.add('active');
+  renderCurrent();
+}
 
-.tl-r { color:#db4437; }
+function clearFilters(){['f-status','f-tier','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
 
-.cname { font-weight:600; font-size:13.5px; display:flex; align-items:center; gap:6px; }
-.csub { font-size:12px; color:var(--text2); margin-top:2px; }
-.badge {
-  display:inline-block;
-  font-size:10.5px;
-  font-weight:600;
-  padding:2
+function openAdd(){
+  editingId=null;
+  document.getElementById('modal-title').textContent='Add contact';
+  ['fname','lname','jobtitle','company','site','email','mobile','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['ctry','tier2','stat'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['f-callback','f-lastcontact','f-calEventId','f-notesHistory','f-tasks','f-lastTouchType','f-lastTouchNote'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openEdit(id){
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  editingId=id;
+  document.getElementById('modal-title').textContent='Edit contact';
+  document.getElementById('f-fname').value=c.fname||'';
+  document.getElementById('f-lname').value=c.lname||'';
+  document.getElementById('f-jobtitle').value=c.jobTitle||'';
+  document.getElementById('f-company').value=c.company||'';
+  document.getElementById('f-ctry').value=c.country||'';
+  document.getElementById('f-site').value=c.site||'';
+  document.getElementById('f-email').value=c.email||'';
+  document.getElementById('f-mobile').value=c.mobile||'';
+  document.getElementById('f-linkedin').value=c.linkedIn||'';
+  document.getElementById('f-tier2').value=c.tier||'';
+  document.getElementById('f-stat').value=c.status||'';
+  document.getElementById('f-callback').value=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';
+  document.getElementById('f-lastcontact').value=c.lastContactDate?localDateStr(new Date(c.lastContactDate)):'';
+  document.getElementById('f-notes').value=c.notes||'';
+  document.getElementById('f-calEventId').value=c.calEventId||'';
+  document.getElementById('f-notesHistory').value=c.notesHistory||'';
+  document.getElementById('f-tasks').value=c.tasks||'';
+  document.getElementById('f-lastTouchType').value=c.lastTouchType||'';
+  document.getElementById('f-lastTouchNote').value=c.lastTouchNote||'';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+async function saveContact(){
+  if(saving)return;
+  const fname=document.getElementById('f-fname').value.trim(),lname=document.getElementById('f-lname').value.trim();
+  if(!fname&&!lname){alert('Please enter a name.');return;}
+  saving=true;
+  const contact={
+    id:editingId||'',calEventId:document.getElementById('f-calEventId').value||'',
+    notesHistory:document.getElementById('f-notesHistory').value||'',
+    tasks:document.getElementById('f-tasks').value||'',
+    lastTouchType:document.getElementById('f-lastTouchType').value||'',
+    lastTouchNote:document.getElementById('f-lastTouchNote').value||'',
+    fname,lname,
+    jobTitle:document.getElementById('f-jobtitle').value.trim(),
+    company:document.getElementById('f-company').value.trim(),
+    country:document.getElementById('f-ctry').value,
+    site:document.getElementById('f-site').value.trim(),
+    email:document.getElementById('f-email').value.trim(),
+    mobile:document.getElementById('f-mobile').value.trim(),
+    linkedIn:document.getElementById('f-linkedin').value.trim(),
+    tier:document.getElementById('f-tier2').value,
+    status:document.getElementById('f-stat').value,
+    callbackDate:document.getElementById('f-callback').value,
+    lastContactDate:document.getElementById('f-lastcontact').value,
+    notes:document.getElementById('f-notes').value.trim()
+  };
+  const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Saving...';
+  try{
+    const saved=await api({action:'save',contact:JSON.stringify(contact)});
+    if(editingId){const idx=contacts.findIndex(c=>c.id===editingId);if(idx>=0)contacts[idx]=saved;}else{contacts.push(saved);}
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+    closeModal();renderCurrent();
+  }catch(e){setSyncStatus('err','Save failed: '+e.message);}
+  btn.disabled=false;btn.textContent='Save';
+  saving=false;
+}
+
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');editingId=null;}
+
+function openDelModal(id){
+  deletingId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
+  document.getElementById('del-msg').textContent='Delete '+c.fname+' '+c.lname+' from '+(c.company||'unknown company')+'? This cannot be undone.';
+  document.getElementById('del-modal-bg').classList.add('open');
+}
+
+async function confirmDelete(){
+  if(!deletingId)return;
+  const btn=document.getElementById('del-confirm-btn');btn.disabled=true;btn.textContent='Deleting...';
+  try{
+    await api({action:'delete',id:deletingId});
+    contacts=contacts.filter(c=>c.id!==deletingId);
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+    closeDelModal();renderCurrent();
+  }catch(e){setSyncStatus('err','Delete failed: '+e.message);}
+  btn.disabled=false;btn.textContent='Delete';
+}
+
+function closeDelModal(){document.getElementById('del-modal-bg').classList.remove('open');deletingId=null;}
+
+function updateBulkCount(){
+  const checked=document.querySelectorAll('.bulk-cb:checked');
+  const btn=document.getElementById('bulk-snooze-btn');
+  const countEl=document.getElementById('bulk-count');
+  if(checked.length>0){btn.style.display='inline-block';countEl.textContent=checked.length;}
+  else{btn.style.display='none';}
+}
+
+async function bulkSnooze(){
+  const checked=[...document.querySelectorAll('.bulk-cb:checked')];
+  if(!checked.length)return;
+  setSyncStatus('loading','Snoozing '+checked.length+' contacts...');
+  let done=0;
+  for(const cb of checked){
+    const id=cb.dataset.id;
+    const c=contacts.find(x=>x.id===id);if(!c)continue;
+    let baseStr=todayStr();
+    if(c.callbackDate){const parts=String(c.callbackDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(parts){const parsed=new Date(+parts[1],+parts[2]-1,+parts[3]);const today=new Date();today.setHours(0,0,0,0);parsed.setHours(0,0,0,0);if(parsed>=today)baseStr=c.callbackDate;}}
+    const p=baseStr.split('-');const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
+    c.callbackDate=localDateStr(d);
+    try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;done++;}
+    catch(e){setSyncStatus('err','Snooze failed on one contact');}
+  }
+  document.getElementById('bulk-snooze-btn').style.display='none';
+  setSyncStatus('ok',done+' contact'+(done!==1?'s':'')+' snoozed');
+  renderCurrent();
+}
+
+async function snooze(id){
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  let baseStr=todayStr();
+  if(c.callbackDate){
+    const parts=String(c.callbackDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(parts){
+      const parsed=new Date(+parts[1],+parts[2]-1,+parts[3]);
+      const today=new Date();today.setHours(0,0,0,0);parsed.setHours(0,0,0,0);
+      if(parsed>=today)baseStr=c.callbackDate;
+    }
+  }
+  const p=baseStr.split('-');
+  const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
+  c.callbackDate=localDateStr(d);
+  setSyncStatus('loading','Saving...');
+  try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));renderCurrent();}
+  catch(e){setSyncStatus('err','Snooze failed: '+e.message);}
+}
+
+// CHANGED: openLog now accepts optional tab parameter
+// Notes button calls openLog with 'history', Log button with 'log', notes cell click with 'log'
+function switchTab(tab,btn){
+  ['log','tasks','history'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).style.display='block';
+  if(btn)btn.classList.add('active');
+  else document.getElementById('tab-btn-'+tab).classList.add('active');
+  if(tab==='tasks')renderTaskList();
+  if(tab==='history')renderNotesHistory();
+}
+
+async function openLog(id, tab){
+  tab = tab || 'log';
+  logContactId=id;const c=contacts.find(x=>x.id===id);if(!c)return;
+  document.getElementById('log-modal-title').textContent=c.fname+' '+c.lname;
+  document.getElementById('log-modal-sub').textContent=(c.jobTitle||'')+(c.company?' · '+c.company:'')+(c.country?' · '+c.country:'');
+  document.getElementById('log-note').value='';
+  document.getElementById('task-input').value='';
+
+  // Reset tabs
+  ['log','tasks','history'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+
+  // Update tasks tab badge
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+
+  // Open on correct tab
+  document.getElementById('tab-'+tab).style.display='block';
+  document.getElementById('tab-btn-'+tab).classList.add('active');
+
+  document.getElementById('log-modal-bg').classList.add('open');
+
+  if(tab==='log'){
+    let logEntries=[];
+    try{logEntries=JSON.parse(c.logEntries||'');}catch(e){}
+    renderLogEntries(logEntries.slice().reverse());
+  }
+  if(tab==='tasks') renderTaskList();
+  if(tab==='history') renderNotesHistory();
+}
+
+function renderLogEntries(logs){
+  const el=document.getElementById('log-entries');
+  if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No touchpoints logged yet.</div>';return;}
+  el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0;overflow:hidden"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' &mdash; <span title="'+esc(e.note)+'" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:inline-block;max-width:280px;vertical-align:bottom;cursor:default;">'+esc(e.note)+'</span>':'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
+}
+
+async function addLogEntry(){
+  if(saving)return;saving=true;
+  const c=contacts.find(x=>x.id===logContactId);if(!c){saving=false;return;}
+  const type=document.getElementById('log-type').value;
+  const note=document.getElementById('log-note').value.trim();
+  const now=new Date();
+  const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  if(type==='Called'||type==='Video call'||type==='Met in person'){
+    c.callbackDate=addDays(CB_LONG);
+  }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
+    const medDate=addDays(CB_MED);const cbStr=c.callbackDate?localDateStr(new     Date(c.callbackDate)):'';if(!cbStr||cbStr<=todayStr()||cbStr<medDate){c.callbackDate=medDate;}
+    if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<medDate){c.callbackDate=medDate;}
+ }else if(type==='Voicemail'||type==='LinkedIn connection request'){
+    const shortDate=addDays(CB_SHORT);const cbStr2=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';if(!cbStr2||cbStr2<=todayStr()||cbStr2<shortDate){c.callbackDate=shortDate;}
+  }
+  c.lastContactDate=localDateStr(now);
+  c.lastTouchType=type;
+  c.lastTouchNote=note;
+
+  const currentEntries=document.getElementById('log-entries');
+  const newRow='<div class="log-entry"><div style="flex:1;min-width:0"><span class="ltype">'+esc(type)+'</span>'+(note?' &mdash; '+esc(note):'')+'</div><div class="lts">'+ts+'</div></div>';
+  if(currentEntries.querySelector('.log-entry')){currentEntries.insertAdjacentHTML('afterbegin',newRow);}
+  else{currentEntries.innerHTML=newRow;}
+  document.getElementById('log-note').value='';
+  renderCurrent();
+
+  try{
+    let entries=[];
+    try{entries=JSON.parse(c.logEntries||'');}catch(e){}
+    entries.push({id:crypto.randomUUID(),contactId:logContactId,type,note,ts});
+    c.logEntries=JSON.stringify(entries);
+    await saveInBackground(c);
+  }catch(e){setSyncStatus('err','Log failed - refresh to resync');}
+  saving=false;
+}
+
+function closeLogModal(){document.getElementById('log-modal-bg').classList.remove('open');logContactId=null;}
+
+function renderTaskList(){
+  const c=contacts.find(x=>x.id===logContactId);const el=document.getElementById('task-list');
+  if(!c){el.innerHTML='';return;}
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  if(!tasks.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No tasks yet.</div>';return;}
+  const hasDone=tasks.some(t=>t.done);
+  el.innerHTML=tasks.map((t,i)=>'<div class="task-item"><input type="checkbox"'+(t.done?' checked':'')+' onchange="toggleTask('+i+')"><span style="'+(t.done?'text-decoration:line-through;color:var(--text3)':'')+'">'+esc(t.text)+'</span></div>').join('')+(hasDone?'<div style="margin-top:8px"><button class="btn btn-sm" onclick="clearCompletedTasks()">Clear completed</button></div>':'');
+}
+
+async function addTask(){
+  if(saving)return;saving=true;
+  const input=document.getElementById('task-input');const text=input.value.trim();if(!text){saving=false;return;}
+  const c=contacts.find(x=>x.id===logContactId);if(!c){saving=false;return;}
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  tasks.push({text,done:false,createdAt:Date.now()});
+  c.tasks=JSON.stringify(tasks);input.value='';
+  renderTaskList();
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+  updateTaskNavBadge();renderCurrent();
+  await saveInBackground(c);
+  saving=false;
+}
+
+async function toggleTask(idx){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  if(tasks[idx])tasks[idx].done=!tasks[idx].done;
+  c.tasks=JSON.stringify(tasks);
+  renderTaskList();
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+  updateTaskNavBadge();renderCurrent();
+  await saveInBackground(c);
+}
+
+async function clearCompletedTasks(){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let tasks=[];if(c.tasks){try{tasks=JSON.parse(c.tasks);}catch(e){tasks=[];}}
+  tasks=tasks.filter(t=>!t.done);
+  c.tasks=JSON.stringify(tasks);
+  renderTaskList();
+  const open=getOpenTasks(c);
+  document.getElementById('tab-btn-tasks').textContent=open.length?'Tasks ('+open.length+')':'Tasks';
+  updateTaskNavBadge();renderCurrent();
+  await saveInBackground(c);
+}
+
+// CHANGED: Notes history tab now shows editable current note at top + previous versions below
+function renderNotesHistory(){
+  const c=contacts.find(x=>x.id===logContactId);
+  // Populate current note display and textarea
+const lcLabel=c&&c.lastContactDate?' · Last contact: '+fmtDate(c.lastContactDate):'';
+document.getElementById('notes-current-label-ts').textContent=lcLabel;
+document.getElementById('notes-current-display').textContent=c&&c.notes?c.notes:'No notes added yet.';
+document.getElementById('notes-edit').value=c&&c.notes?c.notes:'';
+
+  const el=document.getElementById('history-content');
+  if(!c||!c.notesHistory){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';return;}
+  let history=[];try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}
+  if(!history.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';return;}
+  el.innerHTML=history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
+}
+
+// CHANGED: saveNotes now works from within the log modal (notes history tab)
+async function saveNotes(){
+  if(saving)return;saving=true;
+  const c=contacts.find(x=>x.id===logContactId);if(!c){saving=false;return;}
+  const newNote=document.getElementById('notes-edit').value.trim();
+  if(newNote===c.notes){saving=false;return;} // no change
+  if(c.notes){
+    let history=[];if(c.notesHistory){try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}}
+    const now=new Date();
+    const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    history.push({note:c.notes,ts});c.notesHistory=JSON.stringify(history);
+  }
+  c.notes=newNote;
+  // Update display immediately
+  document.getElementById('notes-current-display').textContent=newNote||'No notes added yet.';
+  renderNotesHistory();
+  renderCurrent();
+  await saveInBackground(c);
+  saving=false;
+}
+
+['modal-bg','log-modal-bg','del-modal-bg'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById(id).classList.remove('open');});
+});
+</script>
+</body>
+</html>
