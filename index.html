@@ -285,6 +285,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <input class="search-input" id="f-search" placeholder="Search name, company, mobile, email...">
       <select id="f-status" onchange="renderPipeline()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
       <select id="f-tier" onchange="renderPipeline()"></select>
+      <select id="f-region" onchange="renderPipeline()"></select>
       <select id="f-country" onchange="renderPipeline()"></select>
       <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option></select>
       <button class="btn btn-sm" onclick="clearFilters()">Clear</button>
@@ -296,6 +297,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   <div id="v-accounts" class="view">
     <div class="filter-bar">
       <select id="fa-tier" onchange="renderAccounts()"></select>
+      <select id="fa-region" onchange="renderAccounts()"></select>
       <select id="fa-country" onchange="renderAccounts()"></select>
       <input id="fa-search" placeholder="Search company or site..." style="width:200px" oninput="renderAccounts()">
     </div>
@@ -306,6 +308,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <div class="filter-bar">
       <select id="fall-status" onchange="renderAll()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
       <select id="fall-tier" onchange="renderAll()"></select>
+      <select id="fall-region" onchange="renderAll()"></select>
       <select id="fall-country" onchange="renderAll()"></select>
     </div>
     <div id="all-content"></div>
@@ -478,11 +481,24 @@ function loadSettings(){
 function saveSettingsToStorage(){localStorage.setItem('ve_settings',JSON.stringify(settings));}
 
 function rebuildDropdowns(){
-  // Country/region dropdowns - grouped with optgroup headers per region
+  // Region group filters - GCC / Asia-Pacific / EU etc, broad view
+  ['f-region','fa-region','fall-region'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    let html='<option value="">All regions</option>';
+    Object.entries(settings.regionGroups).forEach(([group,countries])=>{
+      if(!(countries||[]).map(c=>c.trim()).filter(Boolean).length)return;
+      html+='<option value="'+esc(group)+'">'+esc(group)+'</option>';
+    });
+    el.innerHTML=html;
+    el.value=cur;
+  });
+
+  // Country dropdowns - grouped with optgroup headers per region
   ['f-country','fa-country','fall-country','f-ctry'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const isFilter=id!=='f-ctry';const cur=el.value;
-    let html=isFilter?'<option value="">All regions</option>':'<option value="">Select region</option>';
+    let html=isFilter?'<option value="">All countries</option>':'<option value="">Select country</option>';
     Object.entries(settings.regionGroups).forEach(([group,countries])=>{
       const list=(countries||[]).map(c=>c.trim()).filter(Boolean);
       if(!list.length)return;
@@ -702,11 +718,15 @@ function lastTouchHTML(c){
   '</div>';
 }
 
-function filtered(status,tier,country,urgency,search){
+function filtered(status,tier,country,urgency,search,region){
   return contacts.filter(c=>{
     if(status&&c.status!==status)return false;
     if(tier&&c.tier!==tier)return false;
     if(country&&c.country!==country)return false;
+    if(region){
+      const list=(settings.regionGroups[region]||[]).map(x=>x.trim());
+      if(!list.includes(c.country))return false;
+    }
     if(urgency&&urg(c)!==urgency)return false;
     if(search){
       const s=search.toLowerCase();
@@ -778,7 +798,7 @@ function renderStats(list){
 }
 
 function renderPipeline(){
-  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value);
+  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value,document.getElementById('f-region').value);
   renderStats(list);
   const sortCb=(a,b)=>new Date(a.callbackDate||'9999-12-31')-new Date(b.callbackDate||'9999-12-31');
   const ov=list.filter(c=>urg(c)==='overdue').sort(sortCb);
@@ -809,9 +829,10 @@ function toggleSection(key){
 }
 
 function renderAccounts(){
-  const t=document.getElementById('fa-tier').value,co=document.getElementById('fa-country').value;
+  const t=document.getElementById('fa-tier').value,co=document.getElementById('fa-country').value,rg=document.getElementById('fa-region').value;
   const search=(document.getElementById('fa-search').value||'').toLowerCase();
-  const list=contacts.filter(c=>(!t||c.tier===t)&&(!co||c.country===co)&&(!search||(c.company||'').toLowerCase().includes(search)||(c.site||'').toLowerCase().includes(search)));
+  const regionList=rg?(settings.regionGroups[rg]||[]).map(x=>x.trim()):null;
+  const list=contacts.filter(c=>(!t||c.tier===t)&&(!co||c.country===co)&&(!regionList||regionList.includes(c.country))&&(!search||(c.company||'').toLowerCase().includes(search)||(c.site||'').toLowerCase().includes(search)));
   const companies={};
   list.forEach(c=>{const k=c.company||'Unknown';if(!companies[k])companies[k]={tier:c.tier,contacts:[]};companies[k].contacts.push(c);});
   let html='';
@@ -851,7 +872,7 @@ function renderAccounts(){
 }
 
 function renderAll(){
-  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','').sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
+  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','',document.getElementById('fall-region').value).sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
   document.getElementById('all-content').innerHTML=list.map(c=>rowHTML(c)).join('')||'<div class="empty">No contacts match.</div>';
 }
 
@@ -920,7 +941,7 @@ function showView(v,btn){
   renderCurrent();
 }
 
-function clearFilters(){['f-status','f-tier','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
+function clearFilters(){['f-status','f-tier','f-region','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
 
 function openAdd(){
   editingId=null;
