@@ -985,6 +985,9 @@ async function saveContact(){
   const fname=document.getElementById('f-fname').value.trim(),lname=document.getElementById('f-lname').value.trim();
   if(!fname&&!lname){alert('Please enter a name.');return;}
   saving=true;
+  const priorContact=editingId?contacts.find(x=>x.id===editingId):null;
+  const newNotesValue=document.getElementById('f-notes').value.trim();
+  const notesChanged=priorContact?(priorContact.notes||'')!==newNotesValue:!!newNotesValue;
   const contact={
     id:editingId||crypto.randomUUID(),calEventId:document.getElementById('f-calEventId').value||'',
     notesHistory:document.getElementById('f-notesHistory').value||'',
@@ -992,6 +995,7 @@ async function saveContact(){
     lastTouchType:document.getElementById('f-lastTouchType').value||'',
     lastTouchNote:document.getElementById('f-lastTouchNote').value||'',
     logEntries:document.getElementById('f-logEntries').value||'',
+    notesUpdatedAt:notesChanged?localDateStr(new Date()):(priorContact?priorContact.notesUpdatedAt||'':''),
     fname,lname,
     jobTitle:document.getElementById('f-jobtitle').value.trim(),
     company:document.getElementById('f-company').value.trim(),
@@ -1219,8 +1223,9 @@ async function clearCompletedTasks(){
 
 function renderNotesHistory(){
   const c=contacts.find(x=>x.id===logContactId);
+  const noteLabel=c&&c.notesUpdatedAt?' · Note added: '+fmtDate(c.notesUpdatedAt):'';
   const lcLabel=c&&c.lastContactDate?' · Last contact: '+fmtDate(c.lastContactDate):'';
-  document.getElementById('notes-current-label-ts').textContent=lcLabel;
+  document.getElementById('notes-current-label-ts').textContent=noteLabel+lcLabel;
   document.getElementById('notes-current-display').textContent=c&&c.notes?c.notes:'No notes added yet.';
   document.getElementById('notes-edit').value=c&&c.notes?c.notes:'';
 
@@ -1243,6 +1248,7 @@ async function saveNotes(){
     history.push({note:c.notes,ts});c.notesHistory=JSON.stringify(history);
   }
   c.notes=newNote;
+  c.notesUpdatedAt=localDateStr(new Date());
   document.getElementById('notes-current-display').textContent=newNote||'No notes added yet.';
   renderNotesHistory();
   renderCurrent();
