@@ -349,6 +349,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <input type="hidden" id="f-tasks">
     <input type="hidden" id="f-lastTouchType">
     <input type="hidden" id="f-lastTouchNote">
+    <input type="hidden" id="f-logEntries">
     <div class="cal-note">Callback dates are automatically added to your Google Calendar as reminders.</div>
     <div class="mfooter">
       <button class="btn" onclick="closeModal()">Cancel</button>
@@ -948,7 +949,7 @@ function openAdd(){
   document.getElementById('modal-title').textContent='Add contact';
   ['fname','lname','jobtitle','company','site','email','mobile','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
   ['ctry','tier2','stat'].forEach(f=>document.getElementById('f-'+f).value='');
-  ['f-callback','f-lastcontact','f-calEventId','f-notesHistory','f-tasks','f-lastTouchType','f-lastTouchNote'].forEach(f=>document.getElementById(f).value='');
+  ['f-callback','f-lastcontact','f-calEventId','f-notesHistory','f-tasks','f-lastTouchType','f-lastTouchNote','f-logEntries'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -975,6 +976,7 @@ function openEdit(id){
   document.getElementById('f-tasks').value=c.tasks||'';
   document.getElementById('f-lastTouchType').value=c.lastTouchType||'';
   document.getElementById('f-lastTouchNote').value=c.lastTouchNote||'';
+  document.getElementById('f-logEntries').value=c.logEntries||'';
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -989,6 +991,7 @@ async function saveContact(){
     tasks:document.getElementById('f-tasks').value||'',
     lastTouchType:document.getElementById('f-lastTouchType').value||'',
     lastTouchNote:document.getElementById('f-lastTouchNote').value||'',
+    logEntries:document.getElementById('f-logEntries').value||'',
     fname,lname,
     jobTitle:document.getElementById('f-jobtitle').value.trim(),
     company:document.getElementById('f-company').value.trim(),
