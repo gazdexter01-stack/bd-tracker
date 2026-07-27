@@ -1131,7 +1131,60 @@ async function openLog(id, tab){
 function renderLogEntries(logs){
   const el=document.getElementById('log-entries');
   if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No touchpoints logged yet.</div>';return;}
-  el.innerHTML=logs.map(e=>{const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');return'<div class="log-entry"><div style="flex:1;min-width:0;overflow:hidden"><span class="ltype">'+esc(e.type)+'</span>'+(e.note?' &mdash; <span title="'+esc(e.note)+'" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:inline-block;max-width:280px;vertical-align:bottom;cursor:default;">'+esc(e.note)+'</span>':'')+'</div><div class="lts">'+ts+'</div></div>';}).join('');
+  el.innerHTML=logs.map(e=>{
+    const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');
+    return'<div class="log-entry" id="logrow-'+esc(e.id)+'">'+
+      '<div style="flex:1;min-width:0;overflow:hidden" id="logdisp-'+esc(e.id)+'">'+
+        '<span class="ltype">'+esc(e.type)+'</span>'+
+        (e.note?' &mdash; <span title="'+esc(e.note)+'" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:inline-block;max-width:220px;vertical-align:bottom;cursor:default;">'+esc(e.note)+'</span>':'')+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'+
+        '<div class="lts">'+ts+'</div>'+
+        '<button class="btn btn-sm" style="padding:1px 6px" onclick="editLogEntry(\''+esc(e.id)+'\')" title="Edit">&#9998;</button>'+
+        '<button class="btn btn-sm btn-danger" style="padding:1px 6px" onclick="deleteLogEntry(\''+esc(e.id)+'\')" title="Delete">&times;</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+const LOG_TYPE_OPTIONS=['Called','Voicemail','WhatsApp','LinkedIn connection request','LinkedIn message','Email / InMail','Video call','Met in person'];
+
+function editLogEntry(entryId){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let entries=[];try{entries=JSON.parse(c.logEntries||'[]');}catch(e){entries=[];}
+  const entry=entries.find(x=>x.id===entryId);if(!entry)return;
+  const row=document.getElementById('logdisp-'+entryId);if(!row)return;
+  const typeOpts=LOG_TYPE_OPTIONS.map(t=>'<option'+(t===entry.type?' selected':'')+'>'+t+'</option>').join('');
+  row.innerHTML='<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">'+
+    '<select id="editlog-type-'+entryId+'" style="font-size:12px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit">'+typeOpts+'</select>'+
+    '<input id="editlog-note-'+entryId+'" value="'+esc(entry.note||'')+'" placeholder="Optional note" style="font-size:12px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;flex:1;min-width:100px">'+
+    '<button class="btn btn-sm btn-primary" onclick="saveLogEntryEdit(\''+entryId+'\')">Save</button>'+
+    '<button class="btn btn-sm" onclick="renderLogEntries(JSON.parse((contacts.find(x=>x.id===logContactId).logEntries||\'[]\')).slice().reverse())">Cancel</button>'+
+  '</div>';
+}
+
+async function saveLogEntryEdit(entryId){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let entries=[];try{entries=JSON.parse(c.logEntries||'[]');}catch(e){entries=[];}
+  const entry=entries.find(x=>x.id===entryId);if(!entry)return;
+  const newType=document.getElementById('editlog-type-'+entryId).value;
+  const newNote=document.getElementById('editlog-note-'+entryId).value.trim();
+  entry.type=newType;entry.note=newNote;
+  c.logEntries=JSON.stringify(entries);
+  renderLogEntries(entries.slice().reverse());
+  renderCurrent();
+  await saveInBackground(c);
+}
+
+async function deleteLogEntry(entryId){
+  if(!confirm('Delete this touchpoint entry? This cannot be undone.'))return;
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let entries=[];try{entries=JSON.parse(c.logEntries||'[]');}catch(e){entries=[];}
+  entries=entries.filter(x=>x.id!==entryId);
+  c.logEntries=JSON.stringify(entries);
+  renderLogEntries(entries.slice().reverse());
+  renderCurrent();
+  await saveInBackground(c);
 }
 
 async function addLogEntry(){
@@ -1233,7 +1286,48 @@ function renderNotesHistory(){
   if(!c||!c.notesHistory){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';return;}
   let history=[];try{history=JSON.parse(c.notesHistory);}catch(e){history=[];}
   if(!history.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No previous versions saved yet.</div>';return;}
-  el.innerHTML=history.slice().reverse().map(h=>'<div class="history-entry"><div class="history-ts">'+esc(h.ts)+'</div><div class="history-note">'+esc(h.note)+'</div></div>').join('');
+  el.innerHTML=history.slice().reverse().map((h,revIdx)=>{
+    const realIdx=history.length-1-revIdx;
+    return'<div class="history-entry" id="histrow-'+realIdx+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'+
+        '<div class="history-ts">'+esc(h.ts)+'</div>'+
+        '<div style="display:flex;gap:5px;flex-shrink:0">'+
+          '<button class="btn btn-sm" style="padding:1px 6px" onclick="editHistoryEntry('+realIdx+')" title="Edit">&#9998;</button>'+
+          '<button class="btn btn-sm btn-danger" style="padding:1px 6px" onclick="deleteHistoryEntry('+realIdx+')" title="Delete">&times;</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="history-note" id="histnote-'+realIdx+'">'+esc(h.note)+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function editHistoryEntry(idx){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let history=[];try{history=JSON.parse(c.notesHistory||'[]');}catch(e){history=[];}
+  if(!history[idx])return;
+  const el=document.getElementById('histnote-'+idx);if(!el)return;
+  el.innerHTML='<textarea id="edithist-'+idx+'" class="notes-textarea" style="min-height:50px;margin-bottom:6px">'+esc(history[idx].note)+'</textarea>'+
+    '<div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="saveHistoryEdit('+idx+')">Save</button><button class="btn btn-sm" onclick="renderNotesHistory()">Cancel</button></div>';
+}
+
+async function saveHistoryEdit(idx){
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let history=[];try{history=JSON.parse(c.notesHistory||'[]');}catch(e){history=[];}
+  if(!history[idx])return;
+  history[idx].note=document.getElementById('edithist-'+idx).value.trim();
+  c.notesHistory=JSON.stringify(history);
+  renderNotesHistory();
+  await saveInBackground(c);
+}
+
+async function deleteHistoryEntry(idx){
+  if(!confirm('Delete this previous note version? This cannot be undone.'))return;
+  const c=contacts.find(x=>x.id===logContactId);if(!c)return;
+  let history=[];try{history=JSON.parse(c.notesHistory||'[]');}catch(e){history=[];}
+  history.splice(idx,1);
+  c.notesHistory=JSON.stringify(history);
+  renderNotesHistory();
+  await saveInBackground(c);
 }
 
 async function saveNotes(){
