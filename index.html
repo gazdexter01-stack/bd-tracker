@@ -1171,6 +1171,11 @@ async function saveLogEntryEdit(entryId){
   const newNote=document.getElementById('editlog-note-'+entryId).value.trim();
   entry.type=newType;entry.note=newNote;
   c.logEntries=JSON.stringify(entries);
+  // If this was the most recent entry, keep the row's summary badge in sync
+  if(entries.length&&entries[entries.length-1].id===entryId){
+    c.lastTouchType=newType;
+    c.lastTouchNote=newNote;
+  }
   renderLogEntries(entries.slice().reverse());
   renderCurrent();
   await saveInBackground(c);
@@ -1180,8 +1185,18 @@ async function deleteLogEntry(entryId){
   if(!confirm('Delete this touchpoint entry? This cannot be undone.'))return;
   const c=contacts.find(x=>x.id===logContactId);if(!c)return;
   let entries=[];try{entries=JSON.parse(c.logEntries||'[]');}catch(e){entries=[];}
+  const wasMostRecent=entries.length&&entries[entries.length-1].id===entryId;
   entries=entries.filter(x=>x.id!==entryId);
   c.logEntries=JSON.stringify(entries);
+  if(wasMostRecent){
+    if(entries.length){
+      c.lastTouchType=entries[entries.length-1].type;
+      c.lastTouchNote=entries[entries.length-1].note;
+    }else{
+      c.lastTouchType='';
+      c.lastTouchNote='';
+    }
+  }
   renderLogEntries(entries.slice().reverse());
   renderCurrent();
   await saveInBackground(c);
