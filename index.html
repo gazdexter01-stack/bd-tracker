@@ -372,7 +372,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <div id="log-entries" style="max-height:260px;overflow-y:auto;margin-bottom:12px"></div>
       <div class="flabel" style="margin-bottom:5px">Add touchpoint</div>
       <div class="log-add">
-        <select id="log-type"><option>Called</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Video call</option><option>Met in person</option></select>
+        <select id="log-type"><option>Called</option><option>Attempted call - no answer</option><option>Voicemail</option><option>WhatsApp</option><option>LinkedIn connection request</option><option>LinkedIn message</option><option>Email / InMail</option><option>Video call</option><option>Met in person</option></select>
         <input id="log-note" placeholder="Optional note">
         <button class="btn btn-primary btn-sm" onclick="addLogEntry()">Add</button>
       </div>
@@ -441,6 +441,7 @@ const PIN_CODE   = '3005';
 const CB_LONG  = 63;
 const CB_MED   = 7;
 const CB_SHORT = 4;
+const CB_NEXTDAY = 1;
 // =========================================================
 
 const DEFAULT_REGION_GROUPS = {
@@ -1147,7 +1148,7 @@ function renderLogEntries(logs){
   }).join('');
 }
 
-const LOG_TYPE_OPTIONS=['Called','Voicemail','WhatsApp','LinkedIn connection request','LinkedIn message','Email / InMail','Video call','Met in person'];
+const LOG_TYPE_OPTIONS=['Called','Attempted call - no answer','Voicemail','WhatsApp','LinkedIn connection request','LinkedIn message','Email / InMail','Video call','Met in person'];
 
 function editLogEntry(entryId){
   const c=contacts.find(x=>x.id===logContactId);if(!c)return;
@@ -1212,6 +1213,8 @@ async function addLogEntry(){
 
   if(type==='Called'||type==='Video call'||type==='Met in person'){
     c.callbackDate=addDays(CB_LONG);
+  }else if(type==='Attempted call - no answer'){
+    const nextDayDate=addDays(CB_NEXTDAY);const cbStr0=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';if(!cbStr0||cbStr0<=todayStr()||cbStr0<nextDayDate){c.callbackDate=nextDayDate;}
   }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
     const medDate=addDays(CB_MED);const cbStr=c.callbackDate?localDateStr(new     Date(c.callbackDate)):'';if(!cbStr||cbStr<=todayStr()||cbStr<medDate){c.callbackDate=medDate;}
     if(!c.callbackDate||c.callbackDate<=todayStr()||c.callbackDate<medDate){c.callbackDate=medDate;}
