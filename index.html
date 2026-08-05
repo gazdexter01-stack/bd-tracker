@@ -1187,15 +1187,19 @@ async function deleteLogEntry(entryId){
   const c=contacts.find(x=>x.id===logContactId);if(!c)return;
   let entries=[];try{entries=JSON.parse(c.logEntries||'[]');}catch(e){entries=[];}
   const wasMostRecent=entries.length&&entries[entries.length-1].id===entryId;
+  const deletedEntry=entries.find(x=>x.id===entryId);
   entries=entries.filter(x=>x.id!==entryId);
   c.logEntries=JSON.stringify(entries);
-  if(wasMostRecent){
+  if(wasMostRecent&&deletedEntry){
+    // Restore callback date and last contact date to what they were before this entry was logged
+    c.callbackDate=deletedEntry.prevCallbackDate!==undefined?deletedEntry.prevCallbackDate:c.callbackDate;
+    c.lastContactDate=deletedEntry.prevLastContactDate!==undefined?deletedEntry.prevLastContactDate:c.lastContactDate;
     if(entries.length){
       c.lastTouchType=entries[entries.length-1].type;
       c.lastTouchNote=entries[entries.length-1].note;
     }else{
-      c.lastTouchType='';
-      c.lastTouchNote='';
+      c.lastTouchType=deletedEntry.prevLastTouchType||'';
+      c.lastTouchNote=deletedEntry.prevLastTouchNote||'';
     }
   }
   renderLogEntries(entries.slice().reverse());
@@ -1210,6 +1214,12 @@ async function addLogEntry(){
   const note=document.getElementById('log-note').value.trim();
   const now=new Date();
   const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  // Snapshot state as it stood before this entry changes anything, so a later delete can restore it
+  const prevCallbackDate=c.callbackDate||'';
+  const prevLastContactDate=c.lastContactDate||'';
+  const prevLastTouchType=c.lastTouchType||'';
+  const prevLastTouchNote=c.lastTouchNote||'';
 
   if(type==='Called'||type==='Video call'||type==='Met in person'){
     c.callbackDate=addDays(CB_LONG);
@@ -1235,7 +1245,7 @@ async function addLogEntry(){
   try{
     let entries=[];
     try{entries=JSON.parse(c.logEntries||'');}catch(e){}
-    entries.push({id:crypto.randomUUID(),contactId:logContactId,type,note,ts});
+    entries.push({id:crypto.randomUUID(),contactId:logContactId,type,note,ts,prevCallbackDate,prevLastContactDate,prevLastTouchType,prevLastTouchNote});
     c.logEntries=JSON.stringify(entries);
     await saveInBackground(c);
   }catch(e){setSyncStatus('err','Log failed - refresh to resync');}
