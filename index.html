@@ -300,6 +300,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <select id="fa-region" onchange="renderAccounts()"></select>
       <select id="fa-country" onchange="renderAccounts()"></select>
       <input id="fa-search" placeholder="Search company or site..." style="width:200px" oninput="renderAccounts()">
+      <button class="btn btn-sm" onclick="clearAccountFilters()">Clear</button>
     </div>
     <div id="accounts-content"></div>
   </div>
@@ -946,6 +947,8 @@ function showView(v,btn){
 }
 
 function clearFilters(){['f-status','f-tier','f-region','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
+
+function clearAccountFilters(){['fa-tier','fa-region','fa-country','fa-search'].forEach(id=>document.getElementById(id).value='');renderAccounts();}
 
 function openAdd(){
   editingId=null;
