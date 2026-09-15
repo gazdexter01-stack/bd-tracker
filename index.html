@@ -34,6 +34,7 @@
   --dot-green:#639922;--dot-amber:#BA7517;--dot-red:#E24B4A;
   --tl-green:#3b6d11;--tl-amber:#BA7517;--tl-red:#a32d2d;
   --orange:#E8620A;--orange-light:#fdf0e8;--orange-dark:#c4520a;
+  --purple-bg:#f1e9fb;--purple-text:#5b2b96;
   --radius:8px;--radius-lg:12px;
 }
 
@@ -50,6 +51,7 @@
     --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
     --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
     --orange-light:#2a1505;
+    --purple-bg:#2a1a45;--purple-text:#c39ef0;
   }
 }
 
@@ -285,6 +287,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <input class="search-input" id="f-search" placeholder="Search name, company, mobile, email...">
       <select id="f-status" onchange="renderPipeline()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
       <select id="f-tier" onchange="renderPipeline()"></select>
+      <select id="f-sectorfilter" onchange="renderPipeline()"><option value="">All sectors</option><option>Pharma</option><option>Data Centre</option></select>
       <select id="f-region" onchange="renderPipeline()"></select>
       <select id="f-country" onchange="renderPipeline()"></select>
       <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option></select>
@@ -297,6 +300,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   <div id="v-accounts" class="view">
     <div class="filter-bar">
       <select id="fa-tier" onchange="renderAccounts()"></select>
+      <select id="fa-sectorfilter" onchange="renderAccounts()"><option value="">All sectors</option><option>Pharma</option><option>Data Centre</option></select>
       <select id="fa-region" onchange="renderAccounts()"></select>
       <select id="fa-country" onchange="renderAccounts()"></select>
       <input id="fa-search" placeholder="Search company or site..." style="width:200px" oninput="renderAccounts()">
@@ -309,6 +313,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <div class="filter-bar">
       <select id="fall-status" onchange="renderAll()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
       <select id="fall-tier" onchange="renderAll()"></select>
+      <select id="fall-sectorfilter" onchange="renderAll()"><option value="">All sectors</option><option>Pharma</option><option>Data Centre</option></select>
       <select id="fall-region" onchange="renderAll()"></select>
       <select id="fall-country" onchange="renderAll()"></select>
     </div>
@@ -329,13 +334,14 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <div class="fgroup"><div class="flabel">Job title</div><input id="f-jobtitle" placeholder="Job title"></div>
       <div class="fgroup"><div class="flabel">Company</div><input id="f-company" placeholder="Company name"></div>
       <div class="fgroup"><div class="flabel">Region / country</div><select id="f-ctry"></select></div>
+      <div class="fgroup"><div class="flabel">Sector</div><select id="f-sector" onchange="updateTierOptionsForSector()"><option>Pharma</option><option>Data Centre</option></select></div>
       <div class="fgroup"><div class="flabel">Site / location</div><input id="f-site" placeholder="e.g. London office"></div>
       <div class="fgroup"><div class="flabel">Email</div><input id="f-email" type="email" placeholder="email@company.com"></div>
       <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00447..."></div>
       <div class="fgroup full"><div class="flabel">LinkedIn URL</div><input id="f-linkedin" placeholder="https://www.linkedin.com/in/..."></div>
       <div class="fgroup">
-        <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors.</span></span></div>
-        <select id="f-tier2"><option value="">Select tier</option><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option></select>
+        <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text" id="tier-tooltip-text">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors.</span></span></div>
+        <select id="f-tier2"></select>
       </div>
       <div class="fgroup">
         <div class="flabel">Status <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text">Cold: no prior relationship. Warm: engaged but no active need. Active: current live opportunity or conversation.</span></span></div>
@@ -452,6 +458,27 @@ const DEFAULT_REGION_GROUPS = {
   'Other': []
 };
 
+const SECTOR_TIERS = {
+  'Pharma': ['T1 Manufacturer','T2 EPC/Consultancy','T3 Automation Vendors & Equip Suppliers'],
+  'Data Centre': ['T1 Data Centre Operator/Owner','T2 EPC / Design & Construction','T3 IT/OT Infrastructure & Equipment Vendor']
+};
+const SECTOR_TIER_TOOLTIPS = {
+  'Pharma': 'T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors.',
+  'Data Centre': 'T1 = Operator/Owner, T2 = EPC/Design & Construction, T3 = IT/OT Infrastructure & Equipment Vendor.'
+};
+
+function updateTierOptionsForSector(){
+  const sector=document.getElementById('f-sector').value||'Pharma';
+  const tiers=SECTOR_TIERS[sector]||SECTOR_TIERS['Pharma'];
+  const el=document.getElementById('f-tier2');
+  const cur=el.value;
+  el.innerHTML='<option value="">Select tier</option>'+tiers.map(t=>'<option>'+esc(t)+'</option>').join('');
+  // Keep the current selection only if it still belongs to this sector's tier set
+  if(tiers.includes(cur))el.value=cur;
+  const tip=document.getElementById('tier-tooltip-text');
+  if(tip)tip.textContent=SECTOR_TIER_TOOLTIPS[sector]||'';
+}
+
 let contacts=[],editingId=null,logContactId=null,deletingId=null,currentView='pipeline',userPin='';
 let settings={regionGroups:JSON.parse(JSON.stringify(DEFAULT_REGION_GROUPS))};
 let searchTimeout=null;
@@ -513,15 +540,19 @@ function rebuildDropdowns(){
     el.value=cur;
   });
 
-  // Tier dropdowns - single flat set, shared across all regions
-  const tierOptions='<option value="">Select tier</option><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option>';
-  const tierFilterOptions='<option value="">All tiers</option><option>T1 Manufacturer</option><option>T2 EPC/Consultancy</option><option>T3 Automation Vendors &amp; Equip Suppliers</option>';
+  // Tier filter dropdowns - grouped by sector, so a mixed pipeline can filter across either
+  let tierFilterOptions='<option value="">All tiers</option>';
+  Object.entries(SECTOR_TIERS).forEach(([sector,tiers])=>{
+    tierFilterOptions+='<optgroup label="'+esc(sector)+'">';
+    tiers.forEach(t=>{tierFilterOptions+='<option>'+esc(t)+'</option>';});
+    tierFilterOptions+='</optgroup>';
+  });
   ['f-tier','fa-tier','fall-tier'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const cur=el.value;el.innerHTML=tierFilterOptions;el.value=cur;
   });
-  const editTier=document.getElementById('f-tier2');
-  if(editTier){const cur=editTier.value;editTier.innerHTML=tierOptions;editTier.value=cur;}
+  // Edit form's tier dropdown only shows options for the currently selected sector
+  updateTierOptionsForSector();
 }
 
 function openSettings(){
@@ -676,6 +707,12 @@ function lcTraffic(ds){
 function urg(c){return cbTraffic(c.callbackDate).urg;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+function sectorBadge(s){
+  const sector=s||'Pharma';
+  if(sector==='Data Centre')return'<span class="badge" style="background:var(--purple-bg);color:var(--purple-text)">Data Centre</span>';
+  return'<span class="badge" style="background:var(--orange-light);color:var(--orange)">Pharma</span>';
+}
+
 function tierBadge(t){
   if(!t)return'';
   const cls=t.startsWith('T1')?'badge-t1':t.startsWith('T2')?'badge-t2':'badge-t3';
@@ -721,11 +758,12 @@ function lastTouchHTML(c){
   '</div>';
 }
 
-function filtered(status,tier,country,urgency,search,region){
+function filtered(status,tier,country,urgency,search,region,sector){
   return contacts.filter(c=>{
     if(status&&c.status!==status)return false;
     if(tier&&c.tier!==tier)return false;
     if(country&&c.country!==country)return false;
+    if(sector&&(c.sector||'Pharma')!==sector)return false;
     if(region){
       const list=(settings.regionGroups[region]||[]).map(x=>x.trim());
       if(!list.includes(c.country))return false;
@@ -751,7 +789,7 @@ function rowHTML(c,showCheckbox=false){
       '</div>'+
       '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
       '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
-        tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+
+        sectorBadge(c.sector)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+
       '</div>'+
     '</div>'+
     '<div>'+
@@ -803,7 +841,7 @@ function renderStats(list){
 }
 
 function renderPipeline(){
-  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value,document.getElementById('f-region').value);
+  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value,document.getElementById('f-region').value,document.getElementById('f-sectorfilter').value);
   renderStats(list);
   const sortCb=(a,b)=>new Date(a.callbackDate||'9999-12-31')-new Date(b.callbackDate||'9999-12-31');
   const ov=list.filter(c=>urg(c)==='overdue').sort(sortCb);
@@ -834,16 +872,16 @@ function toggleSection(key){
 }
 
 function renderAccounts(){
-  const t=document.getElementById('fa-tier').value,co=document.getElementById('fa-country').value,rg=document.getElementById('fa-region').value;
+  const t=document.getElementById('fa-tier').value,co=document.getElementById('fa-country').value,rg=document.getElementById('fa-region').value,sc=document.getElementById('fa-sectorfilter').value;
   const search=(document.getElementById('fa-search').value||'').toLowerCase();
   const regionList=rg?(settings.regionGroups[rg]||[]).map(x=>x.trim()):null;
-  const list=contacts.filter(c=>(!t||c.tier===t)&&(!co||c.country===co)&&(!regionList||regionList.includes(c.country))&&(!search||(c.company||'').toLowerCase().includes(search)||(c.site||'').toLowerCase().includes(search)));
+  const list=contacts.filter(c=>(!t||c.tier===t)&&(!co||c.country===co)&&(!sc||(c.sector||'Pharma')===sc)&&(!regionList||regionList.includes(c.country))&&(!search||(c.company||'').toLowerCase().includes(search)||(c.site||'').toLowerCase().includes(search)));
   const companies={};
-  list.forEach(c=>{const k=c.company||'Unknown';if(!companies[k])companies[k]={tier:c.tier,contacts:[]};companies[k].contacts.push(c);});
+  list.forEach(c=>{const k=c.company||'Unknown';if(!companies[k])companies[k]={tier:c.tier,sector:c.sector,contacts:[]};companies[k].contacts.push(c);});
   let html='';
   Object.entries(companies).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name,data])=>{
     const sites=[...new Set(data.contacts.map(c=>c.site).filter(Boolean))];
-    html+='<div class="company-block"><div class="company-head"><span style="font-weight:500;font-size:15px;color:var(--orange)">'+esc(name)+'</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+tierBadge(data.tier)+'<span style="font-size:12px;color:var(--text2)">'+data.contacts.length+' contact'+(data.contacts.length>1?'s':'')+'</span>'+(sites.length?'<span style="font-size:12px;color:var(--text3)">'+sites.map(esc).join(' / ')+'</span>':'')+'</div></div>';
+    html+='<div class="company-block"><div class="company-head"><span style="font-weight:500;font-size:15px;color:var(--orange)">'+esc(name)+'</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+sectorBadge(data.sector)+' '+tierBadge(data.tier)+'<span style="font-size:12px;color:var(--text2)">'+data.contacts.length+' contact'+(data.contacts.length>1?'s':'')+'</span>'+(sites.length?'<span style="font-size:12px;color:var(--text3)">'+sites.map(esc).join(' / ')+'</span>':'')+'</div></div>';
     data.contacts.forEach(c=>{
       const cb=cbTraffic(c.callbackDate),lc=lcTraffic(c.lastContactDate);
       html+='<div class="csub-row">'+
@@ -877,7 +915,7 @@ function renderAccounts(){
 }
 
 function renderAll(){
-  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','',document.getElementById('fall-region').value).sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
+  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','',document.getElementById('fall-region').value,document.getElementById('fall-sectorfilter').value).sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
   document.getElementById('all-content').innerHTML=list.map(c=>rowHTML(c)).join('')||'<div class="empty">No contacts match.</div>';
 }
 
@@ -946,15 +984,18 @@ function showView(v,btn){
   renderCurrent();
 }
 
-function clearFilters(){['f-status','f-tier','f-region','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
+function clearFilters(){['f-status','f-tier','f-sectorfilter','f-region','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
 
-function clearAccountFilters(){['fa-tier','fa-region','fa-country','fa-search'].forEach(id=>document.getElementById(id).value='');renderAccounts();}
+function clearAccountFilters(){['fa-tier','fa-sectorfilter','fa-region','fa-country','fa-search'].forEach(id=>document.getElementById(id).value='');renderAccounts();}
 
 function openAdd(){
   editingId=null;
   document.getElementById('modal-title').textContent='Add contact';
   ['fname','lname','jobtitle','company','site','email','mobile','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
-  ['ctry','tier2','stat'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['ctry','stat'].forEach(f=>document.getElementById('f-'+f).value='');
+  document.getElementById('f-sector').value='Pharma';
+  updateTierOptionsForSector();
+  document.getElementById('f-tier2').value='';
   ['f-callback','f-lastcontact','f-calEventId','f-notesHistory','f-tasks','f-lastTouchType','f-lastTouchNote','f-logEntries'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -972,6 +1013,8 @@ function openEdit(id){
   document.getElementById('f-email').value=c.email||'';
   document.getElementById('f-mobile').value=c.mobile||'';
   document.getElementById('f-linkedin').value=c.linkedIn||'';
+  document.getElementById('f-sector').value=c.sector||'Pharma';
+  updateTierOptionsForSector();
   document.getElementById('f-tier2').value=c.tier||'';
   document.getElementById('f-stat').value=c.status||'';
   document.getElementById('f-callback').value=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';
@@ -1011,6 +1054,7 @@ async function saveContact(){
     mobile:document.getElementById('f-mobile').value.trim(),
     linkedIn:document.getElementById('f-linkedin').value.trim(),
     tier:document.getElementById('f-tier2').value,
+    sector:document.getElementById('f-sector').value||'Pharma',
     status:document.getElementById('f-stat').value,
     callbackDate:document.getElementById('f-callback').value,
     lastContactDate:document.getElementById('f-lastcontact').value,
