@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>BD Tracker</title>
+<title>GCC Pharma BD Tracker</title>
 <!--
 =========================================================
   vantEdge BD Tracker
@@ -707,8 +707,8 @@ async function loadContacts(){
 
 function exportCSV(){
   if(!contacts.length){alert('No contacts to export.');return;}
-  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','Office','LinkedIn','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
-  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.office,c.linkedIn,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
+  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','LinkedIn','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
+  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.linkedIn,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
   const csv=[headers.map(h=>'"'+h+'"').join(','),...rows.map(r=>r.join(','))].join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
@@ -1050,7 +1050,7 @@ function clearAccountFilters(){['fa-tier','fa-sectorfilter','fa-region','fa-coun
 function openAdd(){
   editingId=null;
   document.getElementById('modal-title').textContent='Add contact';
-  ['fname','lname','jobtitle','company','site','email','mobile','office','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['fname','lname','jobtitle','company','site','email','mobile','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
   ['ctry','stat'].forEach(f=>document.getElementById('f-'+f).value='');
   document.getElementById('f-sector').value='Pharma';
   updateTierOptionsForSector();
