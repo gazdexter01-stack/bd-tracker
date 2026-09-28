@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BD Tracker</title>
+<title>GCC Pharma BD Tracker</title>
 <!--
 =========================================================
   vantEdge BD Tracker
@@ -39,7 +39,7 @@
 }
 
 @media (prefers-color-scheme:dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg:#1a1a1a;--bg2:#222222;--bg3:#141414;
     --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
     --text:#e8e8e8;--text2:#aaa;--text3:#666;
@@ -53,6 +53,20 @@
     --orange-light:#2a1505;
     --purple-bg:#2a1a45;--purple-text:#c39ef0;
   }
+}
+:root[data-theme="dark"] {
+  --bg:#1a1a1a;--bg2:#222222;--bg3:#141414;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8e8e8;--text2:#aaa;--text3:#666;
+  --blue-bg:#0d2a45;--blue-text:#7ab8f5;
+  --green-bg:#0d2a14;--green-text:#6fcf7a;
+  --amber-bg:#2a1a05;--amber-text:#f0a854;
+  --gray-bg:#242424;--gray-text:#999;
+  --red-bg:#2a0d0d;--red-text:#f47a7a;
+  --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
+  --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
+  --orange-light:#2a1505;
+  --purple-bg:#2a1a45;--purple-text:#c39ef0;
 }
 
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
@@ -237,6 +251,15 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   .settings-row{grid-template-columns:1fr;gap:4px}
 }
 </style>
+<script>
+// Applied immediately, before the page paints, so there's no flash of the wrong theme
+(function(){
+  try{
+    const saved=localStorage.getItem('bd_theme');
+    if(saved==='light'||saved==='dark')document.documentElement.setAttribute('data-theme',saved);
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 
@@ -275,6 +298,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <div class="nav-right">
       <button class="btn" onclick="openAdd()" style="color:var(--orange);border-color:var(--orange);font-size:11px;padding:3px 9px">+ Add contact</button>
       <button class="btn" onclick="exportCSV()" title="Export contacts to CSV" style="font-size:11px;padding:3px 9px">&#8595; CSV</button>
+      <button class="btn" onclick="toggleTheme()" title="Toggle light/dark mode" id="theme-toggle-btn" style="font-size:11px;padding:3px 9px">&#9788;</button>
       <button class="btn" onclick="openSettings()" title="Settings" style="font-size:11px;padding:3px 9px">&#9881;</button>
       <button class="btn" onclick="loadContacts()" title="Refresh" style="font-size:11px;padding:3px 9px">&#8635;</button>
       <span id="sync-status" class="sync-status sync-loading">Connecting...</span>
@@ -596,8 +620,31 @@ function closeOnboarding(){
   loadContacts();
 }
 
+function getEffectiveTheme(){
+  const forced=document.documentElement.getAttribute('data-theme');
+  if(forced)return forced;
+  return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+}
+
+function updateThemeButton(){
+  const btn=document.getElementById('theme-toggle-btn');
+  if(!btn)return;
+  const current=getEffectiveTheme();
+  // Icon shows what you'll switch TO, sun when currently dark, moon when currently light
+  btn.innerHTML=current==='dark'?'&#9788;':'&#9789;';
+  btn.title=current==='dark'?'Switch to light mode':'Switch to dark mode';
+}
+
+function toggleTheme(){
+  const next=getEffectiveTheme()==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  try{localStorage.setItem('bd_theme',next);}catch(e){}
+  updateThemeButton();
+}
+
 window.addEventListener('load',()=>{
   loadSettings();
+  updateThemeButton();
   const searchEl=document.getElementById('f-search');
   if(searchEl)searchEl.oninput=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(renderPipeline,200);};
   const saved=localStorage.getItem('bd_pin');
@@ -652,8 +699,8 @@ async function loadContacts(){
 
 function exportCSV(){
   if(!contacts.length){alert('No contacts to export.');return;}
-  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','LinkedIn','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
-  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.linkedIn,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
+  const headers=['First name','Last name','Job title','Company','Country/Region','Site','Email','Mobile','Office','LinkedIn','Tier','Status','Next callback','Last contact','Last touchpoint','Last touchpoint note','Notes'];
+  const rows=contacts.map(c=>[c.fname,c.lname,c.jobTitle,c.company,c.country,c.site,c.email,c.mobile,c.office,c.linkedIn,c.tier,c.status,c.callbackDate,c.lastContactDate,c.lastTouchType,c.lastTouchNote,c.notes].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"'));
   const csv=[headers.map(h=>'"'+h+'"').join(','),...rows.map(r=>r.join(','))].join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
@@ -995,7 +1042,7 @@ function clearAccountFilters(){['fa-tier','fa-sectorfilter','fa-region','fa-coun
 function openAdd(){
   editingId=null;
   document.getElementById('modal-title').textContent='Add contact';
-  ['fname','lname','jobtitle','company','site','email','mobile','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['fname','lname','jobtitle','company','site','email','mobile','office','linkedin','notes'].forEach(f=>document.getElementById('f-'+f).value='');
   ['ctry','stat'].forEach(f=>document.getElementById('f-'+f).value='');
   document.getElementById('f-sector').value='Pharma';
   updateTierOptionsForSector();
