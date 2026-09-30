@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>GCC Pharma BD Tracker</title>
+<title>BD Tracker</title>
 <!--
 =========================================================
   vantEdge BD Tracker
@@ -1293,8 +1293,8 @@ function editLogEntry(entryId){
   const row=document.getElementById('logdisp-'+entryId);if(!row)return;
   const typeOpts=LOG_TYPE_OPTIONS.map(t=>'<option'+(t===entry.type?' selected':'')+'>'+t+'</option>').join('');
   row.innerHTML='<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">'+
-    '<select id="editlog-type-'+entryId+'" style="font-size:12px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit">'+typeOpts+'</select>'+
-    '<input id="editlog-note-'+entryId+'" value="'+esc(entry.note||'')+'" placeholder="Optional note" style="font-size:12px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;flex:1;min-width:100px">'+
+    '<select id="editlog-type-'+entryId+'" style="font-size:16px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit">'+typeOpts+'</select>'+
+    '<input id="editlog-note-'+entryId+'" value="'+esc(entry.note||'')+'" placeholder="Optional note" style="font-size:16px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:inherit;flex:1;min-width:100px">'+
     '<button class="btn btn-sm btn-primary" onclick="saveLogEntryEdit(\''+entryId+'\')">Save</button>'+
     '<button class="btn btn-sm" onclick="renderLogEntries(JSON.parse((contacts.find(x=>x.id===logContactId).logEntries||\'[]\')).slice().reverse())">Cancel</button>'+
   '</div>';
