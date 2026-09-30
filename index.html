@@ -523,6 +523,28 @@ function localDateStr(d){
 function todayStr(){return localDateStr();}
 function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return localDateStr(d);}
 
+// GCC countries other than UAE run a Sun-Thu work week (weekend is Fri/Sat).
+// Combined with not working Sundays yourself, Mon-Thu is the only overlap
+// where a callback actually makes sense for these countries.
+function isNonUaeGcc(country){
+  if(!country)return false;
+  const gccList=(settings.regionGroups['GCC']||[]).map(x=>x.trim());
+  return gccList.includes(country)&&country!=='UAE';
+}
+
+function shiftPastNonWorkingDays(dateStr,country){
+  if(!dateStr||!isNonUaeGcc(country))return dateStr;
+  const parts=String(dateStr).trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!parts)return dateStr;
+  const d=new Date(+parts[1],+parts[2]-1,+parts[3]);
+  if(isNaN(d.getTime()))return dateStr;
+  // getDay(): 0=Sun, 5=Fri, 6=Sat - all non-working for this Mon-Thu overlap
+  while([0,5,6].includes(d.getDay())){
+    d.setDate(d.getDate()+1);
+  }
+  return localDateStr(d);
+}
+
 function loadSettings(){
   try{
     const s=localStorage.getItem('ve_settings');
@@ -1119,6 +1141,12 @@ async function saveContact(){
     lastContactDate:document.getElementById('f-lastcontact').value,
     notes:document.getElementById('f-notes').value.trim()
   };
+  const shiftedCallback=shiftPastNonWorkingDays(contact.callbackDate,contact.country);
+  if(shiftedCallback!==contact.callbackDate){
+    alert((contact.country||'This country')+' works Sun-Thu, so '+fmtDate(contact.callbackDate)+' falls on their weekend (or your Sunday off). Moved the callback to '+fmtDate(shiftedCallback)+' instead.');
+    contact.callbackDate=shiftedCallback;
+    document.getElementById('f-callback').value=shiftedCallback;
+  }
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Saving...';
   try{
     const saved=await api({action:'save',contact:JSON.stringify(contact)});
@@ -1171,7 +1199,7 @@ async function bulkSnooze(){
     let baseStr=todayStr();
     if(c.callbackDate){const parts=String(c.callbackDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(parts){const parsed=new Date(+parts[1],+parts[2]-1,+parts[3]);const today=new Date();today.setHours(0,0,0,0);parsed.setHours(0,0,0,0);if(parsed>=today)baseStr=c.callbackDate;}}
     const p=baseStr.split('-');const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
-    c.callbackDate=localDateStr(d);
+    c.callbackDate=shiftPastNonWorkingDays(localDateStr(d),c.country);
     try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;done++;}
     catch(e){setSyncStatus('err','Snooze failed on one contact');}
   }
@@ -1193,7 +1221,7 @@ async function snooze(id){
   }
   const p=baseStr.split('-');
   const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
-  c.callbackDate=localDateStr(d);
+  c.callbackDate=shiftPastNonWorkingDays(localDateStr(d),c.country);
   setSyncStatus('loading','Saving...');
   try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));renderCurrent();}
   catch(e){setSyncStatus('err','Snooze failed: '+e.message);}
@@ -1339,6 +1367,7 @@ async function addLogEntry(){
  }else if(type==='Voicemail'||type==='LinkedIn connection request'){
     const shortDate=addDays(CB_SHORT);const cbStr2=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';if(!cbStr2||cbStr2<=todayStr()||cbStr2<shortDate){c.callbackDate=shortDate;}
   }
+  c.callbackDate=shiftPastNonWorkingDays(c.callbackDate,c.country);
   c.lastContactDate=localDateStr(now);
   c.lastTouchType=type;
   c.lastTouchNote=note;
