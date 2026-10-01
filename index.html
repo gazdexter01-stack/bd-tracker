@@ -703,6 +703,34 @@ async function runDailyBalance(force){
   renderCurrent();
 }
 
+// The tracker usually stays open for days, so check every few minutes (and whenever
+// the tab comes back into view) whether a new day has started. If so, pull fresh
+// contacts from the server and rebalance. Skips while a popup is open so nothing
+// you're typing gets disturbed; it simply tries again on the next check.
+function anyModalOpen(){return!!document.querySelector('.modal-bg.open');}
+function checkNewDay(){
+  if(!userPin||balancing||saving||anyModalOpen())return;
+  if(document.getElementById('app').style.display==='none')return;
+  let last='';try{last=localStorage.getItem('bd_last_balance')||'';}catch(e){}
+  if(last!==todayStr())loadContacts();
+}
+setInterval(checkNewDay,5*60*1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkNewDay();});
+window.addEventListener('focus',checkNewDay);
+
+// The tracker is usually left open for days, so watch for the date rolling over.
+// When it does, pull fresh data (which also triggers the daily balance).
+let lastSeenDay=todayStr();
+function checkDayRollover(){
+  const t=todayStr();
+  if(t===lastSeenDay)return;
+  lastSeenDay=t;
+  if(userPin&&document.getElementById('app').style.display!=='none')loadContacts();
+}
+setInterval(checkDayRollover,5*60*1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDayRollover();});
+window.addEventListener('focus',checkDayRollover);
+
 function rebalanceNow(){
   const v=parseInt(document.getElementById('s-daily-cap').value,10);
   if(v>0){settings.dailyCap=v;saveSettingsToStorage();}
