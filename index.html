@@ -314,6 +314,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
   </nav>
 
   <div id="v-pipeline" class="view active">
+    <div id="balance-banner" style="margin-bottom:12px;padding:10px 12px;border-radius:var(--radius);background:var(--blue-bg);color:var(--blue-text);font-size:13px;line-height:1.5;display:none;justify-content:space-between;gap:10px;align-items:flex-start"><span id="balance-banner-text"></span><button class="btn btn-sm" style="flex-shrink:0;padding:1px 8px" onclick="document.getElementById('balance-banner').style.display='none'">&times;</button></div>
     <div class="stat-grid" id="stats"></div>
     <div class="filter-bar">
       <input class="search-input" id="f-search" placeholder="Search name, company, mobile, email...">
@@ -322,7 +323,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <select id="f-sectorfilter" onchange="renderPipeline()"><option value="">All sectors</option><option>Pharma</option><option>Data Centre</option></select>
       <select id="f-region" onchange="renderPipeline()"></select>
       <select id="f-country" onchange="renderPipeline()"></select>
-      <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option></select>
+      <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option><option value="moved">Moved 3+ times</option></select>
       <button class="btn btn-sm" onclick="clearFilters()">Clear</button>
       <button class="btn btn-sm btn-primary" id="bulk-snooze-btn" style="display:none" onclick="bulkSnooze()">Snooze selected (<span id="bulk-count">0</span>)</button>
     </div>
@@ -463,6 +464,12 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <div class="settings-row"><label>EU</label><input id="s-region-eu" placeholder="Ireland, Germany, Switzerland..."></div>
       <div class="settings-row"><label>Other</label><input id="s-region-other" placeholder="Add another region's countries here"></div>
     </div>
+    <div class="settings-section">
+      <h4>Daily workload</h4>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Maximum callbacks on any one day. Once a day the tracker keeps the most important ones for today (Tier 1 first, then whoever has waited longest) and spreads the rest over the next working days. New callbacks also roll to the next day with space.</p>
+      <div class="settings-row"><label>Max per day</label><input id="s-daily-cap" type="number" min="1" max="100" inputmode="numeric" placeholder="12"></div>
+      <div style="margin-top:6px"><button class="btn btn-sm" onclick="rebalanceNow()">Rebalance now</button></div>
+    </div>
     <div class="mfooter">
       <button class="btn" onclick="closeSettings()">Cancel</button>
       <button class="btn btn-primary" onclick="saveSettings()">Save settings</button>
@@ -512,7 +519,9 @@ function updateTierOptionsForSector(){
 }
 
 let contacts=[],editingId=null,logContactId=null,deletingId=null,currentView='pipeline',userPin='';
-let settings={regionGroups:JSON.parse(JSON.stringify(DEFAULT_REGION_GROUPS))};
+const DEFAULT_DAILY_CAP=12;
+const MOVED_FLAG_THRESHOLD=3;
+let settings={regionGroups:JSON.parse(JSON.stringify(DEFAULT_REGION_GROUPS)),dailyCap:DEFAULT_DAILY_CAP};
 let searchTimeout=null;
 let saving=false;
 
@@ -545,6 +554,163 @@ function shiftPastNonWorkingDays(dateStr,country){
   return localDateStr(d);
 }
 
+// =========================================================
+// DAILY WORKLOAD CAP
+// Keeps every day at or below the cap. Your working days are Mon-Fri,
+// non-UAE GCC contacts Mon-Thu only.
+// =========================================================
+function getDailyCap(){const n=parseInt(settings.dailyCap,10);return n>0?n:DEFAULT_DAILY_CAP;}
+
+function parseYmd(s){
+  if(!s)return null;
+  const m=String(s).trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  const d=new Date(s);if(isNaN(d.getTime()))return null;
+  d.setHours(0,0,0,0);return d;
+}
+function normDate(s){const d=parseYmd(s);return d?localDateStr(d):'';}
+
+function isWorkingDayFor(d,country){
+  const g=d.getDay();
+  if(g===0||g===6)return false;
+  if(g===5&&isNonUaeGcc(country))return false;
+  return true;
+}
+
+function tierRank(c){const t=c.tier||'';return t.startsWith('T1')?1:t.startsWith('T2')?2:t.startsWith('T3')?3:4;}
+
+function dayLoad(dateStr,excludeId){
+  let n=0;contacts.forEach(x=>{if(x.id!==excludeId&&normDate(x.callbackDate)===dateStr)n++;});return n;
+}
+
+// Earliest working day on or after dateStr (never before today) with space under the cap
+function findSlot(dateStr,country,excludeId){
+  const cap=getDailyCap();
+  let d=parseYmd(dateStr);if(!d)return dateStr;
+  const t=parseYmd(todayStr());if(d<t)d=t;
+  for(let i=0;i<730;i++){
+    const s=localDateStr(d);
+    if(isWorkingDayFor(d,country)&&dayLoad(s,excludeId)<cap)return s;
+    d.setDate(d.getDate()+1);
+  }
+  return dateStr;
+}
+
+function parseLog(c){try{const e=JSON.parse(c.logEntries||'[]');return Array.isArray(e)?e:[];}catch(e){return[];}}
+function lastRealEntry(entries){for(let i=entries.length-1;i>=0;i--){if(!entries[i].auto)return entries[i];}return null;}
+
+// How many times in a row this contact has been auto moved since the last real touchpoint
+function consecutiveAutoMoves(c){
+  const entries=parseLog(c);let n=0;
+  for(let i=entries.length-1;i>=0;i--){if(entries[i].auto)n++;else break;}
+  return n;
+}
+
+// Works out which callbacks need to move. Returns [{c,from,to}]
+function planBalance(){
+  const cap=getDailyCap();const today=todayStr();
+  const byDate={};const pool=[];
+  contacts.forEach(c=>{
+    const ds=normDate(c.callbackDate);if(!ds)return;
+    if(ds<=today)pool.push(c);else(byDate[ds]=byDate[ds]||[]).push(c);
+  });
+  // Tier 1 first, then whoever has been waiting longest
+  const prio=(a,b)=>tierRank(a)-tierRank(b)||normDate(a.callbackDate).localeCompare(normDate(b.callbackDate));
+  let carry=pool.sort(prio);
+  const lastDate=Object.keys(byDate).sort().pop()||today;
+  const moves=[];
+  const d=parseYmd(today);
+  for(let guard=0;guard<1500;guard++){
+    const ds=localDateStr(d);
+    if(ds>lastDate&&!carry.length)break;
+    const placed=[];const next=[];
+    // Callbacks already booked for this day keep their slot first, so existing plans don't get shuffled
+    (byDate[ds]||[]).slice().sort(prio).forEach(c=>{
+      if(isWorkingDayFor(d,c.country)&&placed.length<cap)placed.push(c);else next.push(c);
+    });
+    // Then anything carried over fills the remaining space
+    carry.forEach(c=>{
+      if(isWorkingDayFor(d,c.country)&&placed.length<cap){
+        placed.push(c);
+        const from=normDate(c.callbackDate);
+        if(from!==ds)moves.push({c,from,to:ds});
+      }else next.push(c);
+    });
+    carry=next.sort(prio);
+    d.setDate(d.getDate()+1);
+  }
+  return moves;
+}
+
+let balancing=false;
+
+function showBalanceBanner(msg){
+  const b=document.getElementById('balance-banner');if(!b)return;
+  document.getElementById('balance-banner-text').textContent=msg;
+  b.style.display='flex';
+}
+
+async function runDailyBalance(force){
+  if(balancing)return;
+  const today=todayStr();
+  if(!force){try{if(localStorage.getItem('bd_last_balance')===today)return;}catch(e){}}
+  const cap=getDailyCap();
+  const moves=planBalance();
+  if(!moves.length){
+    try{localStorage.setItem('bd_last_balance',today);}catch(e){}
+    if(force)showBalanceBanner('Nothing needed moving. Every day is already at '+cap+' callbacks or fewer.');
+    return;
+  }
+  balancing=true;
+  const now=new Date();
+  const ts=fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  // Apply everything locally first so the screen updates straight away
+  moves.forEach(m=>{
+    const c=m.c;
+    const entries=parseLog(c);
+    const overdueDays=-(daysDiff(m.from)||0);
+    const why=overdueDays>0?' ('+overdueDays+' day'+(overdueDays!==1?'s':'')+' overdue)':'';
+    entries.push({
+      id:crypto.randomUUID(),contactId:c.id,type:'Auto rescheduled',auto:true,
+      note:'Moved from '+fmtDate(m.from)+' to '+fmtDate(m.to)+why+' to balance daily workload',
+      ts,
+      prevCallbackDate:c.callbackDate||'',prevLastContactDate:c.lastContactDate||'',
+      prevLastTouchType:c.lastTouchType||'',prevLastTouchNote:c.lastTouchNote||''
+    });
+    c.logEntries=JSON.stringify(entries);
+    c.callbackDate=m.to;
+  });
+  const flagged=contacts.filter(c=>consecutiveAutoMoves(c)>=MOVED_FLAG_THRESHOLD).length;
+  showBalanceBanner('Moved '+moves.length+' callback'+(moves.length!==1?'s':'')+' so no day has more than '+cap+'.'+
+    (flagged?' '+flagged+' contact'+(flagged!==1?'s have':' has')+' now been moved '+MOVED_FLAG_THRESHOLD+'+ times without contact (red "Moved" badge, or filter by "Moved 3+ times").':''));
+  renderCurrent();
+  // Then save one by one in the background (each save also updates the calendar event)
+  let done=0,failed=0;
+  for(const m of moves){
+    setSyncStatus('loading','Balancing '+(done+failed+1)+'/'+moves.length+'...');
+    try{
+      const saved=await api({action:'save',contact:JSON.stringify(m.c)});
+      const idx=contacts.findIndex(x=>x.id===m.c.id);if(idx>=0&&saved)contacts[idx]=saved;
+      done++;
+    }catch(e){failed++;}
+  }
+  balancing=false;
+  if(failed){setSyncStatus('err',failed+' move'+(failed!==1?'s':'')+' failed to save - refresh to resync');}
+  else{
+    try{localStorage.setItem('bd_last_balance',today);}catch(e){}
+    setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));
+  }
+  renderCurrent();
+}
+
+function rebalanceNow(){
+  const v=parseInt(document.getElementById('s-daily-cap').value,10);
+  if(v>0){settings.dailyCap=v;saveSettingsToStorage();}
+  closeSettings();
+  showView('pipeline',document.querySelector('.nav-btn[onclick*="pipeline"]'));
+  runDailyBalance(true);
+}
+
 function loadSettings(){
   try{
     const s=localStorage.getItem('ve_settings');
@@ -557,6 +723,7 @@ function loadSettings(){
         settings.regionGroups=JSON.parse(JSON.stringify(DEFAULT_REGION_GROUPS));
         settings.regionGroups['GCC']=parsed.regions;
       }
+      if(parsed.dailyCap)settings.dailyCap=parsed.dailyCap;
     }
   }catch(e){}
   rebuildDropdowns();
@@ -614,6 +781,7 @@ function openSettings(){
   document.getElementById('s-region-apac').value=(settings.regionGroups['Asia-Pacific']||[]).join(', ');
   document.getElementById('s-region-eu').value=(settings.regionGroups['EU']||[]).join(', ');
   document.getElementById('s-region-other').value=(settings.regionGroups['Other']||[]).join(', ');
+  document.getElementById('s-daily-cap').value=getDailyCap();
   document.getElementById('settings-modal-bg').classList.add('open');
 }
 
@@ -625,7 +793,11 @@ function saveSettings(){
     'EU':parse(document.getElementById('s-region-eu').value),
     'Other':parse(document.getElementById('s-region-other').value)
   };
+  const oldCap=getDailyCap();
+  const newCap=parseInt(document.getElementById('s-daily-cap').value,10);
+  if(newCap>0)settings.dailyCap=newCap;
   saveSettingsToStorage();rebuildDropdowns();closeSettings();renderCurrent();
+  if(getDailyCap()!==oldCap)runDailyBalance(true);
 }
 
 function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
@@ -723,7 +895,7 @@ function setSyncStatus(state,msg){
 
 async function loadContacts(){
   setSyncStatus('loading','Loading...');
-  try{contacts=await api({action:'getAll'});setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));updateTaskNavBadge();renderCurrent();}
+  try{contacts=await api({action:'getAll'});setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));updateTaskNavBadge();renderCurrent();runDailyBalance(false);}
   catch(e){setSyncStatus('err','Failed: '+e.message);}
 }
 
@@ -830,6 +1002,12 @@ function taskBadgeHTML(c){
   return open.length?'<span class="task-badge">'+open.length+' task'+(open.length>1?'s':'')+'</span>':'';
 }
 
+function movedBadgeHTML(c){
+  const n=consecutiveAutoMoves(c);
+  if(n<MOVED_FLAG_THRESHOLD)return'';
+  return'<span class="badge" style="background:var(--red-bg);color:var(--red-text)" title="Auto moved '+n+' times in a row without contact. Call, drop the tier, or park them.">Moved '+n+'x</span>';
+}
+
 function lastTouchHTML(c){
   if(!c.lastTouchType)return'';
   return'<div style="border-top:0.5px solid var(--border);padding-top:5px;margin-top:4px">'+
@@ -849,7 +1027,8 @@ function filtered(status,tier,country,urgency,search,region,sector){
       const list=(settings.regionGroups[region]||[]).map(x=>x.trim());
       if(!list.includes(c.country))return false;
     }
-    if(urgency&&urg(c)!==urgency)return false;
+    if(urgency==='moved'){if(consecutiveAutoMoves(c)<MOVED_FLAG_THRESHOLD)return false;}
+    else if(urgency&&urg(c)!==urgency)return false;
     if(search){
       const s=search.toLowerCase();
       if(!(c.fname+' '+c.lname).toLowerCase().includes(s)&&!(c.company||'').toLowerCase().includes(s)&&!(c.mobile||'').toLowerCase().includes(s)&&!(c.email||'').toLowerCase().includes(s))return false;
@@ -870,7 +1049,7 @@ function rowHTML(c,showCheckbox=false){
       '</div>'+
       '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
       '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
-        sectorBadge(c.sector)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+
+        sectorBadge(c.sector)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+' '+movedBadgeHTML(c)+
       '</div>'+
     '</div>'+
     '<div>'+
@@ -917,7 +1096,7 @@ function renderStats(list){
     '<div class="stat-card"><div class="slabel">Total</div><div class="sval">'+list.length+'</div></div>'+
     '<div class="stat-card"><div class="slabel">Accounts</div><div class="sval">'+accts+'</div></div>'+
     '<div class="stat-card"><div class="slabel">Overdue</div><div class="sval" style="color:var(--tl-red)">'+ov+'</div></div>'+
-    '<div class="stat-card"><div class="slabel">Today</div><div class="sval" style="color:var(--tl-amber)">'+tod+'</div></div>'+
+    '<div class="stat-card"><div class="slabel">Today</div><div class="sval" style="color:var(--tl-amber)">'+tod+'<span style="font-size:13px;color:var(--text3);font-weight:400"> / '+getDailyCap()+'</span></div></div>'+
     '<div class="stat-card"><div class="slabel">This week</div><div class="sval">'+wk+'</div></div>';
 }
 
@@ -1199,7 +1378,7 @@ async function bulkSnooze(){
     let baseStr=todayStr();
     if(c.callbackDate){const parts=String(c.callbackDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(parts){const parsed=new Date(+parts[1],+parts[2]-1,+parts[3]);const today=new Date();today.setHours(0,0,0,0);parsed.setHours(0,0,0,0);if(parsed>=today)baseStr=c.callbackDate;}}
     const p=baseStr.split('-');const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
-    c.callbackDate=shiftPastNonWorkingDays(localDateStr(d),c.country);
+    c.callbackDate=findSlot(shiftPastNonWorkingDays(localDateStr(d),c.country),c.country,c.id);
     try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;done++;}
     catch(e){setSyncStatus('err','Snooze failed on one contact');}
   }
@@ -1221,7 +1400,7 @@ async function snooze(id){
   }
   const p=baseStr.split('-');
   const d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+7);
-  c.callbackDate=shiftPastNonWorkingDays(localDateStr(d),c.country);
+  c.callbackDate=findSlot(shiftPastNonWorkingDays(localDateStr(d),c.country),c.country,c.id);
   setSyncStatus('loading','Saving...');
   try{const saved=await api({action:'save',contact:JSON.stringify(c)});const idx=contacts.findIndex(x=>x.id===id);if(idx>=0)contacts[idx]=saved;setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));renderCurrent();}
   catch(e){setSyncStatus('err','Snooze failed: '+e.message);}
@@ -1270,14 +1449,14 @@ function renderLogEntries(logs){
   if(!logs.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">No touchpoints logged yet.</div>';return;}
   el.innerHTML=logs.map(e=>{
     const ts=esc(e.ts).replace(/ GMT[+-]\d{4}.*/,'');
-    return'<div class="log-entry" id="logrow-'+esc(e.id)+'">'+
+    return'<div class="log-entry" id="logrow-'+esc(e.id)+'"'+(e.auto?' style="opacity:0.65"':'')+'>'+
       '<div style="flex:1;min-width:0;overflow:hidden" id="logdisp-'+esc(e.id)+'">'+
-        '<span class="ltype">'+esc(e.type)+'</span>'+
+        '<span class="ltype"'+(e.auto?' style="font-style:italic;color:var(--text3)"':'')+'>'+esc(e.type)+'</span>'+
         (e.note?' &mdash; <span title="'+esc(e.note)+'" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:inline-block;max-width:220px;vertical-align:bottom;cursor:default;">'+esc(e.note)+'</span>':'')+
       '</div>'+
       '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'+
         '<div class="lts">'+ts+'</div>'+
-        '<button class="btn btn-sm" style="padding:1px 6px" onclick="editLogEntry(\''+esc(e.id)+'\')" title="Edit">&#9998;</button>'+
+        (e.auto?'':'<button class="btn btn-sm" style="padding:1px 6px" onclick="editLogEntry(\''+esc(e.id)+'\')" title="Edit">&#9998;</button>')+
         '<button class="btn btn-sm btn-danger" style="padding:1px 6px" onclick="deleteLogEntry(\''+esc(e.id)+'\')" title="Delete">&times;</button>'+
       '</div>'+
     '</div>';
@@ -1309,7 +1488,8 @@ async function saveLogEntryEdit(entryId){
   entry.type=newType;entry.note=newNote;
   c.logEntries=JSON.stringify(entries);
   // If this was the most recent entry, keep the row's summary badge in sync
-  if(entries.length&&entries[entries.length-1].id===entryId){
+  const latestReal=lastRealEntry(entries);
+  if(latestReal&&latestReal.id===entryId){
     c.lastTouchType=newType;
     c.lastTouchNote=newNote;
   }
@@ -1330,9 +1510,12 @@ async function deleteLogEntry(entryId){
     // Restore callback date and last contact date to what they were before this entry was logged
     c.callbackDate=deletedEntry.prevCallbackDate!==undefined?deletedEntry.prevCallbackDate:c.callbackDate;
     c.lastContactDate=deletedEntry.prevLastContactDate!==undefined?deletedEntry.prevLastContactDate:c.lastContactDate;
-    if(entries.length){
-      c.lastTouchType=entries[entries.length-1].type;
-      c.lastTouchNote=entries[entries.length-1].note;
+    const latestReal=lastRealEntry(entries);
+    if(deletedEntry.auto){
+      // Auto moves never touched the last touchpoint, so leave it as is
+    }else if(latestReal){
+      c.lastTouchType=latestReal.type;
+      c.lastTouchNote=latestReal.note;
     }else{
       c.lastTouchType=deletedEntry.prevLastTouchType||'';
       c.lastTouchNote=deletedEntry.prevLastTouchNote||'';
@@ -1368,6 +1551,9 @@ async function addLogEntry(){
     const shortDate=addDays(CB_SHORT);const cbStr2=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';if(!cbStr2||cbStr2<=todayStr()||cbStr2<shortDate){c.callbackDate=shortDate;}
   }
   c.callbackDate=shiftPastNonWorkingDays(c.callbackDate,c.country);
+  if(c.callbackDate&&normDate(c.callbackDate)!==normDate(prevCallbackDate)){
+    c.callbackDate=findSlot(c.callbackDate,c.country,c.id);
+  }
   c.lastContactDate=localDateStr(now);
   c.lastTouchType=type;
   c.lastTouchNote=note;
