@@ -323,7 +323,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <select id="f-sectorfilter" onchange="renderPipeline()"><option value="">All sectors</option><option>Pharma</option><option>Data Centre</option></select>
       <select id="f-region" onchange="renderPipeline()"></select>
       <select id="f-country" onchange="renderPipeline()"></select>
-      <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="overdue">Overdue</option><option value="today">Today</option><option value="upcoming">Upcoming</option><option value="moved">Moved 3+ times</option></select>
+      <select id="f-urgency" onchange="renderPipeline()"><option value="">All urgency</option><option value="today">Today</option><option value="upcoming">Upcoming</option><option value="moved">Moved 3+ times</option></select>
       <button class="btn btn-sm" onclick="clearFilters()">Clear</button>
       <button class="btn btn-sm btn-primary" id="bulk-snooze-btn" style="display:none" onclick="bulkSnooze()">Snooze selected (<span id="bulk-count">0</span>)</button>
     </div>
@@ -687,6 +687,8 @@ async function runDailyBalance(force){
   // Then save one by one in the background (each save also updates the calendar event)
   let done=0,failed=0;
   for(const m of moves){
+    // Space the saves out so the calendar sync behind each one can keep up
+    if(done+failed>0)await new Promise(r=>setTimeout(r,1500));
     setSyncStatus('loading','Balancing '+(done+failed+1)+'/'+moves.length+'...');
     try{
       const saved=await api({action:'save',contact:JSON.stringify(m.c)});
