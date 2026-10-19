@@ -274,10 +274,10 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 <div id="pin-screen">
   <div class="pin-box">
     <div class="pin-logo"><span style="font-size:34px;font-weight:500;color:var(--text)">BD Tracker</span></div>
-    <p>Enter your PIN to access your contacts.</p>
-    <input type="password" id="pin-input" maxlength="8" placeholder="&bull; &bull; &bull; &bull;" onkeydown="if(event.key==='Enter')checkPin()">
+    <p>Enter your passcode to access your contacts.</p>
+    <input type="password" id="pin-input" maxlength="64" autocomplete="current-password" placeholder="&bull; &bull; &bull; &bull;" onkeydown="if(event.key==='Enter')checkPin()">
     <button class="pin-btn" onclick="checkPin()">Unlock</button>
-    <div class="pin-error" id="pin-error">Incorrect PIN. Try again.</div>
+    <div class="pin-error" id="pin-error">Incorrect passcode. Try again.</div>
   </div>
 </div>
 
@@ -482,7 +482,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
 // CONFIGURATION
 // =========================================================
 const SCRIPT_URL = 'https://bd-tracker-proxy.gazdexter01.workers.dev';
-const PIN_CODE   = '3005';
+// The passcode is checked by the worker (APP_PIN secret), never stored in this file
 
 const CB_LONG  = 63;
 const CB_MED   = 7;
@@ -730,6 +730,21 @@ function checkDayRollover(){
   if(userPin&&document.getElementById('app').style.display!=='none')loadContacts();
 }
 setInterval(checkDayRollover,5*60*1000);
+
+// Pull fresh data when you come back to the tab, and every 2 minutes while it's open,
+// so changes made elsewhere (phone, Claude) show up and aren't overwritten by an old copy.
+// Skipped while a form is open or a save is in progress so nothing you're typing gets lost.
+let lastLoadAt=0;
+function anyModalOpen(){return !!document.querySelector('.modal-bg.open');}
+function backgroundRefresh(minAgeMs){
+  if(!userPin||document.hidden||saving||balancing||anyModalOpen())return;
+  if(document.getElementById('app').style.display==='none')return;
+  if(Date.now()-lastLoadAt<minAgeMs)return;
+  loadContacts();
+}
+setInterval(()=>backgroundRefresh(110*1000),120*1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)backgroundRefresh(20*1000);});
+window.addEventListener('focus',()=>backgroundRefresh(20*1000));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDayRollover();});
 window.addEventListener('focus',checkDayRollover);
 
@@ -832,17 +847,32 @@ function saveSettings(){
 
 function closeSettings(){document.getElementById('settings-modal-bg').classList.remove('open');}
 
-function checkPin(){
+async function checkPin(){
   const val=document.getElementById('pin-input').value.trim();
-  if(val===PIN_CODE){
-    userPin=val;localStorage.setItem('bd_pin',val);
+  if(!val)return;
+  const btn=document.querySelector('.pin-btn');if(btn){btn.disabled=true;btn.textContent='Checking...';}
+  userPin=val;
+  let ok=false;
+  try{contacts=await api({action:'getAll'});ok=true;}catch(e){ok=false;}
+  if(btn){btn.disabled=false;btn.textContent='Unlock';}
+  if(ok){
+    try{localStorage.setItem('bd_pin',val);}catch(e){}
+    document.getElementById('pin-error').style.display='none';
     document.getElementById('pin-screen').style.display='none';
     if(!localStorage.getItem('bd_seen_onboarding')){document.getElementById('onboarding-screen').classList.add('open');}
     else{document.getElementById('app').style.display='block';loadContacts();}
   }else{
+    userPin='';
     document.getElementById('pin-error').style.display='block';
     document.getElementById('pin-input').value='';
   }
+}
+
+function lockApp(){
+  userPin='';
+  try{localStorage.removeItem('bd_pin');}catch(e){}
+  document.getElementById('app').style.display='none';
+  document.getElementById('pin-screen').style.display='';
 }
 
 function closeOnboarding(){
@@ -879,8 +909,8 @@ window.addEventListener('load',()=>{
   updateThemeButton();
   const searchEl=document.getElementById('f-search');
   if(searchEl)searchEl.oninput=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(renderPipeline,200);};
-  const saved=localStorage.getItem('bd_pin');
-  if(saved===PIN_CODE){
+  let saved='';try{saved=localStorage.getItem('bd_pin')||'';}catch(e){}
+  if(saved){
     userPin=saved;
     document.getElementById('pin-screen').style.display='none';
     document.getElementById('app').style.display='block';
@@ -904,6 +934,7 @@ async function api(params){
     }),
     new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout')),45000))
   ]);
+  if(resp.status===401)throw new Error('Invalid PIN');
   if(!resp.ok)throw new Error('HTTP '+resp.status);
   const data=await resp.json();
   if(data.success)return data.data;
@@ -925,8 +956,11 @@ function setSyncStatus(state,msg){
 
 async function loadContacts(){
   setSyncStatus('loading','Loading...');
-  try{contacts=await api({action:'getAll'});setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));updateTaskNavBadge();renderCurrent();runDailyBalance(false);}
-  catch(e){setSyncStatus('err','Failed: '+e.message);}
+  try{contacts=await api({action:'getAll'});lastLoadAt=Date.now();setSyncStatus('ok',contacts.length+' contact'+(contacts.length!==1?'s':''));updateTaskNavBadge();renderCurrent();runDailyBalance(false);}
+  catch(e){
+    if(e.message==='Invalid PIN'){lockApp();return;}
+    setSyncStatus('err','Failed: '+e.message);
+  }
 }
 
 function exportCSV(){
