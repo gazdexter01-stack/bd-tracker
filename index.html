@@ -577,6 +577,7 @@ function isWorkingDayFor(d,country){
   return true;
 }
 
+function statusRank(c){const s=c.status||'';return s==='Active'?1:s==='Warm'?2:s==='Cold'?3:4;}
 function tierRank(c){const t=c.tier||'';return t.startsWith('T1')?1:t.startsWith('T2')?2:t.startsWith('T3')?3:4;}
 
 function dayLoad(dateStr,excludeId){
@@ -614,8 +615,8 @@ function planBalance(){
     const ds=normDate(c.callbackDate);if(!ds)return;
     if(ds<=today)pool.push(c);else(byDate[ds]=byDate[ds]||[]).push(c);
   });
-  // Tier 1 first, then whoever has been waiting longest
-  const prio=(a,b)=>tierRank(a)-tierRank(b)||normDate(a.callbackDate).localeCompare(normDate(b.callbackDate));
+  // Active first, then Warm, then Cold. Within each: Tier 1 first, then whoever has waited longest
+  const prio=(a,b)=>statusRank(a)-statusRank(b)||tierRank(a)-tierRank(b)||normDate(a.callbackDate).localeCompare(normDate(b.callbackDate));
   let carry=pool.sort(prio);
   const lastDate=Object.keys(byDate).sort().pop()||today;
   const moves=[];
