@@ -1067,6 +1067,23 @@ function taskBadgeHTML(c){
   return open.length?'<span class="task-badge">'+open.length+' task'+(open.length>1?'s':'')+'</span>':'';
 }
 
+// Unanswered calls in a row since the last real two way touch (auto moves ignored)
+const NO_ANSWER_TYPES=['Attempted call - no answer','Voicemail'];
+const NO_ANSWER_LIMIT=2;
+function consecutiveNoAnswers(c){
+  const entries=parseLog(c);let n=0;
+  for(let i=entries.length-1;i>=0;i--){
+    if(entries[i].auto)continue;
+    if(NO_ANSWER_TYPES.includes(entries[i].type))n++;else break;
+  }
+  return n;
+}
+function noAnswerBadgeHTML(c){
+  const n=consecutiveNoAnswers(c);
+  if(n<NO_ANSWER_LIMIT)return'';
+  return'<span class="badge" style="background:var(--amber-bg);color:var(--amber-text)" title="'+n+' calls in a row without an answer. Try WhatsApp or LinkedIn instead.">No answer x'+n+', try WhatsApp</span>';
+}
+
 function movedBadgeHTML(c){
   const n=consecutiveAutoMoves(c);
   if(n<MOVED_FLAG_THRESHOLD)return'';
@@ -1114,7 +1131,7 @@ function rowHTML(c,showCheckbox=false){
       '</div>'+
       '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
       '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
-        sectorBadge(c.sector)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+' '+movedBadgeHTML(c)+
+        sectorBadge(c.sector)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+' '+movedBadgeHTML(c)+' '+noAnswerBadgeHTML(c)+
       '</div>'+
     '</div>'+
     '<div>'+
@@ -1607,6 +1624,9 @@ async function addLogEntry(){
 
   if(type==='Called'||type==='Video call'||type==='Met in person'){
     c.callbackDate=addDays(CB_LONG);
+  }else if(NO_ANSWER_TYPES.includes(type)&&consecutiveNoAnswers(c)+1>=NO_ANSWER_LIMIT){
+    // Second unanswered call in a row: stop chasing by phone every day, switch channel and come back in a week
+    const weekDate=addDays(CB_MED);const cbStrN=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';if(!cbStrN||cbStrN<=todayStr()||cbStrN<weekDate){c.callbackDate=weekDate;}
   }else if(type==='Attempted call - no answer'){
     const nextDayDate=addDays(CB_NEXTDAY);const cbStr0=c.callbackDate?localDateStr(new Date(c.callbackDate)):'';if(!cbStr0||cbStr0<=todayStr()||cbStr0<nextDayDate){c.callbackDate=nextDayDate;}
   }else if(type==='Email / InMail'||type==='LinkedIn message'||type==='WhatsApp'){
