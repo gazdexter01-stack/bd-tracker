@@ -598,7 +598,7 @@ function findSlot(dateStr,country,excludeId){
 }
 
 function parseLog(c){try{const e=JSON.parse(c.logEntries||'[]');return Array.isArray(e)?e:[];}catch(e){return[];}}
-function lastRealEntry(entries){for(let i=entries.length-1;i>=0;i--){if(!entries[i].auto)return entries[i];}return null;}
+function lastRealEntry(entries){for(let i=entries.length-1;i>=0;i--){if(!entries[i].auto&&!entries[i].parked)return entries[i];}return null;}
 
 // How many times in a row this contact has been auto moved since the last real touchpoint
 function consecutiveAutoMoves(c){
@@ -1084,6 +1084,34 @@ function noAnswerBadgeHTML(c){
   return'<span class="badge" style="background:var(--amber-bg);color:var(--amber-text)" title="'+n+' calls in a row without an answer. Try WhatsApp or LinkedIn instead.">No answer x'+n+', try WhatsApp</span>';
 }
 
+// ---------- Phone links ----------
+const COUNTRY_DIAL={'UAE':'971','Saudi Arabia':'966','Qatar':'974','Kuwait':'965','Bahrain':'973','Oman':'968','Jordan':'962','Ireland':'353','UK':'44','Switzerland':'41','Germany':'49','Belgium':'32','Netherlands':'31','Denmark':'45','France':'33','Italy':'39','Spain':'34','Singapore':'65','Egypt':'20'};
+// Turns whatever was typed (00971..., +971..., 050...) into international digits, or '' if unsure
+function intlDigits(mobile,country){
+  let raw=String(mobile||'').trim();if(!raw)return'';
+  let d=raw.replace(/[^\d]/g,'');
+  if(raw.startsWith('+'))return d;
+  if(d.startsWith('00'))return d.slice(2);
+  if(d.startsWith('0')){const cc=COUNTRY_DIAL[country];return cc?cc+d.slice(1):'';}
+  return d;
+}
+function phoneHTML(c){
+  if(!c.mobile)return'';
+  const d=intlDigits(c.mobile,c.country);
+  if(!d)return'<div class="csub">'+esc(c.mobile)+'</div>';
+  return'<div class="csub" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+    '<a href="tel:+'+d+'" style="color:inherit" title="Call">'+esc(c.mobile)+'</a>'+
+    '<a href="https://wa.me/'+d+'" target="_blank" rel="noopener" title="Open WhatsApp chat" style="font-size:11px;padding:1px 6px;border-radius:6px;background:var(--green-bg);color:var(--tl-green);text-decoration:none;font-weight:500">WhatsApp</a>'+
+  '</div>';
+}
+
+// ---------- Next step (latest open task) ----------
+function nextStepHTML(c){
+  const open=getOpenTasks(c);if(!open.length)return'';
+  const t=open[open.length-1].text;
+  return'<div style="font-size:11px;color:var(--text2);margin:4px 0;line-height:1.4" title="'+esc(t)+'"><span style="color:var(--text3)">Next: </span>'+esc(t.length>70?t.slice(0,70)+'...':t)+'</div>';
+}
+
 function movedBadgeHTML(c){
   const n=consecutiveAutoMoves(c);
   if(n<MOVED_FLAG_THRESHOLD)return'';
@@ -1139,7 +1167,7 @@ function rowHTML(c,showCheckbox=false){
       '<div class="csub">'+esc(c.site||'')+'</div>'+
       '<div class="csub">'+esc(c.country||'')+'</div>'+
       (c.email?'<div class="csub" style="margin-top:2px">'+esc(c.email)+'</div>':'')+
-      (c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+
+      phoneHTML(c)+
     '</div>'+
     '<div class="notes-cell" onclick="openLog(\''+c.id+'\')" title="Click to open log">'+notesHTML+'</div>'+
     '<div style="font-size:12px">'+
@@ -1151,10 +1179,12 @@ function rowHTML(c,showCheckbox=false){
         '<div style="font-size:10px;color:var(--text3);margin-bottom:1px">Last contact</div>'+
         '<span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span>'+
       '</div>'+
-      lastTouchHTML(c)+
+      nextStepHTML(c)+lastTouchHTML(c)+
     '</div>'+
     '<div class="cactions">'+
       '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="quickNoAnswer(\''+c.id+'\')" title="Log an unanswered call">No ans</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="parkContact(\''+c.id+'\')" title="Set to Cold and come back in 90 days">Park</button>'+
       '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
       '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
       '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
@@ -1234,15 +1264,17 @@ function renderAccounts(){
           '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
           '<div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+statusBadge(c.status)+' '+taskBadgeHTML(c)+'</div>'+
         '</div>'+
-        '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+(c.mobile?'<div class="csub">'+esc(c.mobile)+'</div>':'')+'</div>'+
+        '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+phoneHTML(c)+'</div>'+
         '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer" onclick="openLog(\''+c.id+'\',\'log\')" title="Click to open log">'+esc(c.notes||'')+'</div>'+
         '<div style="font-size:12px">'+
           '<div style="margin-bottom:4px"><span class="dot '+cb.dot+'"></span><span class="'+cb.cls+'">'+cb.label+'</span></div>'+
           '<div style="margin-bottom:4px"><span class="dot '+lc.dot+'"></span><span class="'+lc.cls+'">'+lc.label+'</span></div>'+
-          lastTouchHTML(c)+
+          nextStepHTML(c)+lastTouchHTML(c)+
         '</div>'+
         '<div class="cactions">'+
           '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="snooze(\''+c.id+'\')">+1w</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="quickNoAnswer(\''+c.id+'\')" title="Log an unanswered call">No ans</button>'+
+      '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="parkContact(\''+c.id+'\')" title="Set to Cold and come back in 90 days">Park</button>'+
           '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'log\')">Log</button>'+
           '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openLog(\''+c.id+'\',\'history\')">Notes</button>'+
           '<button class="btn btn-sm" style="min-width:46px;text-align:center" onclick="openEdit(\''+c.id+'\')">Edit</button>'+
@@ -1538,7 +1570,7 @@ function renderLogEntries(logs){
       '</div>'+
       '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'+
         '<div class="lts">'+ts+'</div>'+
-        (e.auto?'':'<button class="btn btn-sm" style="padding:1px 6px" onclick="editLogEntry(\''+esc(e.id)+'\')" title="Edit">&#9998;</button>')+
+        ((e.auto||e.parked)?'':'<button class="btn btn-sm" style="padding:1px 6px" onclick="editLogEntry(\''+esc(e.id)+'\')" title="Edit">&#9998;</button>')+
         '<button class="btn btn-sm btn-danger" style="padding:1px 6px" onclick="deleteLogEntry(\''+esc(e.id)+'\')" title="Delete">&times;</button>'+
       '</div>'+
     '</div>';
@@ -1588,6 +1620,7 @@ async function deleteLogEntry(entryId){
   const deletedEntry=entries.find(x=>x.id===entryId);
   entries=entries.filter(x=>x.id!==entryId);
   c.logEntries=JSON.stringify(entries);
+  if(wasMostRecent&&deletedEntry&&deletedEntry.prevStatus!==undefined){c.status=deletedEntry.prevStatus;}
   if(wasMostRecent&&deletedEntry){
     // Restore callback date and last contact date to what they were before this entry was logged
     c.callbackDate=deletedEntry.prevCallbackDate!==undefined?deletedEntry.prevCallbackDate:c.callbackDate;
@@ -1658,6 +1691,37 @@ async function addLogEntry(){
     await saveInBackground(c);
   }catch(e){setSyncStatus('err','Log failed - refresh to resync');}
   saving=false;
+}
+
+// One tap "no answer" from the row, using the normal logging rules
+async function quickNoAnswer(id){
+  if(saving)return;
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  logContactId=id;
+  document.getElementById('log-type').value='Attempted call - no answer';
+  document.getElementById('log-note').value='';
+  await addLogEntry();
+  logContactId=null;
+  setSyncStatus('ok','No answer logged for '+c.fname+', callback '+fmtDate(c.callbackDate));
+}
+
+const PARK_DAYS=90;
+async function parkContact(id){
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  if(!confirm('Park '+c.fname+' '+c.lname+'? Status goes to Cold and the callback moves out '+PARK_DAYS+' days.'))return;
+  const entries=parseLog(c);
+  const newDate=findSlot(addDays(PARK_DAYS),c.country,c.id);
+  const now=new Date();
+  entries.push({id:crypto.randomUUID(),contactId:c.id,type:'Parked',parked:true,
+    note:'Parked until '+fmtDate(newDate)+', status set to Cold',
+    ts:fmtDate(localDateStr(now))+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
+    prevCallbackDate:c.callbackDate||'',prevLastContactDate:c.lastContactDate||'',
+    prevLastTouchType:c.lastTouchType||'',prevLastTouchNote:c.lastTouchNote||'',prevStatus:c.status||''});
+  c.logEntries=JSON.stringify(entries);
+  c.status='Cold';
+  c.callbackDate=newDate;
+  renderCurrent();
+  await saveInBackground(c);
 }
 
 function closeLogModal(){document.getElementById('log-modal-bg').classList.remove('open');logContactId=null;}
