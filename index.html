@@ -35,6 +35,7 @@
   --tl-green:#3b6d11;--tl-amber:#BA7517;--tl-red:#a32d2d;
   --orange:#E8620A;--orange-light:#fdf0e8;--orange-dark:#c4520a;
   --purple-bg:#f1e9fb;--purple-text:#5b2b96;
+  --pink-bg:#fce7f3;--pink-text:#9d174d;
   --radius:8px;--radius-lg:12px;
 }
 
@@ -51,7 +52,7 @@
     --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
     --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
     --orange-light:#2a1505;
-    --purple-bg:#2a1a45;--purple-text:#c39ef0;
+    --purple-bg:#2a1a45;--purple-text:#c39ef0;--pink-bg:#3d1229;--pink-text:#f5a3cb;
   }
 }
 :root[data-theme="dark"] {
@@ -66,7 +67,7 @@
   --dot-green:#5aaa1a;--dot-amber:#d4891a;--dot-red:#e84a4a;
   --tl-green:#5aaa1a;--tl-amber:#d4891a;--tl-red:#e84a4a;
   --orange-light:#2a1505;
-  --purple-bg:#2a1a45;--purple-text:#c39ef0;
+  --purple-bg:#2a1a45;--purple-text:#c39ef0;--pink-bg:#3d1229;--pink-text:#f5a3cb;
 }
 
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
@@ -1031,6 +1032,11 @@ function sectorBadge(s){
   return'<span class="badge" style="background:var(--orange-light);color:var(--orange)">Pharma</span>';
 }
 
+// TA / HR contacts get a pink badge, worked out from the job title so nothing needs tagging by hand
+const TA_HR_PATTERN=/\b(talent|hr|hrbp|human|people|culture|recruit\w*)\b/i;
+function isTaHr(c){return TA_HR_PATTERN.test(c.jobTitle||'');}
+function taHrBadge(c){return isTaHr(c)?'<span class="badge" style="background:var(--pink-bg);color:var(--pink-text)" title="Talent Acquisition or HR contact">TA/HR</span>':'';}
+
 function tierBadge(t){
   if(!t)return'';
   const cls=t.startsWith('T1')?'badge-t1':t.startsWith('T2')?'badge-t2':'badge-t3';
@@ -1159,7 +1165,7 @@ function rowHTML(c,showCheckbox=false){
       '</div>'+
       '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
       '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
-        sectorBadge(c.sector)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+' '+movedBadgeHTML(c)+' '+noAnswerBadgeHTML(c)+
+        sectorBadge(c.sector)+' '+taHrBadge(c)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+' '+movedBadgeHTML(c)+' '+noAnswerBadgeHTML(c)+
       '</div>'+
     '</div>'+
     '<div>'+
@@ -1262,7 +1268,7 @@ function renderAccounts(){
             (c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
           '</div>'+
           '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
-          '<div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+statusBadge(c.status)+' '+taskBadgeHTML(c)+'</div>'+
+          '<div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+taHrBadge(c)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+'</div>'+
         '</div>'+
         '<div><div class="csub">'+esc([c.site,c.country].filter(Boolean).join(' / '))+'</div>'+(c.email?'<div class="csub">'+esc(c.email)+'</div>':'')+phoneHTML(c)+'</div>'+
         '<div style="max-height:72px;overflow-y:auto;font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer" onclick="openLog(\''+c.id+'\',\'log\')" title="Click to open log">'+esc(c.notes||'')+'</div>'+
