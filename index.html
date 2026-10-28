@@ -1101,7 +1101,7 @@ function phoneHTML(c){
   if(!d)return'<div class="csub">'+esc(c.mobile)+'</div>';
   return'<div class="csub" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
     '<a href="tel:+'+d+'" style="color:inherit" title="Call">'+esc(c.mobile)+'</a>'+
-    '<a href="https://wa.me/'+d+'" target="_blank" rel="noopener" title="Open WhatsApp chat" style="font-size:11px;padding:1px 6px;border-radius:6px;background:var(--green-bg);color:var(--tl-green);text-decoration:none;font-weight:500">WhatsApp</a>'+
+    '<a href="whatsapp://send?phone='+d+'" title="Open WhatsApp chat" style="font-size:11px;padding:1px 6px;border-radius:6px;background:var(--green-bg);color:var(--tl-green);text-decoration:none;font-weight:500">WhatsApp</a>'+
   '</div>';
 }
 
