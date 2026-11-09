@@ -1161,7 +1161,7 @@ function rowHTML(c,showCheckbox=false){
     (showCheckbox?'<div style="display:flex;align-items:flex-start;padding-top:2px"><input type="checkbox" class="bulk-cb" data-id="'+c.id+'" onchange="updateBulkCount()" style="accent-color:var(--orange);margin-top:2px"></div>':'')+
     '<div>'+
       '<div class="cname">'+
-        (c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
+        (c.linkedIn?'<a href="'+esc(liUrl(c.linkedIn))+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
       '</div>'+
       '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
       '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
@@ -1265,7 +1265,7 @@ function renderAccounts(){
       html+='<div class="csub-row">'+
         '<div>'+
           '<div class="cname" style="font-size:13px">'+
-            (c.linkedIn?'<a href="'+esc(c.linkedIn)+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
+            (c.linkedIn?'<a href="'+esc(liUrl(c.linkedIn))+'" target="_blank" style="color:inherit;text-decoration:none;" title="Open LinkedIn profile">'+esc(c.fname)+' '+esc(c.lname)+'</a>':esc(c.fname)+' '+esc(c.lname))+
           '</div>'+
           '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
           '<div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+taHrBadge(c)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+'</div>'+
@@ -1432,7 +1432,7 @@ async function saveContact(){
     site:document.getElementById('f-site').value.trim(),
     email:document.getElementById('f-email').value.trim(),
     mobile:document.getElementById('f-mobile').value.trim(),
-    linkedIn:document.getElementById('f-linkedin').value.trim(),
+    linkedIn:liUrl(document.getElementById('f-linkedin').value),
     tier:document.getElementById('f-tier2').value,
     sector:document.getElementById('f-sector').value||'Pharma',
     status:document.getElementById('f-stat').value,
@@ -1583,6 +1583,7 @@ function renderLogEntries(logs){
   }).join('');
 }
 
+function liUrl(u){u=String(u||'').trim();if(!u)return'';if(/^https?:\/\//i.test(u))return u;return'https://'+u.replace(/^\/+/,'');}
 const LOG_TYPE_OPTIONS=['Called','Attempted call - no answer','Voicemail','WhatsApp','LinkedIn connection request','LinkedIn message','Email / InMail','Video call','Met in person'];
 
 function editLogEntry(entryId){
