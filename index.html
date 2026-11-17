@@ -371,7 +371,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <div class="fgroup"><div class="flabel">Sector</div><select id="f-sector" onchange="updateTierOptionsForSector()"><option>Pharma</option><option>Data Centre</option></select></div>
       <div class="fgroup"><div class="flabel">Site / location</div><input id="f-site" placeholder="e.g. London office"></div>
       <div class="fgroup"><div class="flabel">Email</div><input id="f-email" type="email" placeholder="email@company.com"></div>
-      <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00447..."></div>
+      <div class="fgroup"><div class="flabel">Mobile</div><input id="f-mobile" placeholder="00971 50 123 4567" onblur="this.value=fmtPhone(this.value,document.getElementById('f-ctry').value)"></div>
       <div class="fgroup full"><div class="flabel">LinkedIn URL</div><input id="f-linkedin" placeholder="https://www.linkedin.com/in/..."></div>
       <div class="fgroup">
         <div class="flabel">Tier <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-text" id="tier-tooltip-text">T1 = Manufacturer, T2 = EPC/Consultancy, T3 = Automation Vendors.</span></span></div>
@@ -1101,12 +1101,27 @@ function intlDigits(mobile,country){
   if(d.startsWith('0')){const cc=COUNTRY_DIAL[country];return cc?cc+d.slice(1):'';}
   return d;
 }
+const KNOWN_CC=['1','7','20','27','30','31','32','33','34','36','39','40','41','43','44','45','46','47','48','49','52','55','60','61','62','63','64','65','66','81','82','84','86','90','91','92','94','212','216','351','352','353','358','880','961','962','963','964','965','966','967','968','970','971','972','973','974'];
+// Formats a number as 00971 12 345 6789 style; leaves it as typed if the country code can't be worked out
+function fmtPhone(mobile,country){
+  const raw=String(mobile||'').trim();if(!raw)return'';
+  const d=intlDigits(raw,country);if(!d||d.length<8)return raw;
+  let cc=COUNTRY_DIAL[country];
+  if(!(cc&&d.startsWith(cc))){cc=null;for(const n of [3,2,1]){if(KNOWN_CC.includes(d.slice(0,n))){cc=d.slice(0,n);break;}}}
+  if(!cc)return raw;
+  const nat=d.slice(cc.length);const L=nat.length;if(L<7)return raw;
+  const groups={7:[3,4],8:[4,4],9:[2,3,4],10:[3,3,4],11:[3,4,4]}[L];
+  let parts=[];
+  if(groups){let i=0;for(const g of groups){parts.push(nat.slice(i,i+g));i+=g;}}
+  else{for(let i=0;i<L;i+=3)parts.push(nat.slice(i,i+3));}
+  return '00'+cc+' '+parts.join(' ');
+}
 function phoneHTML(c){
   if(!c.mobile)return'';
   const d=intlDigits(c.mobile,c.country);
   if(!d)return'<div class="csub">'+esc(c.mobile)+'</div>';
   return'<div class="csub" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
-    '<a href="tel:+'+d+'" style="color:inherit" title="Call">'+esc(c.mobile)+'</a>'+
+    '<a href="tel:+'+d+'" style="color:inherit" title="Call">'+esc(fmtPhone(c.mobile,c.country))+'</a>'+
     '<a href="whatsapp://send?phone='+d+'" title="Open WhatsApp chat" style="font-size:11px;padding:1px 6px;border-radius:6px;background:var(--green-bg);color:var(--tl-green);text-decoration:none;font-weight:500">WhatsApp</a>'+
   '</div>';
 }
@@ -1431,7 +1446,7 @@ async function saveContact(){
     country:document.getElementById('f-ctry').value,
     site:document.getElementById('f-site').value.trim(),
     email:document.getElementById('f-email').value.trim(),
-    mobile:document.getElementById('f-mobile').value.trim(),
+    mobile:fmtPhone(document.getElementById('f-mobile').value,document.getElementById('f-ctry').value),
     linkedIn:liUrl(document.getElementById('f-linkedin').value),
     tier:document.getElementById('f-tier2').value,
     sector:document.getElementById('f-sector').value||'Pharma',
