@@ -616,29 +616,29 @@ function planBalance(){
     const ds=normDate(c.callbackDate);if(!ds)return;
     if(ds<=today)pool.push(c);else(byDate[ds]=byDate[ds]||[]).push(c);
   });
-  // Active first, then Warm, then Cold. Within each: Tier 1 first, then whoever has waited longest
-  const prio=(a,b)=>statusRank(a)-statusRank(b)||tierRank(a)-tierRank(b)||normDate(a.callbackDate).localeCompare(normDate(b.callbackDate));
-  let carry=pool.sort(prio);
+  // Each day, everyone due that day (already booked plus anything carried over) is ranked together:
+  // Active first, then Warm, then Cold. So Cold callbacks give up their slot first and
+  // Warm/Active contacts stay as close as possible to their agreed callback date.
+  // Within the same status, callbacks already booked for that day keep their slot before
+  // carried ones (so existing plans don't get shuffled), then Tier 1 first, then whoever has waited longest.
+  const prio=(a,b)=>statusRank(a.c)-statusRank(b.c)||(a.booked?0:1)-(b.booked?0:1)||tierRank(a.c)-tierRank(b.c)||normDate(a.c.callbackDate).localeCompare(normDate(b.c.callbackDate));
+  let carry=pool.map(c=>({c,booked:false}));
   const lastDate=Object.keys(byDate).sort().pop()||today;
   const moves=[];
   const d=parseYmd(today);
   for(let guard=0;guard<1500;guard++){
     const ds=localDateStr(d);
     if(ds>lastDate&&!carry.length)break;
-    const placed=[];const next=[];
-    // Callbacks already booked for this day keep their slot first, so existing plans don't get shuffled
-    (byDate[ds]||[]).slice().sort(prio).forEach(c=>{
-      if(isWorkingDayFor(d,c.country)&&placed.length<cap)placed.push(c);else next.push(c);
+    const due=(byDate[ds]||[]).map(c=>({c,booked:true})).concat(carry).sort(prio);
+    let placed=0;const next=[];
+    due.forEach(x=>{
+      if(isWorkingDayFor(d,x.c.country)&&placed<cap){
+        placed++;
+        const from=normDate(x.c.callbackDate);
+        if(from!==ds)moves.push({c:x.c,from,to:ds});
+      }else next.push({c:x.c,booked:false});
     });
-    // Then anything carried over fills the remaining space
-    carry.forEach(c=>{
-      if(isWorkingDayFor(d,c.country)&&placed.length<cap){
-        placed.push(c);
-        const from=normDate(c.callbackDate);
-        if(from!==ds)moves.push({c,from,to:ds});
-      }else next.push(c);
-    });
-    carry=next.sort(prio);
+    carry=next;
     d.setDate(d.getDate()+1);
   }
   return moves;
