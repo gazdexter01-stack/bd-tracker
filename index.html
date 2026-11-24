@@ -579,6 +579,25 @@ function isWorkingDayFor(d,country){
 }
 
 function statusRank(c){const s=c.status||'';return s==='Active'?1:s==='Warm'?2:s==='Cold'?3:4;}
+// FRESH INTROS
+// A Cold contact you've just started outreach with (email, LinkedIn or WhatsApp in the
+// last 14 days, not a campaign step) keeps a callback 7 days after that message.
+// When balancing, fresh intros rank just behind Warm, so older Cold callbacks give up
+// their slot first and new outreach doesn't get pushed weeks down the line.
+const OUTREACH_TYPES=['Email / InMail','LinkedIn message','LinkedIn connection request','WhatsApp'];
+const FRESH_INTRO_DAYS=14;
+const FRESH_INTRO_GAP=7;
+function freshIntroTarget(c){
+  if((c.status||'')!=='Cold')return'';
+  const lc=normDate(c.lastContactDate);if(!lc)return'';
+  const age=daysDiff(lc);if(age===null||age<-FRESH_INTRO_DAYS)return'';
+  const last=lastRealEntry(parseLog(c));if(!last||!OUTREACH_TYPES.includes(last.type))return'';
+  if(/^(Campaign email|Replied)/i.test(String(last.note||'')))return'';
+  const d=parseYmd(lc);d.setDate(d.getDate()+FRESH_INTRO_GAP);
+  const t=localDateStr(d);const today=todayStr();
+  return t<today?today:t;
+}
+function balanceRank(c){const r=statusRank(c);return r===3&&freshIntroTarget(c)?2.5:r;}
 function tierRank(c){const t=c.tier||'';return t.startsWith('T1')?1:t.startsWith('T2')?2:t.startsWith('T3')?3:4;}
 
 function dayLoad(dateStr,excludeId){
@@ -613,15 +632,17 @@ function planBalance(){
   const cap=getDailyCap();const today=todayStr();
   const byDate={};const pool=[];
   contacts.forEach(c=>{
-    const ds=normDate(c.callbackDate);if(!ds)return;
+    let ds=normDate(c.callbackDate);if(!ds)return;
+    // Fresh intros pushed later than 7 days after the message are pulled back to that day
+    const ft=freshIntroTarget(c);if(ft&&ft<ds)ds=ft;
     if(ds<=today)pool.push(c);else(byDate[ds]=byDate[ds]||[]).push(c);
   });
   // Each day, everyone due that day (already booked plus anything carried over) is ranked together:
-  // Active first, then Warm, then Cold. So Cold callbacks give up their slot first and
+  // Active first, then Warm, then fresh intros, then other Cold. So Cold callbacks give up their slot first and
   // Warm/Active contacts stay as close as possible to their agreed callback date.
   // Within the same status, callbacks already booked for that day keep their slot before
   // carried ones (so existing plans don't get shuffled), then Tier 1 first, then whoever has waited longest.
-  const prio=(a,b)=>statusRank(a.c)-statusRank(b.c)||(a.booked?0:1)-(b.booked?0:1)||tierRank(a.c)-tierRank(b.c)||normDate(a.c.callbackDate).localeCompare(normDate(b.c.callbackDate));
+  const prio=(a,b)=>balanceRank(a.c)-balanceRank(b.c)||(a.booked?0:1)-(b.booked?0:1)||tierRank(a.c)-tierRank(b.c)||normDate(a.c.callbackDate).localeCompare(normDate(b.c.callbackDate));
   let carry=pool.map(c=>({c,booked:false}));
   const lastDate=Object.keys(byDate).sort().pop()||today;
   const moves=[];
