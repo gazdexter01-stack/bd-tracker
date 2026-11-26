@@ -321,6 +321,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
       <input class="search-input" id="f-search" placeholder="Search name, company, mobile, email...">
       <select id="f-status" onchange="renderPipeline()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
       <select id="f-tier" onchange="renderPipeline()"></select>
+      <select id="f-lane" onchange="renderPipeline()" title="Lane"><option value="work" selected>Core + Live</option><option value="Core">Core (AUTO EU)</option><option value="Live">Live deals</option><option value="Parked">Parked</option><option value="">All lanes</option></select>
       <select id="f-sectorfilter" onchange="renderPipeline()"><option value="">All sectors</option><option>Pharma</option><option>Data Centre</option></select>
       <select id="f-region" onchange="renderPipeline()"></select>
       <select id="f-country" onchange="renderPipeline()"></select>
@@ -347,6 +348,7 @@ nav{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(-
     <div class="filter-bar">
       <select id="fall-status" onchange="renderAll()"><option value="">All statuses</option><option>Cold</option><option>Warm</option><option>Active</option></select>
       <select id="fall-tier" onchange="renderAll()"></select>
+      <select id="fall-lane" onchange="renderAll()" title="Lane"><option value="work">Core + Live</option><option value="Core">Core (AUTO EU)</option><option value="Live">Live deals</option><option value="Parked">Parked</option><option value="" selected>All lanes</option></select>
       <select id="fall-sectorfilter" onchange="renderAll()"><option value="">All sectors</option><option>Pharma</option><option>Data Centre</option></select>
       <select id="fall-region" onchange="renderAll()"></select>
       <select id="fall-country" onchange="renderAll()"></select>
@@ -1169,8 +1171,33 @@ function lastTouchHTML(c){
   '</div>';
 }
 
-function filtered(status,tier,country,urgency,search,region,sector){
+// LANES (Nov 2026 niche refocus: pharma Automation/OT, DCS & MES, Europe)
+// Core   = European pharma contacts with a callback: the AUTO EU niche
+// Live   = existing deals worked until they close (STADA, Hikma, Tabuk, Lifera, JamJoom, Sudair, SaudiBio, Avico) or any other contact with a callback outside Europe
+// Parked = no callback set, or a data centre contact. Kept with full history, set a callback to bring one back
+const LANE_EUROPE=['Ireland','UK','United Kingdom','Belgium','Denmark','Switzerland','Germany','Netherlands','Austria','France','Italy','Spain','Sweden','Portugal','Poland','Iceland','Finland','Norway','Czech Republic','Hungary','Slovenia','Croatia','Romania','Malta','Luxembourg'];
+const LANE_LIVE_COMPANIES=/stada|hikma|tabuk|lifera|jamjoom|sudair|saudi ?bio|avico/i;
+function laneOf(c){
+  if(!normDate(c.callbackDate))return'Parked';
+  if((c.sector||'Pharma')==='Data Centre')return'Parked';
+  if(LANE_LIVE_COMPANIES.test(c.company||''))return'Live';
+  if(LANE_EUROPE.includes(c.country)||/lonza/i.test(c.company||''))return'Core';
+  return'Live';
+}
+function laneBadge(c){
+  const l=laneOf(c);
+  if(l==='Core')return'<span class="badge" style="background:var(--green-bg,#e6f4ea);color:var(--green-text,#1e7e34)" title="AUTO EU niche">CORE</span>';
+  if(l==='Live')return'<span class="badge" style="background:var(--amber-bg,#fff4e0);color:var(--amber-text,#a15c00)" title="Existing deal, work until it closes">LIVE</span>';
+  return'<span class="badge" style="background:var(--bg2,#eee);color:var(--text3,#888)" title="Parked: set a callback to bring back">PARKED</span>';
+}
+function laneMatch(c,lane){
+  if(!lane)return true;
+  const l=laneOf(c);
+  return lane==='work'?l!=='Parked':l===lane;
+}
+function filtered(status,tier,country,urgency,search,region,sector,lane){
   return contacts.filter(c=>{
+    if(!laneMatch(c,lane))return false;
     if(status&&c.status!==status)return false;
     if(tier&&c.tier!==tier)return false;
     if(country&&c.country!==country)return false;
@@ -1201,7 +1228,7 @@ function rowHTML(c,showCheckbox=false){
       '</div>'+
       '<div class="csub">'+esc(c.jobTitle||'')+'</div>'+
       '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+
-        sectorBadge(c.sector)+' '+taHrBadge(c)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+' '+movedBadgeHTML(c)+' '+noAnswerBadgeHTML(c)+
+        laneBadge(c)+' '+sectorBadge(c.sector)+' '+taHrBadge(c)+' '+tierBadge(c.tier)+' '+statusBadge(c.status)+' '+taskBadgeHTML(c)+' '+movedBadgeHTML(c)+' '+noAnswerBadgeHTML(c)+
       '</div>'+
     '</div>'+
     '<div>'+
@@ -1255,7 +1282,7 @@ function renderStats(list){
 }
 
 function renderPipeline(){
-  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value,document.getElementById('f-region').value,document.getElementById('f-sectorfilter').value);
+  const list=filtered(document.getElementById('f-status').value,document.getElementById('f-tier').value,document.getElementById('f-country').value,document.getElementById('f-urgency').value,document.getElementById('f-search').value,document.getElementById('f-region').value,document.getElementById('f-sectorfilter').value,document.getElementById('f-lane').value);
   renderStats(list);
   const sortCb=(a,b)=>new Date(a.callbackDate||'9999-12-31')-new Date(b.callbackDate||'9999-12-31');
   const ov=list.filter(c=>urg(c)==='overdue').sort(sortCb);
@@ -1331,7 +1358,7 @@ function renderAccounts(){
 }
 
 function renderAll(){
-  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','',document.getElementById('fall-region').value,document.getElementById('fall-sectorfilter').value).sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
+  const list=filtered(document.getElementById('fall-status').value,document.getElementById('fall-tier').value,document.getElementById('fall-country').value,'','',document.getElementById('fall-region').value,document.getElementById('fall-sectorfilter').value,document.getElementById('fall-lane').value).sort((a,b)=>(a.company+a.lname).localeCompare(b.company+b.lname));
   document.getElementById('all-content').innerHTML=list.map(c=>rowHTML(c)).join('')||'<div class="empty">No contacts match.</div>';
 }
 
@@ -1400,7 +1427,7 @@ function showView(v,btn){
   renderCurrent();
 }
 
-function clearFilters(){['f-status','f-tier','f-sectorfilter','f-region','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
+function clearFilters(){document.getElementById('f-lane').value='work';['f-status','f-tier','f-sectorfilter','f-region','f-country','f-urgency','f-search'].forEach(id=>document.getElementById(id).value='');renderPipeline();}
 
 function clearAccountFilters(){['fa-tier','fa-sectorfilter','fa-region','fa-country','fa-search'].forEach(id=>document.getElementById(id).value='');renderAccounts();}
 
